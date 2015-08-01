@@ -39,6 +39,8 @@ class EegDataSeries():
 
     def calculate_confusion_matrix(self):
         # iterate over the frames of the data and compare predicted values to actual, creating a confusion matrix.
+
+        # probably will want to print it to text somehow so it can be read easily
         pass
 
 def import_training_data():
