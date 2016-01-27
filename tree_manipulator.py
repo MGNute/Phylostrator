@@ -4,7 +4,44 @@ import math
 import dendropy
 from my_globals import *
 
+
+# class Singleton(type):
+#     def __init__(cls, name, bases, dict):
+#         super(Singleton, cls).__init__(name, bases, dict)
+#         cls.instance = None
+#
+#     def __call__(cls, *args, **kw):
+#         if not cls.instance:
+#             # Not created or has been Destroyed
+#             obj = super(Singleton, cls).__call__(*args, **kw)
+#             cls.instance = obj
+#         return cls.instance
+
+class AnnotatedPhylogramModel():
+    def __init__(self):
+        self.rp = None
+        self.annotation = None
+        self.segments=[]
+        self.node_coordinates={}
+        self.annotation_level=None
+        self.checked=[]
+
+
+    def initialize_tree(self,tp):
+        self.rp=Radial_Phylogram(tp)
+        self.rp.get_segments()
+        self.segments=self.rp.segments
+
+    def initialize_annotation(self,ann_path):
+        self.annotation=SfldAnnotationData(ann_path)
+
+
+    pass
+
 class Radial_Phylogram():
+    '''
+    Right now it requires the tree to have labels equal to the "efd_id" field from the annotation
+    '''
     max_dims=None
 
     def __init__(self,tp=None):
@@ -12,14 +49,18 @@ class Radial_Phylogram():
         self.myt=None
         self.node_labels={}
         self.segments=[]
+        self.selected=[]
+        self.leaf_node_coords={}
+        self.selected_color=None
         if tp is not None:
             self.set_treepath(tp)
-
 
     def set_treepath(self,tp):
         self.treepath=tp
         self.myt=dendropy.Tree.get(file=open(self.treepath,'r'),schema="newick")
         self.get_radial_phylogram()
+        self.get_max_dims()
+        self.get_leaf_node_coords()
 
     def get_radial_phylogram(self):
         # myt=set_treepath(tp)
@@ -99,4 +140,103 @@ class Radial_Phylogram():
             i.label=str(lab)
             self.node_labels[str(lab)]={'x':None, 'l':None, 'w':None, 't':None, 'nu':None}
             lab+=1
+
+    def get_selected(self,tx):
+        #TODO: Make sure this is deprecated
+        # print 'getting x coords for selected taxa'
+        settx=set(tx)
+        self.selected=[]
+        # ct = 0
+        for i in self.myt.leaf_node_iter():
+            # ct +=1
+            # if ct % 1000==0:
+            #     print str(i.taxon.label) + ' - ' + type(i.taxon.label)
+            if str(i.taxon.label) in settx:
+                self.selected.append(self.node_labels[i.label]['x'])
+        return self.selected
+
+    def get_leaf_node_coords(self):
+        '''
+        Just makse a dictionary of all the leaf node descriptions along with their coordaintes and a refernce to the
+            node object that stores them
+        '''
+        for i in self.myt.leaf_node_iter():
+            args={'x':self.node_labels[i.label]['x'],'node_ref':i}
+            args['drawn']=False
+            args['color']=None
+            args['annotation']=None
+            self.leaf_node_coords[i.taxon.label]=args.copy()
+            del args
+
+
+class SfldAnnotationData():
+    '''
+    must be tab-separated values
+    must have one of the header fields called "efd_id"
+    '''
+
+    def __init__(self, filepath):
+        self.f=open(filepath,'r')
+        self.data={}
+        self.uniques={}
+
+        #get field names
+        self.fieldnames=self.f.readline().strip().split('\t')
+        try:
+            self.efdid_index=self.fieldnames.index('efd_id')
+            self.annotation_fields=self.fieldnames[:self.efdid_index] + self.fieldnames[(self.efdid_index+1):]
+            self.import_data()
+        except:
+            print 'No column called \"efd_id\" in the annotation file %s' % filepath
+            self.efdid_index=None
+            self.annotation_fields=None
+
+    def import_data(self):
+        '''
+        method run at inititalization to import all the data
+        :return:
+        '''
+        uniques_lists={}
+        for i in range(len(self.fieldnames)):
+            if i != self.efdid_index:
+                uniques_lists[self.fieldnames[i]]=[]
+
+        for i in self.f:
+            a=i.strip().split('\t')
+            args={}
+            id = a[self.efdid_index]
+            for i in range(len(self.fieldnames)):
+                if i != self.efdid_index:
+                    args[self.fieldnames[i]]=a[i]
+                    uniques_lists[self.fieldnames[i]].append(a[i])
+            self.data[id]=args.copy()
+            del args
+
+        for i in uniques_lists.keys():
+            self.uniques[i]=set(uniques_lists[i])
+
+        del uniques_lists
+
+    def get_EFDIDs_grouped_by(self,header_field):
+        # try:
+        assert header_field in self.fieldnames
+        # except:
+        #     print "get_EFIDs_grouped_by called with missing header field"
+        #     return {}
+
+        grouped={}
+        for i in self.data:
+            a=self.data[i][header_field]
+            if a in grouped.keys():
+                grouped[a].append(i)
+            else:
+                grouped[a]=[i]
+
+        for i in grouped:
+            grouped[i]=set(grouped[i])
+
+        # print grouped
+        return grouped
+
+
 
