@@ -7,6 +7,7 @@
 ## PLEASE DO "NOT" EDIT THIS FILE!
 ###########################################################################
 
+from view_classes import ViewAreaSelectorPanel
 import wx
 import wx.xrc
 
@@ -17,7 +18,7 @@ import wx.xrc
 class imgFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"SFLD Tree Viewer", pos = wx.DefaultPosition, size = wx.Size( 1058,759 ), style = 0|wx.SIMPLE_BORDER|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Phylostrator", pos = wx.DefaultPosition, size = wx.Size( 1058,759 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
@@ -32,11 +33,18 @@ class imgFrame ( wx.Frame ):
 		
 		self.SetSizer( bSizer1 )
 		self.Layout()
+		self.m_statusBar2 = self.CreateStatusBar( 1, wx.ST_SIZEGRIP, wx.ID_ANY )
+		self.m_toolBar1 = self.CreateToolBar( wx.TB_HORIZONTAL, wx.ID_ANY ) 
+		self.icnControlPanel = self.m_toolBar1.AddLabelTool( wx.ID_ANY, u"tool", wx.Bitmap( u"resources/icnControls30.png", wx.BITMAP_TYPE_ANY ), wx.NullBitmap, wx.ITEM_CHECK, u"Control Panel", u"Show/Hide the Control Panel", None ) 
+		
+		self.m_toolBar1.Realize() 
+		
 		
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
 		self.img_panel.Bind( wx.EVT_PAINT, self.OnImgPaint )
+		self.Bind( wx.EVT_TOOL, self.control_panel_tool_click, id = self.icnControlPanel.GetId() )
 	
 	def __del__( self ):
 		pass
@@ -44,6 +52,9 @@ class imgFrame ( wx.Frame ):
 	
 	# Virtual event handlers, overide them in your derived class
 	def OnImgPaint( self, event ):
+		event.Skip()
+	
+	def control_panel_tool_click( self, event ):
 		event.Skip()
 	
 
@@ -54,7 +65,7 @@ class imgFrame ( wx.Frame ):
 class ctrlFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"SFLD Tree Viewer - Controls", pos = wx.DefaultPosition, size = wx.Size( 573,645 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"SFLD Tree Viewer - Controls", pos = wx.Point( -1,-1 ), size = wx.Size( 886,645 ), style = wx.DEFAULT_FRAME_STYLE|wx.STAY_ON_TOP|wx.RAISED_BORDER|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
@@ -78,6 +89,9 @@ class ctrlFrame ( wx.Frame ):
 		self.lblFile.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		
 		bSizer4.Add( self.lblFile, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer4.AddSpacer( ( 43, 0), 0, wx.EXPAND, 5 )
 		
 		self.m_FilePicker_tree = wx.FilePickerCtrl( self.m_panel2, wx.ID_ANY, u"C:\\Users\\Michael\\Grad School Stuff\\Research\\Phylogenetics\\results\\2016-01-protein-sfld\\sf1\\sf1.tre", u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
 		self.m_FilePicker_tree.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
@@ -137,7 +151,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_staticline3 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		bSizer3.Add( self.m_staticline3, 0, wx.EXPAND |wx.ALL, 5 )
 		
-		self.m_staticText6 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Actions:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText6 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Saving Images:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText6.Wrap( -1 )
 		self.m_staticText6.SetFont( wx.Font( 11, 72, 90, 92, False, "Cambria" ) )
 		self.m_staticText6.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
@@ -172,7 +186,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel2.SetSizer( bSizer3 )
 		self.m_panel2.Layout()
 		bSizer3.Fit( self.m_panel2 )
-		self.m_notebook1.AddPage( self.m_panel2, u"Main", True )
+		self.m_notebook1.AddPage( self.m_panel2, u"Files", False )
 		self.m_panel4 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_panel4.SetBackgroundColour( wx.Colour( 200, 200, 200 ) )
 		
@@ -233,7 +247,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_panel5 = wx.Panel( self.m_panel4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SUNKEN_BORDER|wx.TAB_TRAVERSAL|wx.VSCROLL )
 		self.m_panel5.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
-		self.m_panel5.SetBackgroundColour( wx.Colour( 255, 234, 213 ) )
+		self.m_panel5.SetBackgroundColour( wx.Colour( 255, 244, 234 ) )
+		self.m_panel5.SetMaxSize( wx.Size( 300,-1 ) )
 		
 		bSizer12.Add( self.m_panel5, 1, wx.ALL|wx.EXPAND, 1 )
 		
@@ -244,7 +259,41 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel4.SetSizer( bSizer10 )
 		self.m_panel4.Layout()
 		bSizer10.Fit( self.m_panel4 )
-		self.m_notebook1.AddPage( self.m_panel4, u"Annotation", False )
+		self.m_notebook1.AddPage( self.m_panel4, u"Node Annotation", False )
+		self.m_Viewer = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_notebook1.AddPage( self.m_Viewer, u"Edge Annotation", False )
+		self.m_panel8 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		bSizer15 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_staticText10 = wx.StaticText( self.m_panel8, wx.ID_ANY, u"Commands", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText10.Wrap( -1 )
+		bSizer15.Add( self.m_staticText10, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		self.m_textCtrl3 = wx.TextCtrl( self.m_panel8, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_textCtrl3.SetMinSize( wx.Size( 500,50 ) )
+		
+		bSizer15.Add( self.m_textCtrl3, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		self.m_panel8.SetSizer( bSizer15 )
+		self.m_panel8.Layout()
+		bSizer15.Fit( self.m_panel8 )
+		self.m_notebook1.AddPage( self.m_panel8, u"Console", False )
+		self.m_panel51 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.FULL_REPAINT_ON_RESIZE|wx.TAB_TRAVERSAL )
+		bSizer14 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_panel6 = ViewAreaSelectorPanel( self.m_panel51, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.RAISED_BORDER|wx.TAB_TRAVERSAL )
+		self.m_panel6.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		self.m_panel6.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
+		self.m_panel6.SetMinSize( wx.Size( 400,300 ) )
+		
+		bSizer14.Add( self.m_panel6, 0, wx.ALL, 5 )
+		
+		
+		self.m_panel51.SetSizer( bSizer14 )
+		self.m_panel51.Layout()
+		bSizer14.Fit( self.m_panel51 )
+		self.m_notebook1.AddPage( self.m_panel51, u"Viewer", True )
 		
 		bSizer2.Add( self.m_notebook1, 1, wx.EXPAND |wx.ALL, 5 )
 		
@@ -252,16 +301,13 @@ class ctrlFrame ( wx.Frame ):
 		self.SetSizer( bSizer2 )
 		self.Layout()
 		self.m_statusBar1 = self.CreateStatusBar( 1, wx.ST_SIZEGRIP, wx.ID_ANY )
-		self.m_menubar1 = wx.MenuBar( 0 )
-		self.m_menu1 = wx.Menu()
-		self.m_menubar1.Append( self.m_menu1, u"File" ) 
-		
-		self.SetMenuBar( self.m_menubar1 )
-		
 		
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
+		self.Bind( wx.EVT_ACTIVATE, self.propogate_values )
+		self.Bind( wx.EVT_CLOSE, self.on_frame_close )
+		self.Bind( wx.EVT_ICONIZE, self.on_frame_iconize )
 		self.m_FilePicker_tree.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_file )
 		self.btn_import_tree.Bind( wx.EVT_BUTTON, self.import_tree )
 		self.m_FilePicker_annotation.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_annotation_file )
@@ -271,12 +317,23 @@ class ctrlFrame ( wx.Frame ):
 		self.m_ComboSelectedField.Bind( wx.EVT_TEXT, self.populate_annotation_values )
 		self.m_slider1.Bind( wx.EVT_SCROLL, self.trigger_redraw )
 		self.m_button4.Bind( wx.EVT_BUTTON, self.trigger_redraw )
+		self.m_panel51.Bind( wx.EVT_PAINT, self.on_zoompanel_paint )
+		self.m_panel6.Bind( wx.EVT_PAINT, self.on_img_paint )
 	
 	def __del__( self ):
 		pass
 	
 	
 	# Virtual event handlers, overide them in your derived class
+	def propogate_values( self, event ):
+		event.Skip()
+	
+	def on_frame_close( self, event ):
+		event.Skip()
+	
+	def on_frame_iconize( self, event ):
+		event.Skip()
+	
 	def set_file( self, event ):
 		event.Skip()
 	
@@ -299,5 +356,11 @@ class ctrlFrame ( wx.Frame ):
 	def trigger_redraw( self, event ):
 		event.Skip()
 	
+	
+	def on_zoompanel_paint( self, event ):
+		event.Skip()
+	
+	def on_img_paint( self, event ):
+		event.Skip()
 	
 

@@ -14,13 +14,12 @@ import numpy as np
 
 class MyApp(wx.App):
     def OnInit(self):
-        self.mainframe = gui_manager(None)
+        self.mainframe = image_manager(None)
         self.SetTopWindow(self.mainframe)
+        self.mainframe.SetIcon(wx.Icon('resources/icnPhyloMain32.png'))
         self.mainframe.Show()
 
         return True
-
-
 
 class gui_manager(sfld_view.ctrlFrame):
     '''
@@ -29,24 +28,26 @@ class gui_manager(sfld_view.ctrlFrame):
     tree_file=None
     annotation_file=None
     def __init__(self,parent):
+        self.parent=parent
         sfld_view.ctrlFrame.__init__(self,parent)
 
         self.c=controller.Controller()
 
         self.working_folder=None
-        self.cold_initialize()
+        # self.cold_initialize()
 
-        self.initial_checks()
-        self.add_value_pickers()
-        self.populate_annotation_fields()
+        # self.initial_checks()
+        # self.add_value_pickers()
+        # self.populate_annotation_fields()
+
+        self.c.circle_size=self.m_slider1.GetValue()
 
         #TODO: This is just for the verstion where we want to do a cold initialize, otherwise have to make the image frame
         #    decide whether to show itself, etc...
 
-        self.image_frame=image_manager(self)
-        self.c.set_ImageFrame_referenece(self.image_frame)
-        self.c.circle_size=self.m_slider1.GetValue()
-        self.image_frame.Show()
+        # self.image_frame=image_manager(self)
+        # self.c.set_ImageFrame_referenece(self.image_frame)
+        # self.image_frame.Show()
 
     def cold_initialize(self):
         self.set_file()
@@ -60,15 +61,18 @@ class gui_manager(sfld_view.ctrlFrame):
         self.m_ComboSelectedField.Clear()
         self.m_ComboSelectedField.AppendItems(flds)
 
+        self.add_value_pickers()
+
         if 'subgroup_id' in flds:
             self.m_ComboSelectedField.SetValue('subgroup_id')
             self.populate_annotation_values()
 
+
+
     def populate_annotation_values(self,event=None):
         fld = self.m_ComboSelectedField.GetValue()
-        self.c.apm.annotation_level=fld
-        unqs = self.c.apm.annotation.uniques[fld]
-        # print unqs
+        self.c.apm.node_annotation_level=fld
+        unqs = self.c.apm.node_annotation.uniques[fld]
 
         self.value_picker.set_values(unqs)
         self.m_panel5.Layout()
@@ -76,11 +80,8 @@ class gui_manager(sfld_view.ctrlFrame):
         self.m_panel4.Layout()
         self.c.set_ValuePickerCtrl_reference(self.value_picker)
 
-
     def add_value_pickers(self):
         self.value_picker=view_classes.ValuePickerControl(self.m_panel5, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SUNKEN_BORDER)
-        # self.value_picker.set_values(['180'])
-
 
         self.m_panel5.SetSizer( self.value_picker)
 
@@ -97,9 +98,10 @@ class gui_manager(sfld_view.ctrlFrame):
 
     def set_file( self, event=None, filepath=None):
         fo=''
-        self.tree_file=self.m_FilePicker_tree.GetPath()
+        self.c.apm.tree_file=self.m_FilePicker_tree.GetPath()
+        # print self.c.tree_file
         try:
-            fo, fi = os.path.split(self.tree_file)
+            fo, fi = os.path.split(self.c.apm.tree_file)
         except:
             pass
         self.working_folder=fo
@@ -111,7 +113,7 @@ class gui_manager(sfld_view.ctrlFrame):
     def SaveCurrentImage(self,event):
         tgt_file=self.m_textImageSaveTarget.GetValue()
         tgt_path=os.path.join(self.working_folder,tgt_file)
-        self.image_frame.save_dc_to_bitmap(tgt_path)
+        self.c.save_image(tgt_path)
 
     # def process_annotationvalue_check(self,event):
     #     checked=[]
@@ -122,16 +124,41 @@ class gui_manager(sfld_view.ctrlFrame):
     #     print checked
 
     def import_tree( self, event=None ):
-        self.c.import_tree(self.tree_file)
+        self.c.import_tree()
 
     def import_annotation( self, event=None ):
         self.c.import_annotation(self.annotation_file)
-        self.c.get_relevent_data_from_model()
+
+        if self.c.apm.state_tree_loaded==True:
+            self.c.get_relevent_data_from_model()
+            self.populate_annotation_fields()
+        else:
+            print "Tree not loaded, so no action taken."
 
     def trigger_redraw(self,event=None):
         self.c.circle_size=int(self.m_slider1.GetValue())
         self.c.trigger_refresh()
 
+    def on_frame_close( self, event ):
+        if event.CanVeto():
+            event.Veto()
+            self.Iconize()
+
+    def on_frame_iconize(self,event):
+        self.parent.m_toolBar1.ToggleTool(self.parent.icnControlPanel.Id,False)
+        # self.Iconize()
+
+    def set_status(self,msg):
+        self.m_statusBar1.SetStatusText(msg)
+
+    def propogate_values( self, event=None ):
+        print "propogating values"
+        self.c.apm.tree_file=self.m_FilePicker_tree.GetPath()
+        self.c.apm.annotation_file=self.m_FilePicker_annotation.GetPath()
+
+    def on_zoompanel_paint(self,event):
+        print "zoompaint"
+        self.m_panel6.Refresh()
 
 
 #
@@ -163,29 +190,47 @@ class image_manager(sfld_view.imgFrame):
 
         self.c=controller.Controller()
 
-
-        print 'opening tree file & making phylogram'
-        # self.rp=trman.Radial_Phylogram(test_tp) #TODO: fix these to refer to textboxes
-        # self.rp.get_max_dims()
-        # self.rp.get_segments()
-        self.oldrange=self.c.max_data_dims
+        self.view_range=self.c.max_data_dims
         self.current_bitmap=None
 
-        print 'getting annotation data'
-        # self.ann_data=trman.SfldAnnotationData(test_annotation) #TODO: same as earlier
         self.eid_hash=None
+        self.c.set_ImageFrame_referenece(self)
+
+        self.control_panel=gui_manager(self)
+
+        if self.icnControlPanel.IsToggled()==False:
+            self.icnControlPanel.Toggle()
+        self.m_toolBar1.Realize()
+
+
+        self.control_panel.Show()
+        self.control_panel.propogate_values()
 
     def save_dc_to_bitmap(self,tgt_path):
-        # self.current_bitmap.SaveFile(test_folder + '/wx_output_bitmap.jpg',wx.BITMAP_TYPE_JPEG)
         self.current_bitmap.SaveFile(tgt_path,wx.BITMAP_TYPE_JPEG)
+
+    def control_panel_tool_click(self,event=None):
+        if self.control_panel.IsIconized()==True:
+            self.control_panel.Iconize(False)
+            print "IsIconized:\t " + str(self.control_panel.IsIconized())
+
+        if event.IsChecked()==True:
+            self.control_panel.Show()
+
+        if event.IsChecked()==False:
+            self.control_panel.Hide()
 
     def OnImgPaint(self,event):
         self.pdc=wx.PaintDC(self.img_panel)
         w=self.pdc.GetSize()[0]
         h=self.pdc.GetSize()[1]
-        #TODO: Uncomment this
-        self.get_current_tree_image(w,h)
-        self.draw_circles(w,h)
+        self.view_range=self.c.view_range
+
+        if self.c.apm.state_tree_loaded:
+            self.get_current_tree_image(w,h)
+
+        if self.c.apm.state_node_annotation_loaded:
+            self.draw_circles(w,h)
 
         if self.current_bitmap<>None:
             # print 'bitmap set to None'
@@ -198,51 +243,35 @@ class image_manager(sfld_view.imgFrame):
 
         sz=(w,h)
 
+
         for i in self.c.apm.segments:
-            x1=convert_coordinates(self.oldrange,sz,i[0])
-            x2=convert_coordinates(self.oldrange,sz,i[1])
+            x1=convert_coordinates(self.view_range,sz,i[0])
+            x2=convert_coordinates(self.view_range,sz,i[1])
             if x1 is not None and x2 is not None:
                 self.memdc.DrawLine(x1[0],x1[1],x2[0],x2[1])
 
         self.memdc.SelectObject(wx.NullBitmap)
 
     def draw_circles(self,w,h,header_field=None,value=None):
-        # if header_field is None:
-        #     header_field='subgroup_id'
-        # if value is None:
-        #     value='180'
-        #
+
         sz=(w,h)
         circ_size=self.c.circle_size
         list_of_circles=self.c.get_circle_sets_by_color()
-        # self.eid_hash=self.ann_data.get_EFDIDs_grouped_by(header_field)
-        # eids=self.eid_hash[value]
-        # print "eids have length %s" % str(len(eids))
-        # circles=self.rp.get_selected(eids)
-
 
         self.memdc.SelectObject(self.current_bitmap)
         curr_brush=self.memdc.GetBrush()
         for i in list_of_circles:
             self.memdc.SetBrush(wx.Brush(wx.Colour(i[0],i[1],i[2]),wx.SOLID))
             for j in list_of_circles[i]:
-                x=convert_coordinates(self.oldrange,sz,j)
+                x=convert_coordinates(self.view_range,sz,j)
                 self.memdc.DrawCirclePoint(wx.Point(x[0],x[1]),circ_size)
 
         self.memdc.SetBrush(curr_brush)
         self.memdc.SelectObject(wx.NullBitmap)
 
-
-    # def testimage(self):
-    #     ti=skimage.io.imread(test_image)
-    #     h=int(ti.shape[0])
-    #     w=int(ti.shape[1])
-    #     print h
-    #     print w
-    #     wxi=wx.ImageFromBuffer(w,h,np.getbuffer(ti))
-    #     wxb=wxi.ConvertToBitmap()
-    #     return wxb
-
+    def set_status(self,msg):
+        self.m_statusBar2.SetStatusText(msg)
+        self.control_panel.set_status(msg)
 
 
 

@@ -23,14 +23,27 @@ class Controller():
 
         #Drawing Properties:
         self.circle_size=None
+        self.max_data_dims=None
+        self.view_range=None
+
+        #File Properties
+        # self.tree_file=None
+        # self.annotation_file=None
+
+    def save_model_to_file(self):
+        #TODO: implement this
+        self.apm.last_circle_size=self.circle_size
+        self.apm.last_view_range=None
+        # save the thing...
+        pass
 
     def get_relevent_data_from_model(self):
         print "getting relevant data from model"
         self.max_data_dims=self.apm.rp.get_max_dims()
         print "getting leaf coordinate data copy"
         self.leaf_coords=self.apm.rp.leaf_node_coords
-        print "getting the annotation fields"
-        self.annotation_fields=self.apm.annotation.annotation_fields
+        print "getting the node_annotation fields"
+        self.annotation_fields=self.apm.node_annotation.annotation_fields
 
     def set_ValuePickerCtrl_reference(self,vpc_pointer):
         self.value_picker_ctrl=vpc_pointer
@@ -47,9 +60,9 @@ class Controller():
         for i in self.leaf_coords:
             self.leaf_coords[i]['drawn']=False
             self.leaf_coords[i]['color']=None
-            # i['annotation']
+            # i['node_annotation']
 
-        all_taxa=self.apm.annotation.get_EFDIDs_grouped_by(self.apm.annotation_level)
+        all_taxa=self.apm.node_annotation.get_EFDIDs_grouped_by(self.apm.node_annotation_level)
         for i in self.apm.checked:
             tx=all_taxa[i[0]]
 
@@ -73,13 +86,26 @@ class Controller():
                     cols[a['color']]=[a['x']]
         return cols
 
-    def import_tree(self,path):
-        self.apm.initialize_tree(path)
-        self.apm.rp.get_max_dims()
+    def import_tree(self,path=None):
+        if path<>None:
+            # self.tree_file=path
+            self.apm.tree_file=path
+
+        self.image_frame.set_status("Importing Tree")
+        self.apm.initialize_tree()
+        self.image_frame.set_status("Calculating Max Dimensions")
+        self.max_data_dims=self.apm.rp.get_max_dims()
+        self.view_range=self.max_data_dims
+        self.image_frame.set_status("Ready")
 
     def import_annotation(self,ann_path):
         self.apm.initialize_annotation(ann_path)
+        self.annotation_fields=self.apm.node_annotation.annotation_fields
 
     def trigger_refresh(self):
         self.image_frame.img_panel.Refresh()
+
+    def save_image(self,tgt_path):
+        self.image_frame.save_dc_to_bitmap(tgt_path)
+
 

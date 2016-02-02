@@ -94,3 +94,31 @@ class ValuePickerControl(wx.BoxSizer):
             self.clr=newcolor.Get()
             self.c.update_cirlces_by_annotation()
             self.c.trigger_refresh()
+
+class ViewAreaSelectorPanel(wx.Panel):
+    xmin=.25
+    xmax=.75
+    ymin=.25
+    ymax=.75
+
+    def __init__(self,parent,*args,**kwargs):
+        wx.Panel.__init__(self,parent,*args,**kwargs)
+        sz=self.GetSize()
+        self.current_bitmap=wx.EmptyBitmap(sz[0],sz[1])
+
+    def on_img_paint(self,event):
+        self.pdc=wx.PaintDC(self)
+        self.pdc.DrawBitmap(self.current_bitmap,0,0)
+        # col=wx.Colour(171,171,171,100)
+        col=wx.Colour(255,0,0,wx.ALPHA_OPAQUE)
+        sz=self.pdc.GetSize()
+        x=int(sz[0]*self.xmin)
+        y=int(sz[1]*self.ymax)
+        h=int(sz[1]*(self.ymax-self.ymin))
+        w=int(sz[0]*(self.xmax-self.xmin))
+        print (x,y,h,w)
+        self.pdc.SetBrush(col,wx.SOLID)
+        self.pdc.DrawRectangle(x,y,h,w)
+        self.Refresh()
+
+        pass

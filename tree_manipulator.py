@@ -18,29 +18,47 @@ from my_globals import *
 #         return cls.instance
 
 class AnnotatedPhylogramModel():
+    tree_file = None
+    annotation_file = None
+
     def __init__(self):
+        #state information
+        self.state_tree_loaded=False
+        self.state_node_annotation_loaded=False
         self.rp = None
-        self.annotation = None
+
+        #picture information
+        self.node_annotation = None
         self.segments=[]
         self.node_coordinates={}
-        self.annotation_level=None
+        self.node_annotation_level=None
         self.checked=[]
 
+    def initialize_tree(self,tp=None):
 
-    def initialize_tree(self,tp):
-        self.rp=Radial_Phylogram(tp)
+        if tp<> None:
+            self.tree_file=tp
+        self.rp=Radial_Phylogram(self.tree_file)
         self.rp.get_segments()
         self.segments=self.rp.segments
+        self.state_tree_loaded=True
+
+    def unload_tree(self):
+        self.rp=None
+        self.rp.segments=[]
+        self.state_tree_loaded=False
 
     def initialize_annotation(self,ann_path):
-        self.annotation=SfldAnnotationData(ann_path)
+        self.annotation_file=ann_path
+        self.node_annotation=SfldAnnotationData(self.annotation_file)
+        self.state_node_annotation_loaded=True
 
 
     pass
 
 class Radial_Phylogram():
     '''
-    Right now it requires the tree to have labels equal to the "efd_id" field from the annotation
+    Right now it requires the tree to have labels equal to the "efd_id" field from the node_annotation
     '''
     max_dims=None
 
@@ -164,7 +182,7 @@ class Radial_Phylogram():
             args={'x':self.node_labels[i.label]['x'],'node_ref':i}
             args['drawn']=False
             args['color']=None
-            args['annotation']=None
+            args['node_annotation']=None
             self.leaf_node_coords[i.taxon.label]=args.copy()
             del args
 
@@ -187,7 +205,7 @@ class SfldAnnotationData():
             self.annotation_fields=self.fieldnames[:self.efdid_index] + self.fieldnames[(self.efdid_index+1):]
             self.import_data()
         except:
-            print 'No column called \"efd_id\" in the annotation file %s' % filepath
+            print 'No column called \"efd_id\" in the node_annotation file %s' % filepath
             self.efdid_index=None
             self.annotation_fields=None
 
