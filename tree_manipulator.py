@@ -2,7 +2,7 @@ __author__ = 'Michael'
 
 import math
 import dendropy
-from my_globals import *
+# from my_globals import *
 
 
 # class Singleton(type):
@@ -138,7 +138,7 @@ class Radial_Phylogram():
 
     def get_segments(self):
         '''
-        sets the 'segments' property to be a list of tuples of tuples.
+        sets the 'segments' property to be a list of tuples of tuples [((x11,y11),(x12,y12)),...]
         '''
 
         self.segments=[]
