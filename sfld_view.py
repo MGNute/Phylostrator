@@ -7,7 +7,6 @@
 ## PLEASE DO "NOT" EDIT THIS FILE!
 ###########################################################################
 
-from view_classes import ViewAreaSelectorPanel
 import wx
 import wx.xrc
 
@@ -18,7 +17,7 @@ import wx.xrc
 class imgFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Phylostrator", pos = wx.DefaultPosition, size = wx.Size( 1058,759 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Phylostrator", pos = wx.DefaultPosition, size = wx.Size( 1500,900 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
@@ -65,7 +64,7 @@ class imgFrame ( wx.Frame ):
 class ctrlFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"SFLD Tree Viewer - Controls", pos = wx.Point( -1,-1 ), size = wx.Size( 886,645 ), style = wx.DEFAULT_FRAME_STYLE|wx.STAY_ON_TOP|wx.RAISED_BORDER|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"SFLD Tree Viewer - Controls", pos = wx.Point( -1,-1 ), size = wx.Size( 886,645 ), style = wx.DEFAULT_FRAME_STYLE|wx.RAISED_BORDER|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
@@ -93,7 +92,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer4.AddSpacer( ( 43, 0), 0, wx.EXPAND, 5 )
 		
-		self.m_FilePicker_tree = wx.FilePickerCtrl( self.m_panel2, wx.ID_ANY, u"C:\\Users\\Michael\\Grad School Stuff\\Research\\Phylogenetics\\results\\2016-01-protein-sfld\\sf1\\sf1.tre", u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
+		self.m_FilePicker_tree = wx.FilePickerCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
 		self.m_FilePicker_tree.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
 		
 		bSizer4.Add( self.m_FilePicker_tree, 1, wx.ALL, 5 )
@@ -116,7 +115,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer5.Add( self.lblFile1, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_FilePicker_annotation = wx.FilePickerCtrl( self.m_panel2, wx.ID_ANY, u"C:\\Users\\Michael\\Grad School Stuff\\Research\\Phylogenetics\\results\\2016-01-protein-sfld\\sf1\\sfld_superfamily_1_excel.tsv", u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
+		self.m_FilePicker_annotation = wx.FilePickerCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
 		self.m_FilePicker_annotation.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
 		
 		bSizer5.Add( self.m_FilePicker_annotation, 1, wx.ALL, 5 )
@@ -170,6 +169,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_textImageSaveTarget = wx.TextCtrl( self.m_panel2, wx.ID_ANY, u"(file name)", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_textImageSaveTarget.SetToolTipString( u"file is saved in the working directory above automatically" )
+		self.m_textImageSaveTarget.SetMaxSize( wx.Size( 300,-1 ) )
 		
 		bSizer13.Add( self.m_textImageSaveTarget, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
@@ -231,6 +231,28 @@ class ctrlFrame ( wx.Frame ):
 		self.m_button4 = wx.Button( self.m_panel4, wx.ID_ANY, u"Trigger Redraw", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer11.Add( self.m_button4, 0, wx.ALL, 5 )
 		
+		self.m_staticline51 = wx.StaticLine( self.m_panel4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		bSizer11.Add( self.m_staticline51, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		self.m_staticText11 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Annotation Text", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText11.Wrap( -1 )
+		bSizer11.Add( self.m_staticText11, 0, wx.ALL, 5 )
+		
+		bSizer151 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_textCtrl4 = wx.TextCtrl( self.m_panel4, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer151.Add( self.m_textCtrl4, 0, wx.ALL, 5 )
+		
+		self.m_button6 = wx.Button( self.m_panel4, wx.ID_ANY, u"draw text", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer151.Add( self.m_button6, 0, wx.ALL, 5 )
+		
+		
+		bSizer11.Add( bSizer151, 0, wx.EXPAND, 5 )
+		
+		self.m_fontPicker1 = wx.FontPickerCtrl( self.m_panel4, wx.ID_ANY, wx.Font( 18, 70, 90, 92, False, "Cambria" ), wx.DefaultPosition, wx.DefaultSize, wx.FNTP_DEFAULT_STYLE )
+		self.m_fontPicker1.SetMaxPointSize( 100 ) 
+		bSizer11.Add( self.m_fontPicker1, 1, wx.ALL|wx.EXPAND, 5 )
+		
 		
 		bSizer11.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
 		
@@ -239,11 +261,22 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer12 = wx.BoxSizer( wx.VERTICAL )
 		
+		bSizer17 = wx.BoxSizer( wx.HORIZONTAL )
+		
 		self.m_staticText8 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Values", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText8.Wrap( -1 )
 		self.m_staticText8.SetFont( wx.Font( 11, 72, 90, 92, False, "Cambria" ) )
 		
-		bSizer12.Add( self.m_staticText8, 0, wx.ALL, 5 )
+		bSizer17.Add( self.m_staticText8, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_button7 = wx.Button( self.m_panel4, wx.ID_ANY, u"Clear Values", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer17.Add( self.m_button7, 0, wx.ALL, 5 )
+		
+		self.m_button8 = wx.Button( self.m_panel4, wx.ID_ANY, u"Load Values", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer17.Add( self.m_button8, 0, wx.ALL, 5 )
+		
+		
+		bSizer12.Add( bSizer17, 0, 0, 5 )
 		
 		self.m_panel5 = wx.Panel( self.m_panel4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SUNKEN_BORDER|wx.TAB_TRAVERSAL|wx.VSCROLL )
 		self.m_panel5.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
@@ -274,26 +307,28 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer15.Add( self.m_textCtrl3, 0, wx.ALL|wx.EXPAND, 5 )
 		
+		bSizer16 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText12 = wx.StaticText( self.m_panel8, wx.ID_ANY, u"Prefix", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText12.Wrap( -1 )
+		bSizer16.Add( self.m_staticText12, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textCtrl5 = wx.TextCtrl( self.m_panel8, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer16.Add( self.m_textCtrl5, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_button5 = wx.Button( self.m_panel8, wx.ID_ANY, u"Run Controller Script", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer16.Add( self.m_button5, 0, wx.ALL, 5 )
+		
+		
+		bSizer15.Add( bSizer16, 0, 0, 5 )
+		
 		
 		self.m_panel8.SetSizer( bSizer15 )
 		self.m_panel8.Layout()
 		bSizer15.Fit( self.m_panel8 )
-		self.m_notebook1.AddPage( self.m_panel8, u"Console", False )
-		self.m_panel51 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.FULL_REPAINT_ON_RESIZE|wx.TAB_TRAVERSAL )
-		bSizer14 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		self.m_panel6 = ViewAreaSelectorPanel( self.m_panel51, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.RAISED_BORDER|wx.TAB_TRAVERSAL )
-		self.m_panel6.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
-		self.m_panel6.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
-		self.m_panel6.SetMinSize( wx.Size( 400,300 ) )
-		
-		bSizer14.Add( self.m_panel6, 0, wx.ALL, 5 )
-		
-		
-		self.m_panel51.SetSizer( bSizer14 )
-		self.m_panel51.Layout()
-		bSizer14.Fit( self.m_panel51 )
-		self.m_notebook1.AddPage( self.m_panel51, u"Viewer", True )
+		self.m_notebook1.AddPage( self.m_panel8, u"Console", True )
+		self.viewer_panel = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.FULL_REPAINT_ON_RESIZE|wx.TAB_TRAVERSAL )
+		self.m_notebook1.AddPage( self.viewer_panel, u"Viewer", False )
 		
 		bSizer2.Add( self.m_notebook1, 1, wx.EXPAND |wx.ALL, 5 )
 		
@@ -305,7 +340,6 @@ class ctrlFrame ( wx.Frame ):
 		self.Centre( wx.BOTH )
 		
 		# Connect Events
-		self.Bind( wx.EVT_ACTIVATE, self.propogate_values )
 		self.Bind( wx.EVT_CLOSE, self.on_frame_close )
 		self.Bind( wx.EVT_ICONIZE, self.on_frame_iconize )
 		self.m_FilePicker_tree.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_file )
@@ -317,17 +351,17 @@ class ctrlFrame ( wx.Frame ):
 		self.m_ComboSelectedField.Bind( wx.EVT_TEXT, self.populate_annotation_values )
 		self.m_slider1.Bind( wx.EVT_SCROLL, self.trigger_redraw )
 		self.m_button4.Bind( wx.EVT_BUTTON, self.trigger_redraw )
-		self.m_panel51.Bind( wx.EVT_PAINT, self.on_zoompanel_paint )
-		self.m_panel6.Bind( wx.EVT_PAINT, self.on_img_paint )
+		self.m_button6.Bind( wx.EVT_BUTTON, self.draw_text )
+		self.m_button7.Bind( wx.EVT_BUTTON, self.valpicker_clear )
+		self.m_button8.Bind( wx.EVT_BUTTON, self.valpicker_load )
+		self.m_button5.Bind( wx.EVT_BUTTON, self.run_controller_script )
+		self.viewer_panel.Bind( wx.EVT_PAINT, self.on_zoompanel_holder_paint )
 	
 	def __del__( self ):
 		pass
 	
 	
 	# Virtual event handlers, overide them in your derived class
-	def propogate_values( self, event ):
-		event.Skip()
-	
 	def on_frame_close( self, event ):
 		event.Skip()
 	
@@ -357,10 +391,19 @@ class ctrlFrame ( wx.Frame ):
 		event.Skip()
 	
 	
-	def on_zoompanel_paint( self, event ):
+	def draw_text( self, event ):
 		event.Skip()
 	
-	def on_img_paint( self, event ):
+	def valpicker_clear( self, event ):
+		event.Skip()
+	
+	def valpicker_load( self, event ):
+		event.Skip()
+	
+	def run_controller_script( self, event ):
+		event.Skip()
+	
+	def on_zoompanel_holder_paint( self, event ):
 		event.Skip()
 	
 

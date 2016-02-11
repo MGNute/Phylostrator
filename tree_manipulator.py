@@ -75,7 +75,7 @@ class Radial_Phylogram():
 
     def set_treepath(self,tp):
         self.treepath=tp
-        self.myt=dendropy.Tree.get(file=open(self.treepath,'r'),schema="newick")
+        self.myt=dendropy.Tree.get(file=open(self.treepath,'r'),schema="newick",preserve_underscores=True)
         self.get_radial_phylogram()
         self.get_max_dims()
         self.get_leaf_node_coords()
@@ -125,13 +125,13 @@ class Radial_Phylogram():
         for i in self.node_labels.keys():
             x=self.node_labels[i]['x'][0]
             y=self.node_labels[i]['x'][1]
-            if x>xma:
+            if x>xma and x is not None:
                 xma=x
-            if x<xmi:
+            if x<xmi and x is not None:
                 xmi=x
-            if y>yma:
+            if y>yma and y is not None:
                 yma=y
-            if y<ymi:
+            if y<ymi and y is not None:
                 ymi=y
         self.max_dims=(xmi-.0001,xma+.0001,ymi-.0001,yma+.0001)
         return (xmi-.0001,xma+.0001,ymi-.0001,yma+.0001)
@@ -151,7 +151,14 @@ class Radial_Phylogram():
             # print self.node_labels[i.label]
 
     def prepare_tree(self):
-        self.myt.reroot_at_edge(self.myt.internal_edges()[1])
+        # print self.myt.internal_edges()[1].length
+        rooted = False
+        for i in self.myt.preorder_edge_iter():
+            if i.length==None:
+                rooted=True
+                break
+        if rooted==False:
+            self.myt.reroot_at_edge(self.myt.internal_edges()[1])
 
         lab=1
         for i in self.myt.postorder_node_iter():
@@ -231,7 +238,7 @@ class SfldAnnotationData():
             del args
 
         for i in uniques_lists.keys():
-            self.uniques[i]=set(uniques_lists[i])
+            self.uniques[i]=list(set(uniques_lists[i]))
 
         del uniques_lists
 
