@@ -61,7 +61,10 @@ class MyFrame1 ( wx.Frame ):
 class zoom_rotation_control ( wx.Panel ):
 	
 	def __init__( self, parent ):
-		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,39 ), style = wx.NO_BORDER|wx.TAB_TRAVERSAL )
+		wx.Panel.__init__ ( self, parent, id = wx.ID_ANY, pos = wx.DefaultPosition, size = wx.Size( 500,39 ), style = wx.RAISED_BORDER|wx.TAB_TRAVERSAL )
+		
+		self.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
+		self.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
 		
 		bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
 		
@@ -117,7 +120,7 @@ class zoom_rotation_control ( wx.Panel ):
 		self.m_textCtrl21 = wx.TextCtrl( self, wx.ID_ANY, u"0", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_textCtrl21.SetMaxSize( wx.Size( 30,-1 ) )
 		
-		bSizer3.Add( self.m_textCtrl21, 0, wx.ALL, 5 )
+		bSizer3.Add( self.m_textCtrl21, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_staticText8 = wx.StaticText( self, wx.ID_ANY, u"°", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText8.Wrap( -1 )
@@ -137,7 +140,12 @@ class zoom_rotation_control ( wx.Panel ):
 		
 		# Connect Events
 		self.m_staticText2.Bind( wx.EVT_LEFT_DOWN, self.zoom_in )
+		self.m_textCtrl2.Bind( wx.EVT_TEXT, self.adjust_zoom )
 		self.m_staticText21.Bind( wx.EVT_LEFT_DOWN, self.zoom_out )
+		self.m_staticText22.Bind( wx.EVT_LEFT_DCLICK, self.rotate_minus_counterclock )
+		self.m_textCtrl21.Bind( wx.EVT_TEXT, self.adjust_rotation )
+		self.m_textCtrl21.Bind( wx.EVT_TEXT_ENTER, self.adjust_rotation )
+		self.m_staticText211.Bind( wx.EVT_LEFT_DCLICK, self.rotate_plus_clockwise )
 	
 	def __del__( self ):
 		pass
@@ -147,7 +155,20 @@ class zoom_rotation_control ( wx.Panel ):
 	def zoom_in( self, event ):
 		event.Skip()
 	
+	def adjust_zoom( self, event ):
+		event.Skip()
+	
 	def zoom_out( self, event ):
+		event.Skip()
+	
+	def rotate_minus_counterclock( self, event ):
+		event.Skip()
+	
+	def adjust_rotation( self, event ):
+		event.Skip()
+	
+	
+	def rotate_plus_clockwise( self, event ):
 		event.Skip()
 	
 
