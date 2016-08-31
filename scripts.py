@@ -15,7 +15,54 @@ def color_scale(value):
     # print "value = " + str(value) + '\tHSV = ' + str((H,S,V)) + '\tRGB = ' + str(rgb)
     return rgb_out
 
-def script_function( prefix, scores=None, header = None):
+def script_function(bw_ref):
+    from my_globals import amato_qiime_root
+    import os, json
+    myf=open(os.path.join(amato_qiime_root,'place_repset_placement.json'),'r')
+    stra=myf.read()
+    myf.close()
+    place = json.loads(stra)
+
+    myotus=['New.ReferenceOTU264','New.ReferenceOTU28','New.ReferenceOTU296','New.ReferenceOTU22','4326866',
+            'New.ReferenceOTU58','New.ReferenceOTU87','180999','300394','296278','New.CleanUp.ReferenceOTU124',
+            '211066','269913','4366524','New.ReferenceOTU2628','New.ReferenceOTU51','308498','110836','147182',
+            'New.CleanUp.ReferenceOTU401','291011','New.ReferenceOTU66','340642','111771','New.CleanUp.ReferenceOTU4697',
+            'New.CleanUp.ReferenceOTU241','New.ReferenceOTU134','4314124','721569','105813','New.CleanUp.ReferenceOTU1989',
+            '195029','New.ReferenceOTU160','4419504','269532','301375','640999','918313','New.ReferenceOTU154']
+
+    placements={}
+    for i in place['placements']:
+        for j in i['nm']:
+            if j[0] in myotus:
+                placements[j[0]]=i['p'][0]
+
+    print "placements:\t%s" % len(placements)
+    if len(placements)>0:
+        print placements[placements.keys()[0]]
+    print "myotus:\t%s" % len(myotus)
+
+    # tmp=bw_ref.radial_phylogram.myt.find_node_with_label(str(placements[placements.keys()[0]][0]))
+    # print tmp.__dict__
+    # print tmp.viewer_node.__dict__
+    # print tmp.edge.__dict__
+    # print tmp.edge.viewer_edge.__dict__
+    for i in placements.keys():
+        nd = bw_ref.radial_phylogram.myt.find_node_with_label(str(placements[i][0]))
+        frac=placements[i][3]/nd.edge.length
+        hx = nd.edge.viewer_edge.head_x
+        tx = nd.edge.viewer_edge.tail_x
+        circ_x = (frac*hx[0]+(1-frac)*tx[0],frac*hx[1]+(1-frac)*tx[1])
+        bw_ref.AddToExtraDrawCircles((circ_x,255,0,0,2))
+    print '%s circles drawn' % len(bw_ref.ExtraDrawCircles)
+
+
+    # titer=bw_ref.radial_phylogram.myt.postorder_node_iter()
+    # for i in range(10):
+    #     a=titer.next()
+    #     print a.__dict__
+
+
+def script_function_proteinstruct( prefix, scores=None, header = None):
     if scores==None:
         sc, hD=get_scores_by_method()
         scores=sc[prefix]
@@ -137,3 +184,22 @@ def get_scores_by_method():
         a=i.strip().split(',')
         scores[a[0]]=(a[1],a[2],a[3],a[4],a[5])     #hhalign_default,hhalign_ensemble_default,hhalign_upp,hhalign_ensemble_upp,upp
     return (scores,header)
+
+def test_alphas():
+    ctrl = Controller()
+    mycolor1=color_scale(float(.5))
+    mycolor2=color_scale(float(.8))
+    # alpha=wx.ALPHA_TRANSPARENT
+    alpha=0.5
+    rects=[]
+    x=400
+    y=400
+    h=100
+    w=100
+    rects.append((x,y,w,h,mycolor2,alpha))
+    x+=int(w/2)
+    rects.append((x,y,w,h,mycolor1,alpha))
+    ctrl.image_frame.draw_rectangles(rects)
+
+def make_hocr_race():
+    ctrl=Controller()

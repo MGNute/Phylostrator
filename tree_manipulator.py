@@ -3,7 +3,8 @@ __author__ = 'Michael'
 import math
 import dendropy
 # from my_globals import *
-
+from view import *
+from utilities import rotate
 
 # class Singleton(type):
 #     def __init__(cls, name, bases, dict):
@@ -70,8 +71,28 @@ class Radial_Phylogram():
         self.selected=[]
         self.leaf_node_coords={}
         self.selected_color=None
+        self.rotation=0
         if tp is not None:
             self.set_treepath(tp)
+
+    # def set_rotation(self,rotation):
+    #     '''
+    #
+    #     :param rotation: rotation given in degrees
+    #     :return:
+    #     '''
+    #     self.rotation=rotation/360 * 2 * math.pi
+    #     tp = self.treepath
+    #     self.set_treepath(tp)
+        # self.get_radial_phylogram()
+        # self.get_segments()
+        # self.get_max_dims()
+
+    def dump_all(self):
+        del self.myt
+        self.myt=None
+        del self.segments
+        self.segments=None
 
     def set_treepath(self,tp):
         self.treepath=tp
@@ -79,6 +100,7 @@ class Radial_Phylogram():
         self.get_radial_phylogram()
         self.get_max_dims()
         self.get_leaf_node_coords()
+        self.get_segments()
 
     def get_radial_phylogram(self):
         # myt=set_treepath(tp)
@@ -109,11 +131,16 @@ class Radial_Phylogram():
             self.node_labels[i.label]['t']=self.node_labels[i.parent_node.label]['nu']
             self.node_labels[i.label]['nu']=self.node_labels[i.label]['t']
             thetav=self.node_labels[i.parent_node.label]['nu']+ww/2
+            self.node_labels[i.label]['theta']=thetav
             self.node_labels[i.parent_node.label]['nu']+=ww
             xu=self.node_labels[i.parent_node.label]['x']
             delta=i.edge_length
             x1=xu[0]+delta*math.cos(thetav)
             x2=xu[1]+delta*math.sin(thetav)
+            # x1_orig = xu[0] + delta * math.cos(thetav)
+            # x2_orig = xu[1] + delta * math.sin(thetav)
+            # x1 = x1_orig*math.cos(self.rotation)-x2_orig*math.sin(self.rotation)
+            # x2 = x1_orig*math.sin(self.rotation)+x2_orig*math.cos(self.rotation)
             self.node_labels[i.label]['x']=(x1,x2)
 
     def get_max_dims(self):
@@ -142,12 +169,34 @@ class Radial_Phylogram():
         '''
 
         self.segments=[]
+        view_segments={}
 
         for i in self.myt.preorder_node_iter():
             if i.parent_node is not None:
-                x1=self.node_labels[i.parent_node.label]['x']
-                x2=self.node_labels[i.label]['x']
+                i.edge.viewer_edge=None
+                i.viewer_node=None
+                x1 = self.node_labels[i.parent_node.label]['x']
+                x2 = self.node_labels[i.label]['x']
+                # x1_orig=self.node_labels[i.parent_node.label]['x']
+                # x2_orig=self.node_labels[i.label]['x']
+                # x1=rotate(x1_orig,self.rotation)
+                # x2=rotate(x2_orig,self.rotation)
+
+                old_label=self.node_labels[i.label]['old_label']
+                try:
+                    bootstrap=float(old_label)
+                except:
+                    bootstrap=None
+                ed = ViewerEdge(x1,x2,None,None,i.edge.label,bootstrap,i.edge)
+                i.edge.viewer_edge=ed
+                nd=ViewerNode(x2,node_ref=i,theta=self.node_labels[i.label]['t'])
+                i.viewer_node=nd
                 self.segments.append((x1,x2))
+                view_segments[i.edge.label]=ed
+            else:
+                i.edge.viewer_edge=None
+                i.viewer_node=None
+        return view_segments
             # print self.node_labels[i.label]
 
     def prepare_tree(self):
@@ -161,10 +210,36 @@ class Radial_Phylogram():
             self.myt.reroot_at_edge(self.myt.internal_edges()[1])
 
         lab=1
-        for i in self.myt.postorder_node_iter():
-            i.label=str(lab)
-            self.node_labels[str(lab)]={'x':None, 'l':None, 'w':None, 't':None, 'nu':None}
+        for i in self.myt.preorder_edge_iter():
+            i.label='edge'+str(lab)
             lab+=1
+
+        lab=1
+        for i in self.myt.postorder_node_iter():
+            oldlab=i.label
+            # i.label='label' + str(lab)
+            # lab+=1
+            # if i.is_leaf()==True:
+            #     taxname=i.taxon.label
+            # else:
+            #     taxname=''
+            # self.node_labels[i.label]={'x':None, 'l':None, 'w':None, 't':None, 'nu':None, 'theta':0, 'old_label':oldlab, 'taxon_label':taxname}
+            if i.taxon == None:
+                if i.label == None:
+                    # print i.__dict__
+                    i.label='label' + str(lab)
+                    lab+=1
+                    if i.is_leaf()==True:
+                        taxname=i.taxon.label
+                    else:
+                        taxname=''
+                else:
+                    taxname=i.label
+            else:
+                i.label=i.taxon.label
+                taxname=i.label
+            self.node_labels[i.label]={'x':None, 'l':None, 'w':None, 't':None, 'nu':None, 'theta':0, 'old_label':oldlab, 'taxon_label':taxname}
+
 
     def get_selected(self,tx):
         #TODO: Make sure this is deprecated
@@ -193,6 +268,142 @@ class Radial_Phylogram():
             self.leaf_node_coords[i.taxon.label]=args.copy()
             del args
 
+    def get_view_nodes(self):
+        view_nodes={}
+        for i in self.myt.preorder_node_iter():
+            vn=ViewerNode(x=self.node_labels[i.label]['x'],node_ref=i,theta=self.node_labels[i.label]['theta'])
+            view_nodes[i.label] = vn
+        return view_nodes
+
+# class AnnotationData():
+#     def __init__(self,filepath,key_field=None):
+#         self.f = open(filepath, 'r')
+#         self.data = {}
+#         self.uniques = {}
+#
+#         # get field names
+#         self.fieldnames = self.f.readline().strip().split('\t')
+#         if key_field==None:
+#             self.key_field=0
+#
+#         self.num_fields=len(self.fieldnames)
+#         for line in self.f:
+#             a=line.strip().split('\t')
+
+class AnnotationData():
+
+    def __init__(self,filepath,filter_vals = None):
+        self.path = filepath
+        self.import_data(filter_vals)
+        self.filter1_field=None
+        self.filter1_options=set([])
+        self.filter1_values=set([])
+        self.filter2_field = None
+        self.filter2_options = set([])
+        self.filter2_values = set([])
+
+        self.selected_annotation_field=None
+        self.active_unique_annotation_values=set([])
+
+    def import_data(self,filter_vals = None):
+        f=open(self.path,'r')
+        self.headers = f.readline().strip().split('\t')
+        self.data = {}
+        if filter_vals is None:
+            for i in f:
+                a=i.strip().split('\t')
+                self.data[a[0]]=tuple(a)
+        else:
+            for i in f:
+                a=i.strip().split('\t')
+                if a[0] in filter_vals:
+                    self.data[a[0]]=tuple(a)
+        f.close()
+
+    def load_filter1(self,header):
+        f1_vals=[]
+
+        self.filter1_field=header
+        if self.filter1_field=='(none)':
+            self.filter1_options = set([])
+            self.filter1_values = set([])
+        else:
+            f1_col = self.headers.index(header)
+            for i in self.data.values():
+                f1_vals.append(i[f1_col])
+
+        self.filter1_options=set(f1_vals)
+        return self.filter1_options
+
+    def load_filter2(self, header):
+        f2_vals = []
+        print "getting values for header %s" % header
+        self.filter2_field = header
+        if self.filter2_field == '(none)':
+            self.filter2_options = set([])
+            self.filter2_values = set([])
+        else:
+            f2_col = self.headers.index(header)
+            f1_col = self.headers.index(self.filter1_field)
+            for i in self.data.values():
+                if len(self.filter1_values) == 0 or i[f1_col] in self.filter1_values:
+                    f2_vals.append(i[f2_col])
+
+        self.filter2_options = set(f2_vals)
+        return self.filter2_options
+
+    def process_filter2(self, selections):
+        if len(selections) == 0:
+            self.filter2_values = set([])
+        else:
+            self.filter2_values = set(selections)
+
+    def process_filter1(self, selections):
+        if len(selections) == 0:
+            self.filter1_values = set([])
+        else:
+            self.filter1_values = set(selections)
+
+    def get_active_unique_annotation_values(self):
+        # print self.selected_annotation_field
+        if self.selected_annotation_field is None or self.selected_annotation_field == '':
+            return None
+        if self.active_unique_annotation_values is not None:
+            del self.active_unique_annotation_values
+        uav = []
+        ann_col = self.headers.index(self.selected_annotation_field)
+        # print ann_col
+        if self.filter1_field is not None:
+            f1_col = self.headers.index(self.filter1_field)
+        if self.filter2_field is not None:
+            f2_col = self.headers.index(self.filter2_field)
+
+        self.grouped={}
+        setuav=set([])
+        for i in self.data.keys():
+            keep = True
+            if self.filter1_field is not None and len(self.filter1_values) > 0 and self.data[i][f1_col] not in self.filter1_values:
+                keep = False
+            elif self.filter2_field is not None and len(self.filter2_values) > 0 and self.data[i][f2_col] not in self.filter2_values:
+                keep = False
+            if keep == True:
+                # uav.append(self.data[i][ann_col])
+                ann_col_val = self.data[i][ann_col]
+                if ann_col_val in setuav:
+                    self.grouped[ann_col_val].append(i)
+                else:
+                    # print self.data[i]
+                    # print "%s - %s" % (ann_col_val,str(setuav))
+                    setuav.update(set([self.data[i][ann_col]]))
+                    self.grouped[ann_col_val]=[i]
+
+        self.active_unique_annotation_values = setuav
+        # print setuav
+        return setuav
+
+    def get_EFDIDs_grouped_by(self,header_field):
+        self.get_active_unique_annotation_values()
+        return self.grouped
 
 class SfldAnnotationData():
     '''
@@ -200,19 +411,22 @@ class SfldAnnotationData():
     must have one of the header fields called "efd_id"
     '''
 
-    def __init__(self, filepath):
+    def __init__(self, filepath,key_field='Observation ID'):
         self.f=open(filepath,'r')
         self.data={}
         self.uniques={}
+        # key_field='seqname'
+        key_field='seqnum'
 
         #get field names
         self.fieldnames=self.f.readline().strip().split('\t')
         try:
-            self.efdid_index=self.fieldnames.index('efd_id')
+            # self.efdid_index=self.fieldnames.index('efd_id')
+            self.efdid_index=self.fieldnames.index(key_field)
             self.annotation_fields=self.fieldnames[:self.efdid_index] + self.fieldnames[(self.efdid_index+1):]
             self.import_data()
         except:
-            print 'No column called \"efd_id\" in the node_annotation file %s' % filepath
+            print 'No column called %s in the node_annotation file %s' % (key_field,filepath)
             self.efdid_index=None
             self.annotation_fields=None
 
