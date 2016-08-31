@@ -1,7 +1,7 @@
 __author__ = 'Michael'
 import wx
 import wx.lib.scrolledpanel
-import pickle
+import pickle, colorsys, random
 import dendropy
 import controller
 import aux_view_classes as avc
@@ -146,6 +146,88 @@ class ValuePicker(wx.BoxSizer):
         self.c.update_circles_by_annotation()
         self.c.trigger_refresh()
 
+class ThreeColorScale():
+    def __init__(self, parent, vals):
+        self.values=np.array(vals,np.float64)
+        self.parent = parent
+        self.val0 = 5
+        self.typ0 = 'Percentile'
+        self.col0 = (255,0,0)
+        self.val1 = 50
+        self.typ1 = 'Percentile'
+        self.col1 = (255, 255, 255)
+        self.val2 = 95
+        self.typ2 = 'Percentile'
+        self.col2 = (0, 0, 255)
+
+    def set_values(self,vals = None):
+        if vals is not None:
+            self.values = np.array(vals,dtype=np.float64)
+        self.col0=self.parent.value_pickers[0].clr
+        self.col1 = self.parent.value_pickers[1].clr
+        self.col2 = self.parent.value_pickers[2].clr
+        self.val0 = self.parent.value_pickers[0].value
+        self.val1 = self.parent.value_pickers[1].value
+        self.val2 = self.parent.value_pickers[2].value
+        self.typ0 = self.parent.value_pickers[0].m_comboBox7.GetValue()
+        self.typ1 = self.parent.value_pickers[1].m_comboBox7.GetValue()
+        self.typ2 = self.parent.value_pickers[2].m_comboBox7.GetValue()
+
+        if self.typ0=='Percentile':
+            a = np.asscalar(np.percentile(self.values,self.val0))
+            # print "percentile: %s" % a
+        else:
+            # print self.typ0
+            a = self.val0
+
+        if self.typ1=='Percentile':
+            b = np.asscalar(np.percentile(self.values,self.val1))
+        else:
+            b = self.val1
+
+        if self.typ2=='Percentile':
+            c = np.asscalar(np.percentile(self.values,self.val2))
+        else:
+            c = self.val2
+
+        li = [a,b,c]
+        li.sort()
+        self.value_pt0 = li[0]
+        self.value_pt1 = li[1]
+        self.value_pt2 = li[2]
+        print (self.value_pt0, self.value_pt1, self.value_pt2)
+
+
+    def get_color(self,val):
+        val = float(val)
+        if val < self.value_pt0:
+            # print "val %s -- A" % val
+            return self.col0
+        elif val > self.value_pt2:
+            # print "val %s -- B" % val
+            return self.col2
+        elif val < self.value_pt1:
+            # print "val %s -- C" % val
+            # h0 = colorsys.rgb_to_hsv(*self.col0)
+            # h1 = colorsys.rgb_to_hsv(*self.col1)
+            h0 = self.col0
+            h1 = self.col1
+            frac = (val - self.value_pt0)/(self.value_pt1-self.value_pt0)
+            hsvnew = (int(h0[0]+frac*(h1[0]-h0[0])),int(h0[1]+frac*(h1[1]-h0[1])),int(h0[2]+frac*(h1[2]-h0[2])))
+            # return colorsys.hsv_to_rgb(*hsvnew)
+            return hsvnew
+        else:
+            # print "val %s -- D" % val
+            # h0 = colorsys.rgb_to_hsv(*self.col1)
+            # h1 = colorsys.rgb_to_hsv(*self.col2)
+            h0 = self.col1
+            h1 = self.col2
+            frac = (val - self.value_pt1) / (self.value_pt2 - self.value_pt1)
+            # hsvnew = (h0[0] + frac * (h1[0] - h0[0]), h0[1] + frac * (h1[1] - h0[1]), h0[2] + frac * (h1[2] - h0[2]))
+            # return colorsys.hsv_to_rgb(*hsvnew)
+            hsvnew = (int(h0[0]+frac*(h1[0]-h0[0])),int(h0[1]+frac*(h1[1]-h0[1])),int(h0[2]+frac*(h1[2]-h0[2])))
+            return hsvnew
+
 
 class SEPPValuePickerControl(ValuePickerControl):
     def __init__(self, parent, *args):
@@ -175,6 +257,32 @@ class SEPPValuePickerControl(ValuePickerControl):
 
         self.add_final_spacer()
 
+    def set_color_scale(self,vals):
+        '''
+        currently set up only for a 3 color scale
+        :return:
+        '''
+        self.clear_all()
+        self.three_color_scale = ThreeColorScale(self,vals)
+        a = SEPPValuePicker(self.parent, self.three_color_scale.val0, self.three_color_scale.col0, val_ctrl=self, ColorScaleCtrl=True)
+        b = SEPPValuePicker(self.parent, self.three_color_scale.val1, self.three_color_scale.col1, val_ctrl=self,
+                            ColorScaleCtrl=True)
+        c = SEPPValuePicker(self.parent, self.three_color_scale.val2, self.three_color_scale.col2, val_ctrl=self, ColorScaleCtrl=True)
+        self.Add(a, 0,  wx.EXPAND, 5)
+        self.value_pickers.append(a)
+        self.Add(b, 0, wx.EXPAND, 5)
+        self.value_pickers.append(b)
+        self.Add(c, 0, wx.EXPAND, 5)
+        self.value_pickers.append(c)
+        self.add_final_spacer()
+        self.three_color_scale.set_values()
+
+
+        # self.value_pickers[0].c.update_circles_by_annotation()
+        pass
+
+    def reset_scale(self):
+        self.three_color_scale.col0 = self.value_pickers[0].clr
 
     def load_values(self, val_temps):
         self.clear_all()
@@ -190,7 +298,7 @@ class SEPPValuePicker(wx.BoxSizer):
     '''
     Tons of code duplcation here but not sure what else to do about that.
     '''
-    def __init__(self, parent=None, value=None, clr=None, sz=2, checked=False, val_ctrl=None):
+    def __init__(self, parent=None, value=None, clr=None, sz=4, checked=False, val_ctrl=None, ColorScaleCtrl=False):
         self.c = controller.SEPPController()
         self.parent=parent
         self.value_picker_control=val_ctrl
@@ -198,9 +306,16 @@ class SEPPValuePicker(wx.BoxSizer):
         self.clr=clr
         self.size=sz
         wx.BoxSizer.__init__(self,wx.HORIZONTAL)
-        self.m_checkBox1 = wx.CheckBox(parent, wx.ID_ANY, value, wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_checkBox1.SetValue(checked)
-        self.Add( self.m_checkBox1, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+        if ColorScaleCtrl==False:
+            self.m_checkBox1 = wx.CheckBox(parent, wx.ID_ANY, value, wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_checkBox1.SetValue(checked)
+            self.Add( self.m_checkBox1, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+        else:
+            self.m_text_control = wx.TextCtrl(parent, wx.ID_ANY, str(value), wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_RIGHT )
+            self.Add(self.m_text_control, 1, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
+            m_comboBox7Choices = [ u"Percentile", u"Value" ]
+            self.m_comboBox7 = wx.ComboBox( parent, wx.ID_ANY, u"Percentile", wx.DefaultPosition,wx.Size( 75,-1 ), m_comboBox7Choices, 0 )
+            self.Add(self.m_comboBox7, 1 , wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
 
         self.m_colourPicker1 = wx.ColourPickerCtrl(parent, wx.ID_ANY, wx.Colour(clr[0],clr[1],clr[2]), wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
         self.Add( self.m_colourPicker1, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -211,11 +326,18 @@ class SEPPValuePicker(wx.BoxSizer):
 
         self.m_spinCtrl.Bind(wx.EVT_SPINCTRL,self.process_size_change)
 
-        self.m_checkBox1.Bind( wx.EVT_CHECKBOX, self.process_annotationvalue_check )
+        if ColorScaleCtrl==False:
+            self.m_checkBox1.Bind( wx.EVT_CHECKBOX, self.process_annotationvalue_check )
+        else:
+            self.m_text_control.Bind(wx.EVT_TEXT_ENTER, self.process_scale_change)
         self.m_colourPicker1.Bind( wx.EVT_COLOURPICKER_CHANGED, self.process_color_change )
-        self.m_checkBox1.Bind(wx.EVT_LEFT_DCLICK,self.move_down_in_list)
+        # self.m_checkBox1.Bind(wx.EVT_LEFT_DCLICK,self.move_down_in_list)
 
-    def move_down_in_list(self,event):
+    def move_down_in_list(self,event=None):
+        pass
+
+    def process_scale_change(self):
+        self.parent.reset_scale()
         pass
 
     def process_annotationvalue_check(self,event=None):
@@ -536,12 +658,14 @@ class PhylogenyBufferedWindow(BufferedWindow):
 
 
     def DrawCircles(self,dc):
+
         # print "Drawing Circles"
         curr_brush = dc.GetBrush()
         for i in self.c.circle_sets_by_color:
             dc.SetBrush(wx.Brush(wx.Colour(i[0],i[1],i[2]),wx.SOLID))
             for j in self.c.circle_sets_by_color[i]:
                 x=self.transform_coordinate(j[0])
+
                 # print x
                 dc.DrawCirclePoint(wx.Point(x[0],-x[1]),j[1])
         dc.SetBrush(curr_brush)
@@ -557,12 +681,16 @@ class PhylogenyBufferedWindow(BufferedWindow):
         dc.SetPen(curr_pen)
 
     def DrawExtraCircles(self,dc,circle_set=None):
+        jr = my_globals.jitter_radius
         curr_brush = dc.GetBrush()
         curr_pen = dc.GetPen()
         if circle_set is None:
             circle_set = self.ExtraDrawCircles
         for i in circle_set:
             x=self.transform_coordinate(i[0])
+            if self.parent.control_panel.m_checkBox6.IsChecked():
+                y = (float(x[0] + (random.random() - .5) / .5 * jr), float(x[1] + (random.random() - .5) / .5 * jr))
+                x = (int(y[0]), int(y[1]))
             dc.SetBrush(wx.Brush(wx.Colour(i[1],i[2],i[3]),wx.SOLID))
             if len(i)>5 and i[5] is not None:
                 dc.SetPen(i[5])

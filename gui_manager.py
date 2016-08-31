@@ -70,7 +70,8 @@ class gui_manager(sfld_view.ctrlFrame):
         self.c.circle_size=self.m_slider1.GetValue()
         self.layout_viewer_panel()
         self.Layout()
-        self.MoveXY(100,100)
+        # self.MoveXY(100, 100)
+        self.MoveXY(1620,300)
 
 
         #TODO: This is just for the verstion where we want to do a cold initialize, otherwise have to make the image frame
@@ -79,6 +80,10 @@ class gui_manager(sfld_view.ctrlFrame):
         # self.image_frame=image_manager(self)
         # self.c.set_ImageFrame_referenece(self.image_frame)
         # self.image_frame.Show()
+
+    def draw_circles( self, event=None ):
+        self.sepp_c.update_circles_by_annotation()
+        self.c.buffered_window.UpdateDrawing()
 
     def cold_initialize(self):
         self.set_file()
@@ -186,7 +191,7 @@ class gui_manager(sfld_view.ctrlFrame):
         self.c.annotation.process_filter1(strItems)
         self.populate_annotation_values()
 
-    def sepp_process_filter2( self, event=None ):
+    def process_filter2( self, event=None ):
         filter2_selections = self.m_listBox21.GetSelections()
         filter2_items = self.m_listBox21.GetItems()
         strItems=[]
@@ -233,7 +238,7 @@ class gui_manager(sfld_view.ctrlFrame):
 
     def sepp_process_filter1( self, event=None ):
         filter1_selections=self.m_listBox3.GetSelections()
-        print filter1_selections
+        # print filter1_selections
         filter1_items=self.m_listBox3.GetItems()
         strItems=[]
         for i in filter1_selections:
@@ -244,7 +249,7 @@ class gui_manager(sfld_view.ctrlFrame):
 
     def sepp_process_filter2( self, event=None ):
         filter2_selections = self.m_listBox2.GetSelections()
-        print filter2_selections
+        # print filter2_selections
         filter2_items = self.m_listBox2.GetItems()
         strItems=[]
         for i in filter2_selections:
@@ -257,11 +262,28 @@ class gui_manager(sfld_view.ctrlFrame):
         sepp_fld = self.m_ComboSelectedField1.GetValue()
         self.sepp_c.active_annotation_field=sepp_fld
         self.sepp_c.get_active_unique_annotation_values()
-        unqs = list(self.sepp_c.active_unique_annotation_values)
+        unqs = self.sepp_c.active_unique_annotation_values_list
+        self.sepp_c.isfloat = False
+        if self.m_checkBox5.IsChecked():
+            try:
+                foo = float(unqs[0]) + float(unqs[1])
+                self.sepp_c.isfloat = True
+            except:
+                self.sepp_c.isfloat = False
 
-        self.sepp_value_picker.set_values(unqs)
+        if self.sepp_c.isfloat ==True:
+            self.sepp_value_picker.set_color_scale(list(set(unqs)))
+        else:
+            if len(unqs)>50:
+                print "this list has more than 50 elements, so we're not going to list them all. Try filtering down first"
+                self.sepp_value_picker.set_values(unqs[0:30])
+            else:
+                self.sepp_value_picker.set_values(unqs)
+
         self.sepp_add_value_pickers()
         self.sepp_c.SeppValuePickerCtrl_ref=self.sepp_value_picker
+        if self.sepp_c.isfloat==True:
+            self.sepp_c.update_circles_by_annotation()
         pass
 
     def sepp_add_value_pickers(self,event=None):
@@ -272,9 +294,12 @@ class gui_manager(sfld_view.ctrlFrame):
         self.m_panel41.Layout()
         self.Layout()
         self.sepp_value_picker_panel.SetupScrolling()
+
+
         pass
 
-
+    def clear_extra_circles( self, event = None):
+        self.c.buffered_window.SeppDrawCircles = None
 
 
 

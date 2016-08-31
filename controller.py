@@ -170,6 +170,7 @@ class SEPPController():
 
         self.active_annotation_field=None
         self.active_unique_annotation_values=set([])
+        self.active_unique_annotation_values_list=[]
         self.filter1_field=None
         self.filter1_options=set([])
         self.filter1_values=set([])
@@ -177,6 +178,7 @@ class SEPPController():
         self.filter2_options=set([])
         self.filter2_values=set([])
         self.selected_annotation_values=set([])
+        self.isfloat = False
 
 
     def set_bufferedwindow_reference(self,bw_ref):
@@ -301,9 +303,61 @@ class SEPPController():
             if keep == True:
                 uav.append(self.sepp_ann_dict[i][ann_col])
 
-        self.active_unique_annotation_values=set(uav)
+        self.active_unique_annotation_values = set(uav)
+        self.active_unique_annotation_values_list=uav
+
+    def update_circles_by_continuous_annotation(self):
+        self.sepp_draw_circles = []
+        with_pendants = self.ctrl_panel.m_checkBox3.IsChecked()
+
+        ann_col = self.saf_headers.index(self.active_annotation_field)
+        vals_for_scale=[]
+        vals_to_draw=[]
+
+        if len(self.filter1_values) > 0:
+            f1_col = self.saf_headers.index(self.filter1_field)
+        else:
+            f1_col = None
+        if len(self.filter2_values) > 0:
+            f2_col = self.saf_headers.index(self.filter2_field)
+        else:
+            f2_col = None
+        for i in self.sepp_ann_dict.values():
+            vals_for_scale.append(i[ann_col])
+            keep = True
+            if f1_col is not None and i[f1_col] not in self.filter1_values:
+                keep = False
+            if f2_col is not None and i[f2_col] not in self.filter2_values:
+                keep = False
+
+            if keep == True:
+                vals_to_draw.append(i)
+
+        self.SeppValuePickerCtrl_ref.three_color_scale.set_values(vals_for_scale)
+        print vals_to_draw[0][ann_col]
+        print self.SeppValuePickerCtrl_ref.three_color_scale.get_color(vals_to_draw[0][ann_col])
+
+        for i in vals_to_draw:
+            x0 = self.get_location_ex_pendant(i[0])
+            x1 = self.get_location_with_pendant(i[0])
+
+            if x0 is not None:
+                clr = self.SeppValuePickerCtrl_ref.three_color_scale.get_color(i[ann_col])
+                sz = self.SeppValuePickerCtrl_ref.value_pickers[0].size
+                if with_pendants == True:
+                    self.sepp_draw_circles.append((x1, clr[0], clr[1], clr[2], sz, None))
+                    self.bw_ref.ExtraDrawSegments.append((x1, x0))
+                else:
+                    self.sepp_draw_circles.append((x0, clr[0], clr[1], clr[2], sz, None))
+
+        self.bw_ref.SeppDrawCircles = self.sepp_draw_circles
+
 
     def update_circles_by_annotation(self):
+        if self.isfloat == True:
+            self.update_circles_by_continuous_annotation()
+            return
+
         self.selected_annotation_values = {}
         self.sepp_draw_circles=[]
         with_pendants=self.ctrl_panel.m_checkBox3.IsChecked()
@@ -337,14 +391,12 @@ class SEPPController():
                 x1 = self.get_location_with_pendant(i[0])
 
                 if x0 is not None:
+                    clr = self.selected_annotation_values[i[ann_col]][0]
+                    sz = self.selected_annotation_values[i[ann_col]][1]
                     if with_pendants==True:
-                        clr = self.selected_annotation_values[i[ann_col]][0]
-                        sz = self.selected_annotation_values[i[ann_col]][1]
                         self.sepp_draw_circles.append((x1,clr[0],clr[1],clr[2],sz,None))
                         self.bw_ref.ExtraDrawSegments.append((x1,x0))
                     else:
-                        clr = self.selected_annotation_values[i[ann_col]][0]
-                        sz = self.selected_annotation_values[i[ann_col]][1]
                         self.sepp_draw_circles.append((x0,clr[0],clr[1],clr[2],sz,None))
 
         self.bw_ref.SeppDrawCircles = self.sepp_draw_circles
@@ -354,7 +406,7 @@ class SEPPController():
 
     def get_location_ex_pendant(self,nm):
         if nm not in self.placements.keys():
-            print "%s not in tree as shown" % nm
+            # print "%s not in tree as shown" % nm
             return None
 
         place = self.placements[nm]

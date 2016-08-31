@@ -58,7 +58,7 @@ class imgFrame ( wx.Frame ):
 class ctrlFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"SFLD Tree Viewer - Controls", pos = wx.Point( 1,1 ), size = wx.Size( 886,679 ), style = wx.DEFAULT_FRAME_STYLE|wx.RAISED_BORDER|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"SFLD Tree Viewer - Controls", pos = wx.Point( 1,1 ), size = wx.Size( 886,750 ), style = wx.DEFAULT_FRAME_STYLE|wx.RAISED_BORDER|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
@@ -375,6 +375,10 @@ class ctrlFrame ( wx.Frame ):
 		self.m_textCtrl13 = wx.TextCtrl( self.m_panel4, wx.ID_ANY, u"1", wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER|wx.TE_RIGHT )
 		bSizer42.Add( self.m_textCtrl13, 0, wx.ALL, 5 )
 		
+		m_comboBox7Choices = [ u"Percentile", u"Value" ]
+		self.m_comboBox7 = wx.ComboBox( self.m_panel4, wx.ID_ANY, u"Combo!", wx.DefaultPosition, wx.DefaultSize, m_comboBox7Choices, 0 )
+		bSizer42.Add( self.m_comboBox7, 0, wx.ALL, 5 )
+		
 		
 		bSizer11.Add( bSizer42, 0, wx.EXPAND, 5 )
 		
@@ -422,7 +426,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel4.SetSizer( bSizer10 )
 		self.m_panel4.Layout()
 		bSizer10.Fit( self.m_panel4 )
-		self.m_notebook1.AddPage( self.m_panel4, u"Taxon Annotation", True )
+		self.m_notebook1.AddPage( self.m_panel4, u"Taxon Annotation", False )
 		self.m_panel41 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_panel41.SetBackgroundColour( wx.Colour( 200, 200, 200 ) )
 		
@@ -475,7 +479,7 @@ class ctrlFrame ( wx.Frame ):
 		bSizer111.Add( self.m_FilePicker_annotation1, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		self.btn_import_annotation1 = wx.Button( self.m_panel41, wx.ID_ANY, u"Import", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer111.Add( self.btn_import_annotation1, 1, wx.ALL|wx.ALIGN_RIGHT|wx.EXPAND, 5 )
+		bSizer111.Add( self.btn_import_annotation1, 0, wx.ALL|wx.ALIGN_RIGHT|wx.EXPAND, 5 )
 		
 		self.m_staticline61 = wx.StaticLine( self.m_panel41, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		bSizer111.Add( self.m_staticline61, 0, wx.EXPAND |wx.ALL, 5 )
@@ -493,6 +497,20 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer111.Add( bSizer1212, 0, wx.EXPAND, 5 )
 		
+		bSizer43 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_checkBox5 = wx.CheckBox( self.m_panel41, wx.ID_ANY, u"Import as Number", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer43.Add( self.m_checkBox5, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_button17 = wx.Button( self.m_panel41, wx.ID_ANY, u"Draw Circles", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer43.Add( self.m_button17, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_button18 = wx.Button( self.m_panel41, wx.ID_ANY, u"Clear Circles", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer43.Add( self.m_button18, 0, wx.ALL, 5 )
+		
+		
+		bSizer111.Add( bSizer43, 0, wx.EXPAND, 5 )
+		
 		gbSizer1 = wx.GridBagSizer( 0, 0 )
 		gbSizer1.SetFlexibleDirection( wx.BOTH )
 		gbSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -509,7 +527,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_listBox3 = wx.ListBox( self.m_panel41, wx.ID_ANY, wx.DefaultPosition, wx.Size( 230,-1 ), m_listBox3Choices, wx.LB_EXTENDED|wx.LB_NEEDED_SB|wx.LB_SORT )
 		gbSizer1.Add( self.m_listBox3, wx.GBPosition( 0, 2 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
-		m_listBox2Choices = [ u"option 1", u"option 2" ]
+		m_listBox2Choices = []
 		self.m_listBox2 = wx.ListBox( self.m_panel41, wx.ID_ANY, wx.DefaultPosition, wx.Size( 230,-1 ), m_listBox2Choices, wx.LB_EXTENDED|wx.LB_SORT )
 		gbSizer1.Add( self.m_listBox2, wx.GBPosition( 1, 2 ), wx.GBSpan( 1, 1 ), wx.ALL|wx.EXPAND, 5 )
 		
@@ -544,8 +562,11 @@ class ctrlFrame ( wx.Frame ):
 		bSizer111.Add( self.m_staticline511, 0, wx.EXPAND |wx.ALL, 5 )
 		
 		self.m_checkBox3 = wx.CheckBox( self.m_panel41, wx.ID_ANY, u"Draw with Pendant Branch", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_checkBox3.SetValue(True) 
 		bSizer111.Add( self.m_checkBox3, 0, wx.ALL, 5 )
+		
+		self.m_checkBox6 = wx.CheckBox( self.m_panel41, wx.ID_ANY, u"Jitter Attachment Point", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_checkBox6.SetValue(True) 
+		bSizer111.Add( self.m_checkBox6, 0, wx.ALL, 5 )
 		
 		self.m_staticline71 = wx.StaticLine( self.m_panel41, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		bSizer111.Add( self.m_staticline71, 0, wx.EXPAND |wx.ALL, 5 )
@@ -594,7 +615,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel41.SetSizer( bSizer101 )
 		self.m_panel41.Layout()
 		bSizer101.Fit( self.m_panel41 )
-		self.m_notebook1.AddPage( self.m_panel41, u"SEPP Annotation", False )
+		self.m_notebook1.AddPage( self.m_panel41, u"SEPP Annotation", True )
 		self.m_ExtraAnnotation = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer512 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -842,6 +863,8 @@ class ctrlFrame ( wx.Frame ):
 		self.btn_import_annotation1.Bind( wx.EVT_BUTTON, self.sepp_import_annotation )
 		self.m_ComboSelectedField1.Bind( wx.EVT_COMBOBOX, self.sepp_populate_annotation_values )
 		self.m_ComboSelectedField1.Bind( wx.EVT_TEXT, self.sepp_populate_annotation_values )
+		self.m_button17.Bind( wx.EVT_BUTTON, self.draw_circles )
+		self.m_button18.Bind( wx.EVT_BUTTON, self.clear_extra_circles )
 		self.m_comboBox5.Bind( wx.EVT_COMBOBOX, self.sepp_load_filter1 )
 		self.m_listBox3.Bind( wx.EVT_LISTBOX, self.sepp_process_filter1 )
 		self.m_listBox2.Bind( wx.EVT_LISTBOX, self.sepp_process_filter2 )
@@ -946,6 +969,12 @@ class ctrlFrame ( wx.Frame ):
 	def sepp_populate_annotation_values( self, event ):
 		event.Skip()
 	
+	
+	def draw_circles( self, event ):
+		event.Skip()
+	
+	def clear_extra_circles( self, event ):
+		event.Skip()
 	
 	def sepp_load_filter1( self, event ):
 		event.Skip()
