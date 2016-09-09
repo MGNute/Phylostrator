@@ -17,6 +17,60 @@ def get_random_color(incr=None):
     rgb=colorsys.hsv_to_rgb(H,S,V)
     return rgb
 
+
+def color_scale_3_set(total):
+    lower_lim = .40
+
+    side = int(float(total) ** .333 + 1)
+    gap = 1.0 / float(side)
+
+    ineliglbe_pts = int((lower_lim - gap * 5 / 6) / gap + 1) ** 3
+    while side ** 3 - ineliglbe_pts < total:
+        side += 1
+        gap = 1.0 / float(side)
+        ineliglbe_pts = int((lower_lim - gap * 5 / 6) / gap + 1) ** 3
+
+    coords = []
+    for i in range(side):
+        c = gap * 5 / 6 + gap * float(i)
+        coords.append(c)
+
+    locus = []
+    backrange = range(side)
+    backrange.sort(reverse=True)
+    for i in backrange:
+        for j in backrange:
+            for k in backrange:
+                newc = (coords[i], coords[j], coords[k])
+                if max(newc) > lower_lim:
+                    locus.append(newc)
+
+    sss = side * side * side - ineliglbe_pts
+    perm = get_ideal_permutation(sss)
+    finals = []
+    for i in perm:
+        finals.append(locus[len(perm) - i - 1])
+    return finals
+
+
+def get_ideal_permutation(els):
+    random.seed(100)
+    m1 = int(els / 2)
+    m2 = m1 + 1
+    Ai = range(1, m1)
+    Bi = range(m2 + 1, els + 1)
+    A = random.sample(Ai, len(Ai))
+    B = random.sample(Bi, len(Bi))
+    out = []
+    out.append(m1 - 1)
+    if len(B) <> len(A):
+        out.append(B.pop() - 1)
+    for i in range(len(A)):
+        out.append(A.pop() - 1)
+        out.append(B.pop() - 1)
+    out.append(m2 - 1)
+    return out
+
 colors=[(240,163,255),(0,117,220),(153,63,0),(76,0,92),(25,25,25),(0,92,49),(43,206,72),(255,204,153),(128,128,128),(148,255,181),(143,124,0),(157,204,0),(194,0,136),(0,51,128),(255,164,5),(255,168,187),(66,102,0),(255,0,16),(94,241,242),(0,153,143),(224,255,102),(116,10,255),(153,0,0),(255,255,128),(255,255,0),(255,80,5)]
 
 def distance_btw_points(pt1,pt2):
