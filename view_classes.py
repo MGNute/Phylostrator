@@ -6,12 +6,15 @@ import dendropy
 import controller
 import aux_view_classes as avc
 from view import *
-import my_globals
+# import my_globals
 import numpy as np
 global colors
 import tree_manipulator as tm
 from utilities import *
 from sfld_view import AddTxtDialog
+
+global opts
+opts = controller.Options()
 
 class ValuePickerControl(wx.BoxSizer):
     def __init__(self,parent,*args):
@@ -459,7 +462,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
         self.circles=None
         self.c = controller.Controller()
         self.c.set_BufferedWindow_reference(self)
-        self.tree_path = my_globals.amato_qiime_tree
+        self.tree_path = opts.init_tree
         self.radial_phylogram = tm.Radial_Phylogram(self.tree_path)
         # self.c.apm.state_tree_loaded=True
         self.set_initial_corners()
@@ -539,7 +542,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
                     eref = (i,ln)
         newtree = eref[0].head_node.extract_subtree()
         newtree_tree = dendropy.Tree(seed_node = newtree)
-        newtree_tree.write(path=my_globals.amato_temp_subtree,schema = "newick")
+        newtree_tree.write(path=opts.temp_subtree_path,schema = "newick")
         print "wrote the tree from node %s and below to the subtree path" % eref[0].tail_node.label
 
     def on_clear_extra(self,event=None):
@@ -1134,7 +1137,6 @@ class ViewAreaSelectorPanel(wx.Panel):
 
         # pdc.DrawBitmap(self.current_bitmap, 0, 0, False)
         # pdc.DrawBitmap(wx.BitmapFromImage(self.myimg,3),0,0)
-        # pdc.DrawBitmap(wx.Bitmap(my_globals.amato_qiime_root + 'test.jpg', wx.BITMAP_TYPE_JPEG),1,1)
 
         # pdc.DrawLineList(self.line_list)
         # self.Update()
@@ -1250,7 +1252,6 @@ class ViewAreaSelectorPanel(wx.Panel):
 
         # self.UpdateDrawing()
         self.myimg=self.current_bitmap.ConvertToImage()
-        # self.myimg.SaveFile(my_globals.amato_qiime_root + 'test.jpg',wx.BITMAP_TYPE_JPEG)
 
 
 class MyContextMenu(wx.Menu):

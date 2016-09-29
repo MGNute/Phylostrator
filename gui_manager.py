@@ -2,7 +2,7 @@ import scripts
 
 __author__ = 'Michael'
 
-from my_globals import *
+# from my_globals import *
 import sfld_view
 import view_classes
 import controller
@@ -522,14 +522,6 @@ class gui_manager(sfld_view.ctrlFrame):
             self.m_textCtrl3311.SetValue(str(t))
 
     def run_controller_script( self, event=None, text=None ):
-        # if text==None:
-        #     text=self.m_textCtrl5.GetValue()
-        # scripts.script_function(text)
-        # scripts.test_alphas()
-        # self.c.image_frame.save_dc_to_bitmap('test.jpg')
-        # self.c.image_frame.draw_text("the quick brown fox")
-        # self.c.image_frame.save_dc_to_bitmap('test2.jpg')
-        # self.c.image_frame.img_panel.Refresh()
         scripts.script_function(self.parent.img_panel)
         pass
 

@@ -1,6 +1,7 @@
 __author__ = 'Michael'
 import tree_manipulator as trman
 import json, colorsys
+import ConfigParser
 
 class Singleton(type):
     def __init__(cls, name, bases, dict):
@@ -13,6 +14,16 @@ class Singleton(type):
             obj = super(Singleton, cls).__call__(*args, **kw)
             cls.instance = obj
         return cls.instance
+
+
+class Options():
+    __metaclass__ = Singleton
+    def __init__(self):
+        self.cfg = ConfigParser.ConfigParser().read('init_settings.cfg')
+        self.init_tree = self.cfg.get('main','initial_tree')
+        self.init_annotation = self.cfg.get('main', 'initial_tree')
+        self.jitter_radius = self.cfg.getint('main','jitter_radius')
+        self.temp_subtree_path = self.cfg.get('main','temp_subtree_path')
 
 class Controller():
     __metaclass__ = Singleton

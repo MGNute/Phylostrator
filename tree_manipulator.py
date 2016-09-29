@@ -2,7 +2,6 @@ __author__ = 'Michael'
 
 import math
 import dendropy
-# from my_globals import *
 from view import *
 from utilities import rotate
 
@@ -57,8 +56,6 @@ class AnnotatedPhylogramModel():
 
     pass
 
-
-
 class Radial_Phylogram():
     '''
     Right now it requires the tree to have labels equal to the "efd_id" field from the node_annotation
@@ -91,6 +88,104 @@ class Radial_Phylogram():
         # self.get_segments()
         # self.get_max_dims()
 
+    def spacefill_get_space_filling_phylogram(self):
+        '''
+        This function will populate the dendropy tree with a set of properties on each edge and node that
+        define a 2D tree layout that approximately fills the rectangular viewing area optimally.
+
+        The properties are 'deflect_angle' on each edge, a 'location' on each node and an 'aspect_ratio'
+        on the tree object. The layout is defined by a root-edge, the aspect ratio and the deflect angles (
+        positive = clockwise). Default aspect ratio is 1.6 (w/h)
+        :return:
+        '''
+        if self.myt.aspect_ratio is None:
+            self.myt.aspect_ratio = 1.6
+        to = 0
+        for i in self.myt.postorder_edge_iter():
+            if i.length is None:
+                i.length = 0.0
+            to += i.length
+
+        self.myt.calc_node_ages(ultrametricity_precision=False,is_force_max_age=True)
+        self.myt.calc_node_root_distances(False)
+
+        first = True
+        for i in self.myt.postorder_edge_iter():
+            current_opposite_dist=0
+            if first==True:
+                root_childs= i.head_node.child_nodes()
+                root_child_dists = [(j.age+j.edge_length) for j in root_childs]
+                root_opposite_dists = [(max(root_child_dists[:ind]+root_child_dists[(ind+1):])) for ind in range(len(root_childs))]
+                first = False
+            else:
+                if i.head_node in root_childs:
+                    ind = root_childs.index(i)
+                    current_opposite_dist = root_opposite_dists[ind]
+
+            if i.head_node.is_leaf() == True:
+                i.head_mass = 0
+                i.tail_mass = to - i.length
+                # i.head_width = -1
+                i.head_len = i.length
+                i.tail_len = i.head_node.parent.root_distance + current_opposite_dist
+                # i.tail_width =
+            else:
+                cn = i.head_node.child_nodes()
+                i.head_mass = sum([(k.edge.head_mass + k.edge.length) for k in cn])
+                i.tail_mass = to - i.length - i.head_mass
+                i.head_len = i.length+i.age
+                i.tail_len = i.head_node.parent.root_distance + current_opposite_dist
+
+        self.cent_edge = self.spacefill_get_centroid_edge()
+        self.cent_child_nodes = []
+        for e in self.cent_edge.adjacent_edges:
+            if e.head_node==self.cent_edge.head_node:
+                self.cent_child_nodes.append(e.tail_node)
+            else:
+                self.cent_child_nodes.append(e.head_node)
+
+        self.myt.reroot_at_edge(self.cent_edge)
+        for i in self.myt.preorder_node_iter():
+            if i.length is None:
+                i.length = 0.
+
+        self.myt.calc_node_ages(ultrametricity_precision=False,is_force_max_age=True)
+        self.myt.calc_node_root_distances(False)
+
+        d = self.cent_edge.length
+
+        for i in self.cent_child_nodes:
+            ages=[(j.age + j.edge_length) for j in i.child_nodes()]
+            # TODO: continue here
+
+    def spacefill_get_centroid_edge(self):
+        '''
+        finds the edge with the minimal squared deviation from a (1/4, 1/4, 1/4, 1/4) split based
+        on the 'age' attribute of the four child nodes (plus lengths)
+        :return:
+        '''
+        m_sse = 9999999.0
+        cent_edge = None
+        for i in self.myt.preorder_edge_iter():
+            eds = i.adjacent_edges
+            hn = i.head_node
+            tn = i.tail_node
+            if len(eds)>=4:
+                heads= [(e.head_node==hn or e.head_node==tn) for e in eds]
+                k = len(heads)
+                lens = [0.]*k
+                for ind in range(k):
+                    if heads[ind]==True:
+                        lens[ind]=eds[ind].length+eds[ind].tail_len
+                    else:
+                        lens[ind]=eds[ind].length+eds[ind].head_len
+                all_lens = sum(lens)
+                sse=sum([(j/all_lens-1.0/float(k))**2 for j in lens])
+                if sse < m_sse:
+                    m_sse = sse
+                    cent_edge = i
+        return cent_edge
+
     def dump_all(self):
         del self.myt
         self.myt=None
@@ -104,6 +199,7 @@ class Radial_Phylogram():
         self.get_max_dims()
         self.get_leaf_node_coords()
         self.get_segments()
+
 
     def get_radial_phylogram(self):
         # myt=set_treepath(tp)
@@ -133,7 +229,7 @@ class Radial_Phylogram():
             # k+=1
             # print k
             # if i.edge_length is None:
-            i.edge_length = 0.001 # debug
+            # i.edge_length = 0.001 # debug
             ww=float(len(i.leaf_nodes()))/leafct*2*math.pi
             self.node_labels[i.label]['w']=ww   # wedge angle
             self.node_labels[i.label]['t']=self.node_labels[i.parent_node.label]['nu'] # angle of right wedge border
@@ -153,22 +249,26 @@ class Radial_Phylogram():
             # x1 = x1_orig*math.cos(self.rotation)-x2_orig*math.sin(self.rotation)
             # x2 = x1_orig*math.sin(self.rotation)+x2_orig*math.cos(self.rotation)
             self.node_labels[i.label]['x']=(x1,x2)
+        # print theta_vals[0:50]
+        # print theta_vals2[0:50]
+        # print theta_vals3[0:50]
+        # print "Debug 1:"  # DEBUG 3
+        # self.print_right_angles()
 
-    def get_space_filling_phylogram(self):
-        to = 0
-        for i in self.myt.postorder_edge_iter():
-            if i.length is None:
-                i.length = 0.0
-            to += i.length
 
-        for i in self.myt.postorder_edge_iter():
-            if i.head_node.is_leaf() == True:
-                i.head_mass = 0
-                i.tail_mass = to - i.length
-            else:
-                cn = i.head_node.child_nodes()
-                i.head_mass = sum([(k.edge.head_mass + k.edge.length) for k in cn])
-                i.tail_mass = to - i.length - i.head_mass
+    def print_right_angles(self):
+        ct = 0
+        first_fifty=[]
+        ffl=[]
+        for i in self.myt.preorder_node_iter():
+            first_fifty.append(self.node_labels[i.label]['t'])
+            ffl.append(i.label)
+            ct +=1
+            if ct > 50:
+                print first_fifty
+                print ffl
+                return None
+
 
     def get_max_dims(self):
         xma=float(0)
@@ -224,7 +324,6 @@ class Radial_Phylogram():
                 i.edge.viewer_edge=None
                 i.viewer_node=None
         return view_segments
-            # print self.node_labels[i.label]
 
     def prepare_tree(self):
         # print self.myt.internal_edges()[1].length
@@ -348,21 +447,6 @@ class Radial_Phylogram():
 
         self.get_segments()
         self.get_max_dims()
-
-# class AnnotationData():
-#     def __init__(self,filepath,key_field=None):
-#         self.f = open(filepath, 'r')
-#         self.data = {}
-#         self.uniques = {}
-#
-#         # get field names
-#         self.fieldnames = self.f.readline().strip().split('\t')
-#         if key_field==None:
-#             self.key_field=0
-#
-#         self.num_fields=len(self.fieldnames)
-#         for line in self.f:
-#             a=line.strip().split('\t')
 
 class AnnotationData():
 
