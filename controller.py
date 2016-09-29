@@ -19,7 +19,8 @@ class Singleton(type):
 class Options():
     __metaclass__ = Singleton
     def __init__(self):
-        self.cfg = ConfigParser.ConfigParser().read('init_settings.cfg')
+        self.cfg = ConfigParser.ConfigParser()
+        self.cfg.read('init_settings.cfg')
         self.init_tree = self.cfg.get('main','initial_tree')
         self.init_annotation = self.cfg.get('main', 'initial_tree')
         self.jitter_radius = self.cfg.getint('main','jitter_radius')
