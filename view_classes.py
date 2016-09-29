@@ -987,11 +987,6 @@ class ViewAreaSelectorPanel(wx.Panel):
             self.c.image_frame.m_statusBar2.SetStatusText(
                 "Indirect: xmin: %s, xmax: %s, ymin: %s, ymax: %s" % (self.xmin, self.xmax, self.ymin, self.ymax), 0)
 
-
-
-
-
-
     def phylogeny_viewer_loaded(self):
         self.Bind(wx.EVT_SIZE, self.on_size_change)
         self.viewer_loaded=True
@@ -1044,33 +1039,9 @@ class ViewAreaSelectorPanel(wx.Panel):
             args['box_ymax']=self.temp_ymax+offset[1]
             self.set_box_coords(direct=True,**args)
             self.sz=self.GetSize()
-            # CHANGE
-            # self.xmin=(float(self.temp_xmin)+float(offset[0]))/float(self.sz[0])
-            # self.xmax=self.temp_xmax+float(offset[0])/float(self.sz[0])
-            # self.ymin=(float(self.temp_ymin)+float(offset[1]))/float(self.sz[1])
-            # self.ymax=self.temp_ymax+float(offset[1])/float(self.sz[1])
-            # print str((self.xmin,self.ymin))
-            # if self.xmin<0:
-            #     self.xmin=0
-            # if self.xmin+self.zoom>1:
-            #     self.xmax=1
-                # self.xmin=1-self.zoom
-            # if self.ymin<0:
-            #     self.ymin=0
-            #     self.ymax=h
-            # if self.ymin+self.zoom>1:
-            #     self.ymin=1-self.zoom
-        # print str(offset) + "\t" + str(self.sz) + "\t" + str((self.xmin,self.xmax,self.ymin, self.ymax))
-        # self.UpdateDrawing()
         self.Refresh()
 
     def reposition_view_square(self):
-        # sz=self.GetSize()
-        #CHANGE
-        # self.box_xmin=self.xmin*float(sz[0])
-        # self.box_xmax=self.box_xmin+self.zoom*float(sz[0])
-        # self.box_ymin=self.ymin*float(sz[1])
-        # self.box_ymax=self.box_ymin+self.zoom*float(sz[1])
         self.set_box_coords()
 
 
@@ -1127,7 +1098,7 @@ class ViewAreaSelectorPanel(wx.Panel):
         # pdc.Clear()
         # pdc.DrawBitmap(self.current_bitmap,0,0,True)
         temp_image=wx.BitmapFromBuffer(self.current_bitmap.GetWidth(),self.current_bitmap.GetHeight(),self.imgbuffer)
-        self.memdc.Clear()
+        # self.memdc.Clear()
         # print "cleared memdc"
         new_bitmap=wx.EmptyBitmap(*self.sz)
         self.memdc.SelectObject(new_bitmap)
@@ -1240,7 +1211,7 @@ class ViewAreaSelectorPanel(wx.Panel):
         self.sz=self.GetSize()
         self.current_bitmap = wx.EmptyBitmapRGBA(self.sz[0], self.sz[1], 255, 255, 255,wx.ALPHA_OPAQUE)
         # self.current_bitmap = wx.EmptyBitmap(self.sz[0], self.sz[1])
-        self.memdc.Clear()
+        # self.memdc.Clear()
         self.memdc.SelectObject(self.current_bitmap)
         self.memdc.SetPen(wx.Pen(wx.Colour(0,0,0,255),1,wx.SOLID))
         self.memdc.DrawLineList(self.line_list)
