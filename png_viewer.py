@@ -45,7 +45,11 @@ class PNGBufferedWindow(BufferedWindow):
 
     def load_image(self):
         del self.image
-        self.image = wx.Bitmap(name=self.image_path,type=wx.BITMAP_TYPE_PNG)
+        try:
+            self.image = wx.Bitmap(name=self.image_path,type=wx.BITMAP_TYPE_PNG)
+        except:
+            time.sleep(1)
+            self.image = wx.Bitmap(name=self.image_path, type=wx.BITMAP_TYPE_PNG)
         self.mod_time = os.path.getmtime(self.image_path)
         self.UpdateDrawing()
 

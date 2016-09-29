@@ -456,6 +456,7 @@ class AlignmentController(Controller):
     def __init__(self):
         Controller.__init__(self)
         # self.starting_pt = self.image_frame.
+        self.image_frame=None
 
         #Drawing Properties:
         self.circle_size=None

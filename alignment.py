@@ -1,4 +1,5 @@
 __author__ = 'Michael'
+
 import copy
 import dendropy
 import numpy as np
@@ -114,35 +115,48 @@ def check_is_leaf(a):
 
 class MultipleSequenceAlignment():
 
-    def __init__(self,refpath=None,estpath=None, treepath=None):
+    def __init__(self,refpath=None,estpath=None, treepath=None, compare_with_est=False, generic_coords=False):
         self.refpath=refpath
         self.estpath=estpath
         self.treepath=treepath
         self.ref=None
         self.est=None
         self.node_order=[]
-        if self.treepath==None:
-            self.treepath=test_tre
-        self.get_node_order()
-        if self.refpath==None:
-            self.refpath=test_aln_ref
-        self.set_refpath()
-        self.finalize_ref_alignment()
-        if self.estpath==None:
-            self.estpath=test_aln_est
-        self.set_estpath()
-        tp,fn= self.count_tp_fn()
-        print "Reference Alignment Length:\t%s" % self.reflen
-        print "Reference Homologs:\t%s" % tp
-        print "Estimated Homologs:\t%s" % self.est_homologs
-        print "Shared Homologs:\t%s" % self.shared_homologs
+        self.generic_coords=generic_coords
+        if self.treepath<>None:
+            print 'setting treepath to %s' % treepath
+            self.set_treepath(self.treepath)
 
-        self.write_column_wise_errors()
+
+        if self.refpath<>None:
+            print 'setting reference alignment to %s' % self.refpath
+            self.set_refpath()
+
+        print "Reference Alignment Length:\t%s" % self.reflen
+        if compare_with_est==True:
+            self.finalize_ref_alignment()
+            if self.estpath==None:
+                self.estpath=test_aln_est
+            self.set_estpath()
+            tp,fn= self.count_tp_fn()
+
+            print "Reference Homologs:\t%s" % tp
+            print "Estimated Homologs:\t%s" % self.est_homologs
+            print "Shared Homologs:\t%s" % self.shared_homologs
+
+            self.write_column_wise_errors()
+
+    def set_treepath(self,tp):
+        self.treepath=tp
+        self.get_node_order()
+
 
 
     def get_node_order(self):
         print "Reading reference tree and getting node order..."
-        self.tree=dendropy.Tree.get(path=self.treepath,schema="newick")
+        self.tree=dendropy.Tree.get(path=self.treepath,schema="newick",preserve_underscores=True)
+        self.numtaxa = len(self.tree.leaf_nodes())
+        print "the tree has %s taxa" % self.numtaxa
         if len(self.node_order)>0:
             self.old_node_order=copy.deepcopy(self.node_order)
         self.node_order=[]
@@ -156,7 +170,10 @@ class MultipleSequenceAlignment():
         #     ct+=1
 
 
-    def set_refpath(self):
+    def set_refpath(self,rp=None):
+        if rp<>None:
+            self.refpath=rp
+
         print "Reading reference alignment..."
         self.ref_temp=read_from_fasta(self.refpath)
         self.ref=remove_all_blank_columns(self.ref_temp)
@@ -236,17 +253,23 @@ class MultipleSequenceAlignment():
             outf.write('%s,%s,%s\n' % (i,tp,fn))
         outf.close()
 
-    def get_cladogram_segments(self, bottom=1260, top=1560, firstnode=53, spacing=6, horizontal=True, leafs_on_left_or_bottom=True):
+    def get_cladogram_segments(self, bottom_or_left=1260, top_or_right=1560, firstnode=53, spacing=6, horizontal=True, leafs_on_left_or_bottom=True, generic_coords=False):
+        res = 100000
+        if self.generic_coords==True:
+            bottom_or_left=0
+            top_or_right=res #default resolution
+            spacing= float(top_or_right)/len(self.tree.leaf_nodes())
+            firstnode=spacing/2
         # for grid graphic:  bottom=700, top=1000, firstnode=53, spacing=6
         t=copy.deepcopy(self.tree)
         self.tree_vertices={}
         for i in t.postorder_edge_iter():
             if i.length is not None:
                 i.length=1.0
-        print "rerooting at midpoint..."
-        t.reroot_at_midpoint()
+        # print "rerooting at midpoint..."
+        # t.reroot_at_midpoint()
         height=t.max_distance_from_root()
-        incr = int(abs(top-bottom)/height)
+        incr = int(abs(top_or_right - bottom_or_left) / height)
         # incr = int((top-bottom)/height)
 
         ct = 0
@@ -256,13 +279,15 @@ class MultipleSequenceAlignment():
             # self.node_added_order.append(i)
             args={}
             if check_is_leaf(i)==True:
+                # if i.taxon.label == 'Zangia_citrina_HKAS52684':
+                #     print 'at taxon Zangia_citrina_HKAS52684: order %s' % ct
                 self.node_order.append(i.taxon.label)
                 self.node_order_lookup[i.taxon.label]=ct
                 order=ct
                 ct+=1
                 # order = self.node_order_lookup[i.taxon.label]
-                self.tree_vertices[i]=(bottom,firstnode+spacing*order)
-                args={'nd':i,'vert':(bottom,firstnode+spacing*order),'cvs':None}
+                self.tree_vertices[i]=(bottom_or_left, firstnode + spacing * order)
+                args={'nd':i,'vert':(bottom_or_left, firstnode + spacing * order), 'cvs':None}
                 self.node_added_order.append(args)
             else:
                 maxht=0
@@ -284,6 +309,9 @@ class MultipleSequenceAlignment():
                 args={'nd':i,'vert':(newht,newcent),'cvs':copy.deepcopy(cvs)}
                 self.node_added_order.append(args)
 
+        # from utilities import write_list_to_file
+        # write_list_to_file(self.node_order_lookup.keys(),'C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\mushrooms\\keylist.txt')
+
         self.segment_endpoints=[]
         for i in t.postorder_edge_iter():
             if i.length is not None:
@@ -291,6 +319,14 @@ class MultipleSequenceAlignment():
                 v2=self.tree_vertices[i.head_node.parent_node]
                 self.segment_endpoints.append((v1[0],v1[1],v2[0],v1[1]))
                 self.segment_endpoints.append((v2[0],v1[1],v2[0],v2[1]))
+
+        if self.generic_coords==True:
+            temp_se = copy.deepcopy(self.segment_endpoints)
+            del self.segment_endpoints
+            self.segment_endpoints=[]
+            for i in temp_se:
+                fres = float(res)
+                self.segment_endpoints.append((float(i[0])/fres, float(i[1])/fres, float(i[2])/fres, float(i[3])/fres))
 
         self.t_copy=t
 
@@ -322,7 +358,7 @@ class MSAColumn():
         return ((a*(a-1) >> 1),np.sum(self.fn_mat)/2)
 
     def add_char(self,label,site_char,seq_position):
-        self.chars[self.node_order_lookup[label]]=(nucleotide_to_int(site_char),seq_position)
+        self.chars[self.node_order_lookup[label]]=(nucleotide_to_int(site_char),seq_position,site_char.upper())
 
     def populate_tp_matrix(self):
         numtaxa=len(self.chars.keys())
@@ -341,3 +377,8 @@ class MSAColumn():
         j_row=self.node_order_lookup[j_label]
         self.fn_mat[i_row,j_row]=0
         self.fn_mat[j_row,i_row]=0
+
+if __name__=='__main__':
+    from gui_manager import AlignmentApp
+    app=AlignmentApp()
+    app.MainLoop()

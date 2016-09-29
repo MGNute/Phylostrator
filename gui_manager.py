@@ -10,7 +10,7 @@ import wx
 import wx.lib.scrolledpanel
 import os.path
 import utilities
-
+import math
 
 class MyApp(wx.App):
     def OnInit(self):
@@ -20,6 +20,8 @@ class MyApp(wx.App):
         self.mainframe.Show()
 
         return True
+
+
 
 class gui_manager(sfld_view.ctrlFrame):
     '''
@@ -70,8 +72,8 @@ class gui_manager(sfld_view.ctrlFrame):
         self.c.circle_size=self.m_slider1.GetValue()
         self.layout_viewer_panel()
         self.Layout()
-        # self.MoveXY(100, 100)
-        self.MoveXY(1620,300)
+        self.MoveXY(100, 100)
+        # self.MoveXY(1620,300)
 
 
         #TODO: This is just for the verstion where we want to do a cold initialize, otherwise have to make the image frame
@@ -112,9 +114,10 @@ class gui_manager(sfld_view.ctrlFrame):
             self.populate_annotation_values()
 
     def draw_text(self,event=None, text=None):
-        if text == None:
-            text = self.m_textCtrl4.GetValue()
-        self.parent.draw_text(text)
+        raise NotImplementedError
+        # if text == None:
+        #     text = self.m_textCtrl4.GetValue()
+        # self.parent.draw_text(text)
 
     def populate_annotation_values(self,event=None):
         fld = self.m_ComboSelectedField.GetValue()
@@ -134,10 +137,7 @@ class gui_manager(sfld_view.ctrlFrame):
         # self.m_panel4.Layout()
         self.c.set_ValuePickerCtrl_reference(self.value_picker)
 
-    def change_starting_column( self, event ):
-        v=self.m_startCol.GetValue()
-        print "starting column changed to %s" % v
-        self.parent.img_panel.ChangeStartingColumn(v)
+
 
     #
     # methods related to value picker
@@ -320,6 +320,7 @@ class gui_manager(sfld_view.ctrlFrame):
         except:
             pass
 
+
     def on_show_legend_check( self, event=None ):
         if self.m_checkBox4.IsChecked():
             legend_data=[]
@@ -356,9 +357,11 @@ class gui_manager(sfld_view.ctrlFrame):
             tgt_path=os.path.join(self.working_folder,tgt_file)
         self.c.save_image(tgt_path)
 
-    def save_alignment_image( self, event ):
-        tgt_file=os.path.join(self.m_dirPicker2.GetTextCtrlValue(),self.m_textCtrl8.GetValue()+'_'+str(self.m_startCol.GetValue())+'.jpg')
-        self.parent.img_panel.SaveToFile(tgt_file,wx.BITMAP_TYPE_JPEG)
+    def reroot_above(self,event=None):
+        self.c.buffered_window.reroot_above_active_edge()
+
+    def rotate_clockwise( self, event=None ):
+        self.c.buffered_window.pivot_clockwise
 
 
     def layout_viewer_panel(self):
@@ -367,8 +370,7 @@ class gui_manager(sfld_view.ctrlFrame):
         # self.m_panel6.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
 
         # self.zoom_control = view_classes.zoom_rotation_ctrl( self.viewer_panel)
-        self.m_panel9 = view_classes.ViewAreaSelectorPanel(self.viewer_panel, wx.ID_ANY, wx.DefaultPosition,
-                                                           wx.DefaultSize, wx.TAB_TRAVERSAL)
+        self.make_viewer_panel_ojbect()
         self.m_panel9.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
         self.m_panel9.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
         mysizer= self.viewer_panel.GetSizer()
@@ -380,6 +382,10 @@ class gui_manager(sfld_view.ctrlFrame):
         mysizer.Fit(self.viewer_panel)
         # self.txtZoom = wx.StaticText()
 
+    def make_viewer_panel_ojbect(self):
+        self.m_panel9 = view_classes.ViewAreaSelectorPanel(self.viewer_panel, wx.ID_ANY, wx.DefaultPosition,
+                                                           wx.DefaultSize, wx.TAB_TRAVERSAL)
+
     # def process_annotationvalue_check(self,event):
     #     checked=[]
     #     for i in self.value_picker.value_pickers:
@@ -390,7 +396,16 @@ class gui_manager(sfld_view.ctrlFrame):
 
     def import_tree( self, event=None ):
         mytree=self.m_FilePicker_tree.GetPath()
-        self.c.import_tree(mytree)
+        if mytree[-3:].lower()=='.rp':
+            print "importing from picked file %s" % mytree
+            import pickle
+            fi = open(mytree,'r')
+            self.c.buffered_window.radial_phylogram=pickle.load(fi)
+            fi.close()
+            self.c.buffered_window.MakeDrawData(False)
+            self.c.buffered_window.UpdateDrawing()
+        else:
+            self.c.import_tree(mytree)
 
     def import_annotation( self, event=None ):
         self.set_annotation_file()
@@ -403,6 +418,7 @@ class gui_manager(sfld_view.ctrlFrame):
         #     print "Tree not loaded, so no action taken."
 
     def trigger_redraw(self,event=None):
+        self.c.buffered_window.MakeDrawData()
         self.c.circle_size=int(self.m_slider1.GetValue())
         self.c.trigger_refresh()
 
@@ -465,6 +481,46 @@ class gui_manager(sfld_view.ctrlFrame):
         # print "zoompaint"
         self.m_panel9.Refresh()
 
+    def redraw_tree(self,event=None):
+        self.c.buffered_window.adjust_tree()
+
+    def expand_clade_out(self,event=None):
+        if self.c.buffered_window.active_edge is not None:
+            w = float(self.m_textCtrl331.GetValue())
+            w *= 1.05
+            self.m_textCtrl331.SetValue(str(w))
+
+    def expand_clade_in(self,event=None):
+        if self.c.buffered_window.active_edge is not None:
+            w = float(self.m_textCtrl331.GetValue())
+            w /= 1.05
+            self.m_textCtrl331.SetValue(str(w))
+
+    def save_rp_file( self, event=None ):
+        import pickle
+        if os.path.exists(self.m_dirPicker4.GetPath()):
+            f=open(os.path.join(self.m_dirPicker4.GetPath(),self.m_textCtrl17.GetValue()+'.rp'),'w')
+            pickle.dump(self.c.buffered_window.radial_phylogram,f)
+            f.close()
+
+
+
+
+    def pivot_clock(self,event=None):
+        if self.c.buffered_window.active_edge is not None:
+            print "pivoting clockwise"
+            t = float(self.m_textCtrl3311.GetValue())
+            print "t: %s" % t
+            t += 5.0/360.0*2.0*math.pi
+            print "new t: %s" % t
+            self.m_textCtrl3311.SetValue(str(t))
+
+    def pivot_ctrclock(self,event=None):
+        if self.c.buffered_window.active_edge is not None:
+            t = float(self.m_textCtrl3311.GetValue())
+            t -= 5.0/360.0*2.0*math.pi
+            self.m_textCtrl3311.SetValue(str(t))
+
     def run_controller_script( self, event=None, text=None ):
         # if text==None:
         #     text=self.m_textCtrl5.GetValue()
@@ -487,35 +543,72 @@ class gui_manager(sfld_view.ctrlFrame):
     #     # print ""
     #     # print f.GetNativeFontInfoUserDesc()
 
+class alignment_gui_manager(gui_manager):
+    def __init__(self,parent):
+        gui_manager.__init__(self,parent)
+
+    def change_starting_column(self, event):
+        '''
+        ALIGNMENT
+        :param event:
+        :return:
+        '''
+        v = self.m_startCol.GetValue()
+        print "starting column changed to %s" % v
+        self.parent.img_panel.ChangeStartingColumn(v)
 
 
+    def save_alignment_image(self, event):
+        tgt_file = os.path.join(self.m_dirPicker2.GetTextCtrlValue(),
+                                self.m_textCtrl8.GetValue() + '_' + str(self.m_startCol.GetValue()) + '.jpg')
+        self.parent.img_panel.SaveToFile(tgt_file, wx.BITMAP_TYPE_JPEG)
 
-class image_manager(sfld_view.imgFrame):
+class abstract_image_manager(sfld_view.imgFrame):
     def __init__(self,parent):
         sfld_view.imgFrame.__init__(self,parent)
 
         # initialize controller and other misc
         self.c = controller.Controller()
-        # self.c = controller.AlignmentController()
         self.c.set_ImageFrame_referenece(self)
         self.sz=None
 
         # make control panel
-        self.control_panel=gui_manager(self)
+        self.make_control_panel()
+
+        # add window
+        self.make_image_panel()
+
+        # bind methods
+        self.bind_methods()
+
+
+    def make_control_panel(self):
+        raise NotImplementedError
+
+    def make_image_panel(self):
+        raise NotImplementedError
+
+    def bind_methods(self):
+        raise NotImplementedError
+
+    def set_status(self,msg):
+        self.m_statusBar2.SetStatusText(msg)
+
+class image_manager(abstract_image_manager):
+    def __init__(self,parent):
+        abstract_image_manager.__init__(self,parent)
+
+    def make_control_panel(self):
+        self.control_panel = gui_manager(self)
         self.control_panel.SetIcon(wx.Icon('resources/icnPhyloMain32.png'))
         self.control_panel.Show()
         self.control_panel.propogate_values()
 
-        # add window
-        # self.img_panel=view_classes.BufferedWindow
-        self.make_image_panel()
-
-        # bind methods
-        self.img_panel.Bind(wx.EVT_RIGHT_DCLICK,self.right_dclick)
-
-
     def right_dclick(self, event):
         print event.GetPosition()
+
+    def bind_methods(self):
+        self.img_panel.Bind(wx.EVT_RIGHT_DCLICK, self.right_dclick)
 
     def control_panel_tool_click(self,event=None):
         # print self.control_panel.IsActive()
@@ -525,9 +618,8 @@ class image_manager(sfld_view.imgFrame):
 
     def make_image_panel(self):
         self.bSizer1 = wx.BoxSizer( wx.VERTICAL )
-        # self.img_panel = view_classes.HOCRbufferedWindow( self )
-        # self.img_panel = view_classes.AlignmentBufferedWindow(self)
         self.img_panel = view_classes.PhylogenyBufferedWindow(self)
+        # self.img_panel = view_classes.CairoPhylogenyBufferedWindow(self)
         self.img_panel.SetForegroundColour( wx.Colour( 255, 255, 255 ) )
         self.img_panel.SetBackgroundColour( wx.Colour( 255, 255, 255 ) )
 
@@ -535,215 +627,22 @@ class image_manager(sfld_view.imgFrame):
         self.SetSizer( self.bSizer1 )
         self.Layout()
 
-    def set_status(self,msg):
-        self.m_statusBar2.SetStatusText(msg)
-        # self.control_panel.set_status(msg)
+class AlignmentImageManager(image_manager):
+    def __init__(self,parent):
+        image_manager.__init__(self,parent)
 
-    # def on_click( self, event ):
-    #     print "mouse_clicked"
-    #     self.m_statusBar2.SetStatusText("x: %s, y: %s" % event.GetPositionTuple(),2)
+    def make_control_panel(self):
+        self.control_panel = alignment_gui_manager(self)
+        self.control_panel.SetIcon(wx.Icon('resources/icnPhyloMain32.png'))
+        self.control_panel.Show()
+        self.control_panel.propogate_values()
 
+    def make_image_panel(self):
+        self.bSizer1 = wx.BoxSizer( wx.VERTICAL )
+        self.img_panel = view_classes.AlignmentBufferedWindow(self)
+        self.img_panel.SetForegroundColour( wx.Colour( 255, 255, 255 ) )
+        self.img_panel.SetBackgroundColour( wx.Colour( 255, 255, 255 ) )
 
-# class image_manager_old(sfld_view.imgFrame):
-#
-#     def __init__(self,parent):
-#         sfld_view.imgFrame.__init__(self,parent)
-#
-#
-#         self.c=controller.Controller()
-#
-#         self.view_range=self.c.max_data_dims
-#         # self.current_bitmap=None
-#         # self.memdc=wx.MemoryDC(wx.NullBitmap)
-#         self.sz=None
-#
-#         self.c.set_ImageFrame_referenece(self)
-#
-#
-#
-#         self.control_panel=gui_manager(self)
-#         self.control_panel.SetIcon(wx.Icon('resources/icnPhyloMain32.png'))
-#
-#         # if self.icnControlPanel.IsToggled()==False:
-#         #     self.icnControlPanel.Toggle()
-#         # self.m_toolBar1.Realize()
-#
-#         self.Bind(wx.EVT_PAINT,self.OnPaint)
-#
-#         self.control_panel.Show()
-#         self.control_panel.propogate_values()
-#         self.control_panel.Raise()
-#         # self.control_panel.run_controller_script()
-#
-#         self.Bind(wx.EVT_RIGHT_DCLICK,self.right_dclick)
-#
-#     def save_dc_to_bitmap(self,tgt_path):
-#         self.current_bitmap.SaveFile(tgt_path,wx.BITMAP_TYPE_JPEG)
-#
-#     def right_dlick(self,event):
-#         print event.GetPosition()
-#
-#
-#     def control_panel_tool_click(self,event=None):
-#         if self.control_panel.IsIconized()==True:
-#             self.control_panel.Iconize(False)
-#             print "IsIconized:\t " + str(self.control_panel.IsIconized())
-#
-#         if event.IsChecked()==True:
-#             self.control_panel.Show()
-#
-#         if event.IsChecked()==False:
-#             self.control_panel.Hide()
-#
-#     def OnImgPaint(self,event):
-#         pdc=wx.PaintDC(self.img_panel)
-#         self.sz=pdc.GetSize()
-#         w=pdc.GetSize()[0]
-#         h=pdc.GetSize()[1]
-#         pdc.Blit(0,0,w,h,self.memdc,0,0,wx.COPY,True,0,0)
-#         # pdc
-#
-#         # if self.current_bitmap<>None:
-#         #     print 'bitmap exists'
-#         #     self.pdc.DrawBitmap(self.current_bitmap,0,0)
-#
-#     # def OnImgPaint(self,event):
-#     #     self.pdc=wx.PaintDC(self.img_panel)
-#     #     self.sz=self.pdc.GetSize()
-#     #     # if self.current_bitmap==None:
-#     #     #     print "makeing empty"
-#     #     #     self.current_bitmap=wx.EmptyBitmapRGBA(self.sz[0],self.sz[1],255,255,255,100)
-#     #     w=self.pdc.GetSize()[0]
-#     #     h=self.pdc.GetSize()[1]
-#     #     self.view_range=self.c.view_range
-#     #
-#     #     # if self.c.apm.state_tree_loaded:
-#     #     #     self.get_current_tree_image(w,h)
-#     #
-#     #     # if self.c.apm.state_node_annotation_loaded:
-#     #     #     self.draw_circles(w,h)
-#     #
-#     #     if self.current_bitmap<>None:
-#     #         print 'bitmap exists'
-#     #         self.pdc.DrawBitmap(self.current_bitmap,0,0)
-#
-#     def draw_circles(self,w=None,h=None,header_field=None,value=None):
-#         # circ_size=self.c.circle_size
-#         list_of_circles=self.c.get_circle_sets_by_color()
-#
-#         #quick housekeeping in case it hasn't been initialized
-#         prevnone=False
-#         if self.current_bitmap==None:
-#             prevnone=True
-#             self.current_bitmap=wx.EmptyBitmap(self.sz[0],self.sz[1])
-#         if prevnone==True:
-#             self.memdc.Clear()
-#         self.memdc.SelectObject(self.current_bitmap)
-#         sz=self.memdc.GetSize()
-#         curr_brush=self.memdc.GetBrush()
-#         for i in list_of_circles:
-#             self.memdc.SetBrush(wx.Brush(wx.Colour(i[0],i[1],i[2]),wx.SOLID))
-#             for j in list_of_circles[i]:
-#                 # print j
-#                 x=convert_coordinates(self.view_range,sz,j[0])
-#                 self.memdc.DrawCirclePoint(wx.Point(x[0],x[1]),j[1])
-#
-#         self.memdc.SetBrush(curr_brush)
-#         self.memdc.SelectObject(wx.NullBitmap)
-#
-#         self.memdc.SelectObject(self.current_bitmap)
-#     def get_current_tree_image(self,w=None,h=None):
-#         self.view_range=self.c.view_range
-#         self.current_bitmap=wx.EmptyBitmap(self.sz[0],self.sz[1])
-#         self.memdc.Clear()
-#
-#         # sz=(w,h)
-#         sz=self.memdc.GetSize()
-#
-#         for i in self.c.apm.segments:
-#             x1=convert_coordinates(self.view_range,sz,i[0])
-#             x2=convert_coordinates(self.view_range,sz,i[1])
-#             if x1[2] is True and x2[2] is True:
-#                 self.memdc.DrawLine(x1[0],x1[1],x2[0],x2[1])
-#
-#
-#         self.memdc.SelectObject(wx.NullBitmap)
-#         self.control_panel.m_panel6.get_parent_bitmap()
-#
-
-#
-#     def draw_text(self,text,x=None,y=None, fnt=None):
-#         #quick housekeeping in case it hasn't been initialized
-#         print text
-#         prevnone=False
-#         if self.current_bitmap==None:
-#             prevnone=True
-#             print "drawing text, replacing bitmap"
-#             self.current_bitmap=wx.EmptyBitmapRGBA(self.sz[0],self.sz[1])#,255,255,255,0)
-#         # self.memdc.SelectObject(self.current_bitmap)
-#         # if prevnone==True:
-#         # self.memdc.Clear()
-#         # self.memdc.SelectObject(self.current_bitmap)
-#         # self.memdc.Clear()
-#         if fnt==None:
-#             fnt=self.control_panel.m_fontPicker1.GetSelectedFont()
-#             print "font color: " + str( self.memdc.GetBrush().GetColour())
-#             self.memdc.SetBrush(wx.Brush(wx.Colour(0,0,0,125),wx.SOLID))
-#             print "font color: " + str( self.memdc.GetBrush().GetColour())
-#             # print fnt.__dict__
-#         self.memdc.SetFont(fnt)
-#
-#         sz=self.memdc.GetSize()
-#         if x==None:
-#             x=sz[0]/2 #centered by default
-#         if y==None:
-#             y=10 # near top by default
-#         # self.memdc.DrawText(text,sz[0]/2,10)
-#         self.memdc.DrawText(text,x,y)
-#         print self.memdc.GetPixel(420,420)
-#         print self.memdc.GetPixel(475,420)
-#         print self.memdc.GetPixel(525,420)
-#         print self.memdc.GetPixel(100,100)
-#         # self.memdc.SelectObject(wx.NullBitmap)
-#         self.img_panel.Update()
-#         # self.test_blit()
-#
-#     def draw_rectangles(self,rects):
-#         '''
-#         Draws multiple rectangles.
-#         :param rects: must be a list of tuples where each tuple is of the form (x,y,width,height,color,alpha), and
-#                     where color is an RGB 3-tuple.
-#         :return:
-#         '''
-#         #quick housekeeping in case it hasn't been initialized
-#         prevnone=False
-#         if self.current_bitmap==None:
-#             prevnone=True
-#             print "drawing rects, replacing bitmap"
-#
-#             # self.current_bitmap=wx.EmptyBitmap(self.sz[0],self.sz[1])
-#             self.current_bitmap=wx.EmptyBitmapRGBA(self.sz[0],self.sz[1],255,255,255,100)
-#             # self.current_bitmap.UseAlpha()
-#             print self.current_bitmap.HasAlpha()
-#
-#         self.memdc.SelectObject(self.current_bitmap)
-#         # print self.memdc.GetPixel(401,401)
-#         # print self.memdc.GetPixel(100,100)
-#         # if prevnone==True:
-#         #     self.memdc.Clear()
-#
-#         currbrush=self.memdc.GetBrush()
-#         for i in rects:
-#             color=i[4]
-#             alpha=int(i[5]*255)
-#             self.memdc.SetBrush(wx.Brush(wx.Colour(color[0],color[1],color[2],alpha)))
-#             self.memdc.DrawRectangle(i[0],i[1],i[2],i[3])
-#         self.memdc.SetBrush(currbrush)
-#         # self.memdc.SelectObject(wx.NullBitmap)
-#         # self.img_panel.Refresh()
-#
-#     def test_blit(self):
-#         cdc=wx.ClientDC(self.img_panel)
-#         cdc.Blit(0,0,self.sz[0],self.sz[1],self.memdc,0,0,wx.COPY,True,0,0)
-#         self.img_panel.Update()
-#
+        self.bSizer1.Add( self.img_panel, 1, wx.EXPAND, 0 )
+        self.SetSizer( self.bSizer1 )
+        self.Layout()

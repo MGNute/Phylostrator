@@ -1,12 +1,12 @@
 __author__ = 'Michael'
-import wx
+import wx, os.path
 import wx.lib.scrolledpanel
 import pickle, colorsys, random
 import dendropy
 import controller
 import aux_view_classes as avc
 from view import *
-import my_globals, alignment
+import my_globals
 import numpy as np
 global colors
 import tree_manipulator as tm
@@ -453,6 +453,7 @@ class BufferedWindow(wx.Panel):
         self.Update()
 
 class PhylogenyBufferedWindow(BufferedWindow):
+    active_edge = None
     def __init__(self,parent,*args, **kwargs):
         self.parent=parent
         self.circles=None
@@ -475,7 +476,6 @@ class PhylogenyBufferedWindow(BufferedWindow):
         BufferedWindow.__init__(self,parent, *args, **kwargs)
         self.set_corner_boundaries()
         self.c.zoom_panel.phylogeny_viewer_loaded()
-
         self.Bind(wx.EVT_LEFT_DOWN, self.on_click)
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_double_click)
         self.Bind(wx.EVT_RIGHT_DOWN, self.on_right_click)
@@ -486,9 +486,6 @@ class PhylogenyBufferedWindow(BufferedWindow):
         self.parent.m_statusBar2.SetStatusText("Tree Space -- x: %s, y: %s" % self.transform_coordinate(event.GetPositionTuple(),True), 1)
 
         tscoord = self.transform_coordinate(event.GetPositionTuple(), True)
-        # print event.GetPositionTuple()
-        # print tscoord
-        # print self.transform_coordinate(tscoord,False)
         minlen = 99999999.0
         eref = None
         ct = 0
@@ -508,8 +505,11 @@ class PhylogenyBufferedWindow(BufferedWindow):
         pos2 = "(%.2f, %.2f)" % eref[0].tail_node.viewer_node.ts_x
         # self.parent.m_statusBar2.SetStatusText("head: %s, %s |tail: %s, %s| len: %s" % (eref[0].head_node.label,eref[0].head_node.viewer_node.ts_x,eref[0].tail_node.label,
         #                                                                                   eref[0].tail_node.viewer_node.ts_x, eref[1]),2)
-        self.parent.m_statusBar2.SetStatusText("head: %s, %s |tail: %s, %s| len: %s" % (eref[0].head_node.label, pos1, eref[0].tail_node.label,
+        self.parent.m_statusBar2.SetStatusText("head: %s, %s |tail: %s, %s| len: %s" % (eref[0].head_node.label,
+                                                                                        pos1, eref[0].tail_node.label,
                                                                                           pos2, eref[1]),2)
+        self.active_edge=eref[0]
+        self.activate_edge(eref[0])
 
 
         # self.parent.m_statusBar2.SetStatusText("head: %s, %s |tail: %s, %s| len: %s" % (eref[0].head_node.label,eref[0].viewer_edge.head_x,eref[0].tail_node.label,
@@ -542,15 +542,54 @@ class PhylogenyBufferedWindow(BufferedWindow):
         newtree_tree.write(path=my_globals.amato_temp_subtree,schema = "newick")
         print "wrote the tree from node %s and below to the subtree path" % eref[0].tail_node.label
 
-
-    def on_right_click( self, event ):
-        print "mouse_clicked"
+    def on_clear_extra(self,event=None):
+        self.active_edge = None
+        self.parent.control_panel.m_textCtrl33.SetValue("None")
         self.ClearExtraDrawSegments()
         self.UpdateDrawing()
+
+    def reroot_above_active_edge(self):
+        if self.active_edge is not None:
+            self.radial_phylogram.myt.reroot_at_edge(self.active_edge)
+            self.radial_phylogram.refresh_all()
+            self.MakeDrawData()
+
+    def activate_edge(self,ed, pos1=None, pos2=None):
+        self.active_edge = ed
+        self.parent.control_panel.m_textCtrl33.SetValue(
+            "head: %s, %s |tail: %s, %s| len: %s" % (ed.head_node.label,
+                                                     pos1, ed.tail_node.label,
+                                                     pos2, ed))
+        self.parent.control_panel.m_textCtrl331.SetValue(str(self.radial_phylogram.node_labels[ed.head_node.label]['w']))
+        self.parent.control_panel.m_textCtrl3311.SetValue(str(self.radial_phylogram.node_labels[ed.head_node.label]['t']))
+
+    def deactivate_edge(self):
+        self.active_edge = None
+        self.parent.control_panel.m_textCtrl33.SetValue("None")
+        self.parent.control_panel.m_textCtrl331.SetValue("")
+        self.parent.control_panel.m_textCtrl3311.SetValue("")
+
+    def adjust_tree(self):
+        if self.active_edge is not None:
+            width_radians = float(self.parent.control_panel.m_textCtrl331.GetValue())
+            right_edge_radians = float(self.parent.control_panel.m_textCtrl3311.GetValue())
+            self.radial_phylogram.deform_clade_by_wedge_and_radians(self.active_edge,width_radians,right_edge_radians)
+            self.MakeDrawData(False)
+            self.UpdateDrawing()
+        else:
+            print "active edge not set! Tree not adjusted."
+
+
+    def on_right_click( self, event ):
+        # print "mouse_clicked"
+        menu = MyContextMenu(self, event.GetPosition())
+        self.PopupMenu(menu, event.GetPosition())
+        menu.Destroy()
         # self.parent.m_statusBar2.SetStatusText("x: %s, y: %s" % event.GetPositionTuple(),1)
 
     def import_new_tree(self,treepath):
-        del self.radial_phylogram
+        if self.radial_phylogram is not None:
+            del self.radial_phylogram
         self.tree_path=treepath
         self.radial_phylogram=tm.Radial_Phylogram(self.tree_path)
         self.c.circle_sets_by_color = None
@@ -587,15 +626,16 @@ class PhylogenyBufferedWindow(BufferedWindow):
 
 
 
-    def MakeDrawData(self):
-
+    def MakeDrawData(self, initial=True):
+        self.radial_phylogram.get_leaf_node_coords()
         self.DrawData['segments']=[]
 
         for i in self.radial_phylogram.segments:
             self.DrawData['segments'].append((i[0][0],i[0][1],i[1][0],i[1][1]))
         max_dims=self.radial_phylogram.get_max_dims()
-        self.top_left=(max_dims[0],max_dims[3])
-        self.bottom_right=(max_dims[1],max_dims[2])
+        if initial==True:
+            self.top_left=(max_dims[0],max_dims[3])
+            self.bottom_right=(max_dims[1],max_dims[2])
 
 
     def UpdateMiscInfoOnDraw(self):
@@ -796,7 +836,8 @@ class PhylogenyBufferedWindow(BufferedWindow):
         self.UpdateDrawing()
         print "done redrawing"
 
-
+    def DrawCairoFigure(self,event=None):
+        print "Not using CairoBufferedWindow"
 
 class HOCRbufferedWindow(BufferedWindow):
     def __init__(self,parent,*args, **kwargs):
@@ -851,260 +892,6 @@ class HOCRbufferedWindow(BufferedWindow):
             x1,y1=self.convert_time_to_window((i[0],0))
             x2,y2=self.convert_time_to_window((i[1],1))
             dc.DrawLine(x1,y1,x2,y2)
-
-class AlignmentBufferedWindow(BufferedWindow):
-    def __init__(self,parent,*args, **kwargs):
-        self.parent=parent
-        # self.aln=alignment.MultipleSequenceAlignment()
-        self.aln=pickle.load(open(my_globals.test_root + '\\alignment.pkl','rb'))
-        # self.save_alignment(self.aln,my_globals.test_root + '\\alignment.pkl')
-        self.c = controller.AlignmentController()
-
-        # self.aln_bp=alignment.MultipleSequenceAlignment()
-        # self.save_alignment(self.aln_bp,my_globals.test_root + '\\alignment_bp.pkl')
-
-
-        self.MakeDrawData()
-        BufferedWindow.__init__(self,parent, *args, **kwargs)
-
-    def save_alignment(self,alnmt,filename):
-        pickle.dump(alnmt,open(filename,'wb'))
-
-    # def convert_time_to_window(self,time_coords,tc2=None):
-    #     '''
-    #     :param time_coords: comes in the form (time, position on racecourse)
-    #     :return:
-    #     '''
-    #     topleft=(50,100)
-    #     h=400
-    #     w=1800
-    #     mintime=my_globals.ticks[0][1]
-    #     numticks=len(my_globals.ticks)
-    #     maxtime=my_globals.ticks[numticks-1][1]
-    #
-    #     y=int((1-time_coords[1])*h+topleft[1])
-    #     x=int(topleft[0] + w*(time_coords[0]-mintime)/(maxtime-mintime))
-    #     if tc2==None:
-    #         return (x,y)
-    #     else:
-    #         y2=int((1-tc2[1])*h+topleft[1])
-    #         x2=int(topleft[0] + w*(time_coords[0]-mintime)/(maxtime-mintime))
-    #         return(x,y,x2,y2)
-
-    def UpdateMiscInfoOnDraw(self):
-        self.c.image_frame.control_panel.m_textHeight.SetValue(str(self._Buffer.Height))
-        self.c.image_frame.control_panel.m_textWidth.SetValue(str(self._Buffer.Width))
-
-    def ChangeStartingColumn(self,value):
-        self.DrawData['starting_col']=value
-        col=self.aln.msa_cols[value]
-        # print len(col.chars)
-        # print col.chars
-        self.UpdateDrawing()
-
-    def MakeDrawData(self):
-        # self.aln.get_cladogram_segments()
-        self.DrawData={'starting_col': self.parent.control_panel.m_startCol.GetValue(), 'aln': self.aln }
-        self.DrawData['tree_segs']=self.aln.segment_endpoints
-
-    def Draw(self,dc):
-        self.UpdateMiscInfoOnDraw()
-        dc.SetBackground(wx.Brush("White"))
-        dc.Clear()
-        dc.SetPen(wx.Pen(wx.Colour(0,0,0)))
-        dc.DrawLineList(self.aln.segment_endpoints)
-        w=8
-        h=6
-        topleft=(50,50)
-        numcols=150
-
-
-        self.DrawCharacterBoxesAtPosition(dc,self.DrawData['starting_col'],w,h,topleft,numcols)
-
-    def DrawFNGrid(self,dc):
-        self.UpdateMiscInfoOnDraw()
-        dc.SetBackground(wx.Brush("White"))
-        dc.Clear()
-
-
-        w=6
-        topleft=(50,50)
-        dc.DrawRectangle(topleft[0],topleft[1],1+100*w,1+100*w)
-        tp=self.DrawData['aln'].msa_cols[self.DrawData['starting_col']].tp_mat
-        fn=self.DrawData['aln'].msa_cols[self.DrawData['starting_col']].fn_mat
-        true_est_pos=np.where(tp-fn >0)
-        fn_est=np.where(fn>0)
-        print "tp: %s" % str(np.sum(tp)/2)
-        print "fn: %s" % str(np.sum(fn)/2)
-        # dc.SetPen(wx.Pen(wx.Colour(100,100,100),width=w+2))
-        recs=[]
-        for i in range(true_est_pos[0].shape[0]):
-            x=true_est_pos[0][i]
-            y=true_est_pos[1][i]
-            recs.append((x*w+topleft[0]+1,y*w+topleft[0]+1,w,w))
-        dc.DrawRectangleList(recs,pens=wx.TRANSPARENT_PEN,brushes=wx.Brush(wx.Colour(50,50,50)))
-
-        # dc.SetPen(wx.Pen(wx.Colour(255,0,0),width=w+2))
-        recs=[]
-        for i in range(fn_est[0].shape[0]):
-            x=fn_est[0][i]
-            y=fn_est[1][i]
-            recs.append((x*w+topleft[0]+1,y*w+topleft[0]+1,w,w))
-        dc.DrawRectangleList(recs,pens=wx.TRANSPARENT_PEN,brushes=wx.Brush(wx.Colour(255,0,0)))
-
-        # dc.DrawLineList(self.DrawData['tree_segs'])
-        dc.SetPen(wx.Pen(wx.Colour(0,0,0)))
-        dc.DrawLineList(self.aln.segment_endpoints)
-        self.DrawCharacterBoxes(dc,w,topleft)
-
-
-        # print "drew_lines"
-        # b=dc.GetBrush()
-        # p=dc.GetPen()
-        # dc.SetBrush(wx.Brush(wx.Colour(255,0,0)))
-        # dc.SetPen(wx.TRANSPARENT_PEN)
-        # circs=self.c.image_frame.control_panel.m_spinCtrl2.GetValue()
-        # for i in self.aln.node_added_order[0:(circs+1)]:
-        #     # if self.c.image_frame.control_panel.m_chkAddSlow.IsChecked()==True:
-        #         # time.sleep(0.33)
-        #     a=self.aln.tree_vertices[i['nd']]
-        #     dc.DrawCircle(a[0],a[1],3)
-        # dc.SetPen(p)
-        # dc.SetBrush(b)
-        # dc.DrawPointList(self.aln.tree_vertices.values(),wx.Pen(wx.Colour(0,0,255),width=3))
-
-    def DrawAnnotation(self,dc):
-        dc.SetFont(wx.Font( 11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Cambria" ))
-        dc.DrawText("Gutell 16S.B.ALL - R0 - subset size 100",25,25)
-        dc.DrawText("<-- Taxon (arranged by phylogeny) -->")
-
-    def DrawCharacterBoxes(self,dc,w,h,topleft):
-        d=dc.GetBrush()
-        p=dc.GetPen()
-        dc.SetPen(wx.TRANSPARENT_PEN)
-        left_boundary=topleft[0]+w*100+3
-        # top_bound=topleft[1]
-        col=self.aln.msa_cols[self.DrawData['starting_col']]
-        # ('A',Orange); ('C',Blue); ('G':Yellow): ('T':Green)}
-        myclrs=[wx.Colour(255,153,0),wx.Colour(0,0,255),wx.Colour(255,255,0),wx.Colour(0,255,0),wx.Colour(50,50,50),wx.Colour(150,150,150)]
-        for j in col.chars.keys():
-            top_bound=topleft[1]+1+j*w
-            site=col.chars[j][0]-1
-            if site >= 0:
-                dc.SetBrush(wx.Brush(myclrs[site]))
-                dc.DrawRectangle(left_boundary,top_bound,w,h)
-        dc.SetBrush(d)
-        dc.SetPen(p)
-
-    def DrawCharacterBoxesAtPosition(self,dc,colnum,w,h,topleft,numcols):
-        d=dc.GetBrush()
-        p=dc.GetPen()
-        dc.SetPen(wx.TRANSPARENT_PEN)
-        left_boundary=topleft[0]
-        # top_bound=topleft[1]
-        # print "starting at %s, spanning %s cols" % (colnum, numcols)
-
-        for i in range(numcols):
-            col=self.aln.msa_cols[colnum+i]
-            # ('A',Orange); ('C',Blue); ('G':Yellow): ('T':Green)}
-            myclrs=[wx.Colour(255,153,0),wx.Colour(0,0,255),wx.Colour(255,255,0),wx.Colour(0,255,0),wx.Colour(50,50,50),wx.Colour(125,76,126),wx.Colour(125,255,0)]
-            for j in col.chars.keys():
-                top_bound=topleft[1]+1+j*h
-                site=col.chars[j][0]-1
-                if site >= 0:
-                    try:
-                        dc.SetBrush(wx.Brush(myclrs[site]))
-                    except:
-                        print (site,j,colnum,i,col.node_order_lookup.keys()[col.node_order_lookup.values().index(j)])
-                        # print colnum+i
-                    dc.DrawRectangle(left_boundary,top_bound,w,h)
-            left_boundary+=w
-
-        dc.SetBrush(d)
-        dc.SetPen(p)
-        dc.DrawText(str(colnum),topleft[0],topleft[1]-15)
-        dc.DrawText(str(colnum+50),650,topleft[1]-15)
-        dc.DrawText(str(colnum+100),1250,topleft[1]-15)
-
-        # dc.DrawLine(50,100,1850,100)
-        # dc.DrawLine(50,500,1850,500)
-        # for i in self.DrawData['ticks']:
-        #     lab=i[0]
-        #     t=i[1]
-        #     x,y=self.convert_time_to_window((t,0))
-        #     dc.DrawLine(x,y,x,y+10)
-        #     tw,th=dc.GetTextExtent(lab)
-        #     dc.DrawRotatedText(lab,x+int(th/2),y+10,270)
-        #
-        # for i in self.DrawData['racers']:
-        #     x1,y1=self.convert_time_to_window((i[0],0))
-        #     x2,y2=self.convert_time_to_window((i[1],1))
-        #     dc.DrawLine(x1,y1,x2,y2)
-
-
-    # def right_dclick(self,event=None):
-    #     print "here"
-    #     print event.GetPosition()
-
-    # def Draw(self, dc):
-    #     dc.SetBackground( wx.Brush("White") )
-    #     dc.Clear() # make sure you clear the bitmap!
-    #
-    #     # Here's the actual drawing code.
-    #     for key,data in self.DrawData.items():
-    #         if key == "Rectangles":
-    #             dc.SetBrush(wx.BLUE_BRUSH)
-    #             dc.SetPen(wx.Pen('VIOLET', 4))
-    #             for r in data:
-    #                 dc.DrawRectangle(*r)
-    #         elif key == "Ellipses":
-    #             dc.SetBrush(wx.Brush("GREEN YELLOW"))
-    #             dc.SetPen(wx.Pen('CADET BLUE', 2))
-    #             for r in data:
-    #                 dc.DrawEllipse(*r)
-    #         elif key == "Polygons":
-    #             dc.SetBrush(wx.Brush("SALMON"))
-    #             dc.SetPen(wx.Pen('VIOLET RED', 4))
-    #             for r in data:
-    #                 dc.DrawPolygon(r)
-    #
-    #
-    # def MakeNewData(self):
-    #     ## This method makes some random data to draw things with.
-    #     MaxX, MaxY = (500,800)
-    #     DrawData = {}
-    #
-    #     # make some random rectangles
-    #     l = []
-    #     for i in range(5):
-    #         w = random.randint(1,MaxX/2)
-    #         h = random.randint(1,MaxY/2)
-    #         x = random.randint(1,MaxX-w)
-    #         y = random.randint(1,MaxY-h)
-    #         l.append( (x,y,w,h) )
-    #     DrawData["Rectangles"] = l
-    #
-    #     # make some random ellipses
-    #     l = []
-    #     for i in range(5):
-    #         w = random.randint(1,MaxX/2)
-    #         h = random.randint(1,MaxY/2)
-    #         x = random.randint(1,MaxX-w)
-    #         y = random.randint(1,MaxY-h)
-    #         l.append( (x,y,w,h) )
-    #     DrawData["Ellipses"] = l
-    #
-    #     # Polygons
-    #     l = []
-    #     for i in range(3):
-    #         points = []
-    #         for j in range(random.randint(3,8)):
-    #             point = (random.randint(1,MaxX),random.randint(1,MaxY))
-    #             points.append(point)
-    #         l.append(points)
-    #     DrawData["Polygons"] = l
-    #
-    #     return DrawData
 
 # class ViewAreaSelectorPanel(BufferedWindow):
 class ValuePickerScrolledPanel(wx.lib.scrolledpanel.ScrolledPanel):
@@ -1243,7 +1030,7 @@ class ViewAreaSelectorPanel(wx.Panel):
 
         self.click=None
         self.clickup=None
-        self.set_zoom_level(    )
+        self.set_zoom_level()
 
     def reset_view_square(self,offset=None,zoom=None):
         if offset<>None:
@@ -1466,33 +1253,143 @@ class ViewAreaSelectorPanel(wx.Panel):
         # self.myimg.SaveFile(my_globals.amato_qiime_root + 'test.jpg',wx.BITMAP_TYPE_JPEG)
 
 
-# class MyPopupMenu(wx.Menu):
-#     def __init__(self, parent, point):
-#         wx.Menu.__init__(self)
-#         self.phylo_bw = parent
-#         self.pt = point
-#
-#         itemAddTxt = wx.MenuItem(self, wx.NewId(), "Add Text Annotation Here")
-#         self.AppendItem(itemAddTxt)
-#         self.Bind(wx.EVT_MENU, self.OnAddText, itemAddTxt)
-#
-#         item = wx.MenuItem(self, wx.NewId(), "Item Two")
-#         self.AppendItem(item)
-#         self.Bind(wx.EVT_MENU, self.OnItem2, item)
-#
-#         item = wx.MenuItem(self, wx.NewId(), "Item Three")
-#         self.AppendItem(item)
-#         self.Bind(wx.EVT_MENU, self.OnItem3, item)
-#
-#     def OnAddText(self, event):
-#         ad=AddTxtDialog().ShowModal()
-#
-#
-#         print "Item One selected in the %s window" % self.WinName
-#
-#     def OnItem2(self, event):
-#         print "Item Two selected in the %s window" % self.WinName
-#
-#     def OnItem3(self, event):
-#         print "Item Three selected in the %s window" % self.WinName
+class MyContextMenu(wx.Menu):
+    def __init__(self, parent, point):
+        wx.Menu.__init__(self)
+        self.phylo_bw = parent
+        self.pt = point
 
+        itemClear = wx.MenuItem(self, wx.NewId(), "Clear Extra Lines")
+        self.AppendItem(itemClear)
+        self.Bind(wx.EVT_MENU, self.OnClear, itemClear)
+
+        item = wx.MenuItem(self, wx.NewId(), "Export Cairo Graphic")
+        self.AppendItem(item)
+        self.Bind(wx.EVT_MENU, self.OnItem2, item)
+
+        item = wx.MenuItem(self, wx.NewId(), "Item Three")
+        self.AppendItem(item)
+        self.Bind(wx.EVT_MENU, self.OnItem3, item)
+#
+    def OnClear(self, event):
+        self.phylo_bw.on_clear_extra()
+
+    def OnItem2(self, event):
+        # self.phylo_bw.DrawCairoFigure()
+        print "drawing Cairo figure not implemented"
+        # print "Item Two selected in the %s window" % self.WinName
+
+    def OnItem3(self, event):
+        print "Item Three selected in the window"
+
+# import cairo
+# class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
+#
+#     def __init__(self,parent,*args,**kwargs):
+#         PhylogenyBufferedWindow.__init__(self,parent,*args,**kwargs)
+#         self.image_path = 'C:\\Users\\miken\\Grad School Stuff\\Research\\Phylogenetics\\code\\Phylostrator2\\resources\\temp_new.png'
+#         self.Bind(wx.EVT_RIGHT_DCLICK, self.DrawCairoFigure)
+#
+#
+#     def DrawCairoFigure(self, event=None):
+#         WIDTH = self.Size[0]
+#         HEIGHT = self.Size[1]
+#         surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, WIDTH, HEIGHT)
+#         ctx = cairo.Context(surf)
+#         ctx.set_source_rgb(1, 1, 1)
+#         ctx.rectangle(0, 0, WIDTH, HEIGHT)
+#         ctx.fill()
+#         # ctx.set_matrix(cairo.Matrix(self.t11_inv,self.t21_inv,self.t12_inv,self.t22_inv,self.t13_inv, self.t23_inv))
+#         ctx.set_matrix(cairo.Matrix(self.t11, -self.t21, self.t12, -self.t22, self.t13, -self.t23))
+#         print ctx.get_matrix()
+#         ctx.set_line_width(.002)
+#
+#         ctx.set_source_rgb(0,0,0)
+#         for i in self.radial_phylogram.myt.preorder_edge_iter():
+#             if i.viewer_edge is not None:
+#                 x0 = i.viewer_edge.head_x
+#                 x1 = i.viewer_edge.tail_x
+#                 ctx.move_to(*x0)
+#                 ctx.line_to(*x1)
+#                 ctx.stroke()
+#
+#         if self.c.circle_sets_by_color <> None:
+#             self.DrawCirclesCairo(ctx)
+#
+#         # if len(self.ExtraDrawCircles) > 0:
+#         #     self.DrawExtraCirclesCairo(ctx)
+#         #
+#         # if self.SeppDrawCircles is not None:
+#         #     self.DrawExtraCirclesCairo(ctx, self.SeppDrawCircles)
+#         #
+#         # if len(self.ExtraDrawSegments) > 0:
+#         #     self.DrawExtraSegmentsCairo(ctx)
+#         #
+#         # if self.LegendDrawData <> None:
+#         #     self.DrawLegendCairo(ctx)
+#         surf.write_to_png(self.image_path)
+#
+#     def DrawLegendCairo(self, ctx):
+#         # curr_brush = dc.GetBrush()
+#         # # print self.LegendDrawData['entries']
+#         # # print self.LegendDrawData['entries'][0][1]
+#         # textent = dc.GetTextExtent(self.LegendDrawData['entries'][0][0])
+#         # h = self.LegendDrawData['H']
+#         # w = self.LegendDrawData['W']
+#         # gap = textent[1]
+#         # for i in self.LegendDrawData['entries']:
+#         #     dc.SetBrush(wx.Brush(i[1]))
+#         #     dc.DrawRectangle(w, h, gap, gap)
+#         #     dc.DrawText(i[0], w + gap + 2, h)
+#         #     h += (gap + 2)
+#         # dc.SetBrush(curr_brush)
+#         pass
+#
+#     def DrawCirclesCairo(self, ctx):
+#         # print "Drawing Circles"
+#         # curr_brush = dc.GetBrush()
+#         for i in self.c.circle_sets_by_color:
+#             ctx.set_source_rgba(float(i[0])/255, float(i[1])/255, float(i[2])/255, .5)
+#             # dc.SetBrush(wx.Brush(wx.Colour(i[0], i[1], i[2]), wx.SOLID))
+#             for j in self.c.circle_sets_by_color[i]:
+#                 # x = self.transform_coordinate(j[0])
+#                 ctx.new_sub_path()
+#                 ctx.arc(j[0][0],j[0][1],.007,0,2*math.pi)
+#                 ctx.fill()
+#
+#                 # print x
+#                 # dc.DrawCirclePoint(wx.Point(x[0], -x[1]), j[1])
+#         # dc.SetBrush(curr_brush)
+#
+#
+#     def DrawExtraSegmentsCairo(self, ctx):
+#         # curr_pen = dc.GetPen()
+#         # dc.SetPen(wx.Pen(wx.RED, .5))
+#         # for i in self.ExtraDrawSegments:
+#         #     x1 = self.transform_coordinate(i[0])
+#         #     x2 = self.transform_coordinate(i[1])
+#         #     dc.DrawLine(x1[0], -x1[1], x2[0], -x2[1])
+#         #     # print "drawing red line from (%s, %s) to (%s, %s)" % (x1[0],x1[1],x2[0],x2[1])
+#         # dc.SetPen(curr_pen)
+#         pass
+#
+#
+#     def DrawExtraCirclesCairo(self, ctx, circle_set=None):
+#         # jr = my_globals.jitter_radius
+#         # curr_brush = dc.GetBrush()
+#         # curr_pen = dc.GetPen()
+#         # if circle_set is None:
+#         #     circle_set = self.ExtraDrawCircles
+#         # for i in circle_set:
+#         #     x = self.transform_coordinate(i[0])
+#         #     if self.parent.control_panel.m_checkBox6.IsChecked():
+#         #         y = (float(x[0] + (random.random() - .5) / .5 * jr), float(x[1] + (random.random() - .5) / .5 * jr))
+#         #         x = (int(y[0]), int(y[1]))
+#         #     dc.SetBrush(wx.Brush(wx.Colour(i[1], i[2], i[3]), wx.SOLID))
+#         #     if len(i) > 5 and i[5] is not None:
+#         #         dc.SetPen(i[5])
+#         #
+#         #     dc.DrawCirclePoint(wx.Point(x[0], -x[1]), i[4])
+#         # dc.SetBrush(curr_brush)
+#         # dc.SetPen(curr_pen)
+#         pass

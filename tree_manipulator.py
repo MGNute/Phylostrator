@@ -57,6 +57,8 @@ class AnnotatedPhylogramModel():
 
     pass
 
+
+
 class Radial_Phylogram():
     '''
     Right now it requires the tree to have labels equal to the "efd_id" field from the node_annotation
@@ -74,6 +76,7 @@ class Radial_Phylogram():
         self.rotation=0
         if tp is not None:
             self.set_treepath(tp)
+        # self.print_right_angles()
 
     # def set_rotation(self,rotation):
     #     '''
@@ -104,6 +107,9 @@ class Radial_Phylogram():
 
     def get_radial_phylogram(self):
         # myt=set_treepath(tp)
+        # theta_vals=[]
+        # theta_vals2=[]
+        # theta_vals3=[]
         self.prepare_tree()
         for i in self.myt.postorder_node_iter():
             if i.is_leaf()==True:
@@ -126,22 +132,43 @@ class Radial_Phylogram():
         for i in pr:
             # k+=1
             # print k
+            # if i.edge_length is None:
+            i.edge_length = 0.001 # debug
             ww=float(len(i.leaf_nodes()))/leafct*2*math.pi
-            self.node_labels[i.label]['w']=ww
-            self.node_labels[i.label]['t']=self.node_labels[i.parent_node.label]['nu']
+            self.node_labels[i.label]['w']=ww   # wedge angle
+            self.node_labels[i.label]['t']=self.node_labels[i.parent_node.label]['nu'] # angle of right wedge border
+            # theta_vals.append(self.node_labels[i.label]['t'])
             self.node_labels[i.label]['nu']=self.node_labels[i.label]['t']
             thetav=self.node_labels[i.parent_node.label]['nu']+ww/2
             self.node_labels[i.label]['theta']=thetav
+            # theta_vals2.append(i.label)
             self.node_labels[i.parent_node.label]['nu']+=ww
             xu=self.node_labels[i.parent_node.label]['x']
             delta=i.edge_length
             x1=xu[0]+delta*math.cos(thetav)
             x2=xu[1]+delta*math.sin(thetav)
+            # theta_vals3.append(self.node_labels[i.label]['t'])
             # x1_orig = xu[0] + delta * math.cos(thetav)
             # x2_orig = xu[1] + delta * math.sin(thetav)
             # x1 = x1_orig*math.cos(self.rotation)-x2_orig*math.sin(self.rotation)
             # x2 = x1_orig*math.sin(self.rotation)+x2_orig*math.cos(self.rotation)
             self.node_labels[i.label]['x']=(x1,x2)
+
+    def get_space_filling_phylogram(self):
+        to = 0
+        for i in self.myt.postorder_edge_iter():
+            if i.length is None:
+                i.length = 0.0
+            to += i.length
+
+        for i in self.myt.postorder_edge_iter():
+            if i.head_node.is_leaf() == True:
+                i.head_mass = 0
+                i.tail_mass = to - i.length
+            else:
+                cn = i.head_node.child_nodes()
+                i.head_mass = sum([(k.edge.head_mass + k.edge.length) for k in cn])
+                i.tail_mass = to - i.length - i.head_mass
 
     def get_max_dims(self):
         xma=float(0)
@@ -215,6 +242,7 @@ class Radial_Phylogram():
             lab+=1
 
         lab=1
+        alllabs=set([])
         for i in self.myt.postorder_node_iter():
             oldlab=i.label
             # i.label='label' + str(lab)
@@ -225,7 +253,7 @@ class Radial_Phylogram():
             #     taxname=''
             # self.node_labels[i.label]={'x':None, 'l':None, 'w':None, 't':None, 'nu':None, 'theta':0, 'old_label':oldlab, 'taxon_label':taxname}
             if i.taxon == None:
-                if i.label == None:
+                if i.label == None or i.label in alllabs:
                     # print i.__dict__
                     i.label='label' + str(lab)
                     lab+=1
@@ -238,6 +266,7 @@ class Radial_Phylogram():
             else:
                 i.label=i.taxon.label
                 taxname=i.label
+            alllabs.add(oldlab)
             self.node_labels[i.label]={'x':None, 'l':None, 'w':None, 't':None, 'nu':None, 'theta':0, 'old_label':oldlab, 'taxon_label':taxname}
 
 
@@ -260,6 +289,7 @@ class Radial_Phylogram():
         Just makse a dictionary of all the leaf node descriptions along with their coordaintes and a refernce to the
             node object that stores them
         '''
+        self.leaf_node_coords={}
         for i in self.myt.leaf_node_iter():
             args={'x':self.node_labels[i.label]['x'],'node_ref':i}
             args['drawn']=False
@@ -274,6 +304,50 @@ class Radial_Phylogram():
             vn=ViewerNode(x=self.node_labels[i.label]['x'],node_ref=i,theta=self.node_labels[i.label]['theta'])
             view_nodes[i.label] = vn
         return view_nodes
+
+    def refresh_all(self):
+        self.get_radial_phylogram()
+        self.get_segments()
+        self.get_max_dims()
+
+    # def deform_clade_by_wedge_and_radians_dummy(self, myedge, width_radians, right_edge_radians):
+    #     pass
+
+    def deform_clade_by_wedge_and_radians(self,myedge,width_radians, right_edge_radians):
+        nd = myedge.head_node
+        init_ww = self.node_labels[nd.label]['w']
+        init_t = self.node_labels[nd.label]['t']
+
+
+        pr = nd.preorder_iter()
+        a=pr.next()
+        self.node_labels[a.label]['w']=width_radians
+        self.node_labels[a.label]['t']=right_edge_radians
+        self.node_labels[a.label]['nu']=right_edge_radians
+        ref_ct = float(len(a.leaf_nodes()))
+
+        for i in pr:
+            # k+=1
+            # print k
+            ww=float(len(i.leaf_nodes()))/ref_ct*width_radians
+            self.node_labels[i.label]['w']=ww   # wedge angle
+            self.node_labels[i.label]['t']=self.node_labels[i.parent_node.label]['nu'] # angle of right wedge border
+            self.node_labels[i.label]['nu']=self.node_labels[i.label]['t']
+            thetav=self.node_labels[i.parent_node.label]['nu']+ww/2
+            self.node_labels[i.label]['theta']=thetav
+            self.node_labels[i.parent_node.label]['nu']+=ww
+            xu=self.node_labels[i.parent_node.label]['x']
+            delta=i.edge_length
+            x1=xu[0]+delta*math.cos(thetav)
+            x2=xu[1]+delta*math.sin(thetav)
+            # x1_orig = xu[0] + delta * math.cos(thetav)
+            # x2_orig = xu[1] + delta * math.sin(thetav)
+            # x1 = x1_orig*math.cos(self.rotation)-x2_orig*math.sin(self.rotation)
+            # x2 = x1_orig*math.sin(self.rotation)+x2_orig*math.cos(self.rotation)
+            self.node_labels[i.label]['x']=(x1,x2)
+
+        self.get_segments()
+        self.get_max_dims()
 
 # class AnnotationData():
 #     def __init__(self,filepath,key_field=None):
@@ -476,6 +550,3 @@ class SfldAnnotationData():
 
         # print grouped
         return grouped
-
-
-

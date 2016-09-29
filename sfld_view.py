@@ -615,7 +615,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel41.SetSizer( bSizer101 )
 		self.m_panel41.Layout()
 		bSizer101.Fit( self.m_panel41 )
-		self.m_notebook1.AddPage( self.m_panel41, u"SEPP Annotation", True )
+		self.m_notebook1.AddPage( self.m_panel41, u"SEPP Annotation", False )
 		self.m_ExtraAnnotation = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer512 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -820,6 +820,181 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel8.Layout()
 		bSizer15.Fit( self.m_panel8 )
 		self.m_notebook1.AddPage( self.m_panel8, u"Console", False )
+		self.m_panel82 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_panel82.SetBackgroundColour( wx.Colour( 251, 209, 191 ) )
+		
+		bSizer151 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		bSizer89 = wx.BoxSizer( wx.VERTICAL )
+		
+		bSizer91 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText74 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Tree Line Width", wx.DefaultPosition, wx.Size( 120,-1 ), 0 )
+		self.m_staticText74.Wrap( -1 )
+		bSizer91.Add( self.m_staticText74, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textCtrl30 = wx.TextCtrl( self.m_panel82, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer91.Add( self.m_textCtrl30, 0, wx.ALL, 5 )
+		
+		
+		bSizer89.Add( bSizer91, 0, 0, 5 )
+		
+		bSizer911 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText741 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Tree Line Color", wx.DefaultPosition, wx.Size( 120,-1 ), 0 )
+		self.m_staticText741.Wrap( -1 )
+		bSizer911.Add( self.m_staticText741, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_colourPicker1 = wx.ColourPickerCtrl( self.m_panel82, wx.ID_ANY, wx.BLACK, wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
+		bSizer911.Add( self.m_colourPicker1, 0, wx.ALL, 5 )
+		
+		
+		bSizer89.Add( bSizer911, 0, 0, 5 )
+		
+		
+		bSizer151.Add( bSizer89, 1, wx.EXPAND, 5 )
+		
+		self.m_staticline32 = wx.StaticLine( self.m_panel82, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_VERTICAL )
+		bSizer151.Add( self.m_staticline32, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		bSizer90 = wx.BoxSizer( wx.VERTICAL )
+		
+		bSizer92 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		bSizer96 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_staticText77 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Tree Manipulator", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText77.Wrap( -1 )
+		self.m_staticText77.SetFont( wx.Font( 12, 74, 90, 92, False, "Arial" ) )
+		self.m_staticText77.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer96.Add( self.m_staticText77, 0, wx.ALL, 5 )
+		
+		bSizer97 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText78 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Active Edge:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText78.Wrap( -1 )
+		self.m_staticText78.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer97.Add( self.m_staticText78, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textCtrl33 = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"None", wx.DefaultPosition, wx.Size( 200,-1 ), wx.TE_READONLY|wx.NO_BORDER )
+		bSizer97.Add( self.m_textCtrl33, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_button36 = wx.Button( self.m_panel82, wx.ID_ANY, u"Reroot Above", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer97.Add( self.m_button36, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer96.Add( bSizer97, 0, 0, 5 )
+		
+		bSizer971 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText781 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Wedge Angle (w)", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText781.Wrap( -1 )
+		self.m_staticText781.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer971.Add( self.m_staticText781, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textCtrl331 = wx.TextCtrl( self.m_panel82, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
+		bSizer971.Add( self.m_textCtrl331, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer971.AddSpacer( ( 20, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_staticText7811 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Right Border (t):", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText7811.Wrap( -1 )
+		self.m_staticText7811.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer971.Add( self.m_staticText7811, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textCtrl3311 = wx.TextCtrl( self.m_panel82, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
+		bSizer971.Add( self.m_textCtrl3311, 0, wx.ALL, 5 )
+		
+		
+		bSizer96.Add( bSizer971, 0, 0, 5 )
+		
+		bSizer98 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText79 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Pivot Branch:", wx.DefaultPosition, wx.Size( 100,-1 ), 0 )
+		self.m_staticText79.Wrap( -1 )
+		self.m_staticText79.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer98.Add( self.m_staticText79, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_button37 = wx.Button( self.m_panel82, wx.ID_ANY, u"Clockwise", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer98.Add( self.m_button37, 0, wx.ALL, 5 )
+		
+		self.m_button38 = wx.Button( self.m_panel82, wx.ID_ANY, u"Counterclockwise", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer98.Add( self.m_button38, 0, wx.ALL, 5 )
+		
+		
+		bSizer96.Add( bSizer98, 0, 0, 5 )
+		
+		bSizer981 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText791 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Expand Branch:", wx.DefaultPosition, wx.Size( 100,-1 ), 0 )
+		self.m_staticText791.Wrap( -1 )
+		self.m_staticText791.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer981.Add( self.m_staticText791, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_button371 = wx.Button( self.m_panel82, wx.ID_ANY, u"Out", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer981.Add( self.m_button371, 0, wx.ALL, 5 )
+		
+		self.m_button381 = wx.Button( self.m_panel82, wx.ID_ANY, u"In", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer981.Add( self.m_button381, 0, wx.ALL, 5 )
+		
+		
+		bSizer96.Add( bSizer981, 0, 0, 5 )
+		
+		bSizer99 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_button45 = wx.Button( self.m_panel82, wx.ID_ANY, u"Redraw Tree", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer99.Add( self.m_button45, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		bSizer107 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_button46 = wx.Button( self.m_panel82, wx.ID_ANY, u"Save RP File", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer107.Add( self.m_button46, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_dirPicker4 = wx.DirPickerCtrl( self.m_panel82, wx.ID_ANY, wx.EmptyString, u"Select a folder", wx.DefaultPosition, wx.DefaultSize, wx.DIRP_DEFAULT_STYLE )
+		bSizer107.Add( self.m_dirPicker4, 1, wx.ALL, 5 )
+		
+		
+		bSizer99.Add( bSizer107, 0, wx.EXPAND, 5 )
+		
+		bSizer56 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText43 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"File Name", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText43.Wrap( -1 )
+		bSizer56.Add( self.m_staticText43, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer56.AddSpacer( ( 25, 0), 0, 0, 5 )
+		
+		self.m_textCtrl17 = wx.TextCtrl( self.m_panel82, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer56.Add( self.m_textCtrl17, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer99.Add( bSizer56, 0, wx.EXPAND, 5 )
+		
+		
+		bSizer96.Add( bSizer99, 1, wx.EXPAND, 5 )
+		
+		
+		bSizer92.Add( bSizer96, 1, wx.EXPAND, 5 )
+		
+		
+		bSizer90.Add( bSizer92, 1, wx.EXPAND, 5 )
+		
+		
+		bSizer151.Add( bSizer90, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_panel82.SetSizer( bSizer151 )
+		self.m_panel82.Layout()
+		bSizer151.Fit( self.m_panel82 )
+		self.m_notebook1.AddPage( self.m_panel82, u"Cairo", True )
 		
 		bSizer2.Add( self.m_notebook1, 1, wx.EXPAND |wx.ALL, 5 )
 		
@@ -878,6 +1053,13 @@ class ctrlFrame ( wx.Frame ):
 		self.m_spinCtrl2.Bind( wx.EVT_SPINCTRL, self.add_circles )
 		self.m_button9.Bind( wx.EVT_BUTTON, self.save_alignment_image )
 		self.m_button5.Bind( wx.EVT_BUTTON, self.run_controller_script )
+		self.m_button36.Bind( wx.EVT_BUTTON, self.reroot_above )
+		self.m_button37.Bind( wx.EVT_BUTTON, self.pivot_clock )
+		self.m_button38.Bind( wx.EVT_BUTTON, self.pivot_ctrclock )
+		self.m_button371.Bind( wx.EVT_BUTTON, self.expand_clade_out )
+		self.m_button381.Bind( wx.EVT_BUTTON, self.expand_clade_in )
+		self.m_button45.Bind( wx.EVT_BUTTON, self.redraw_tree )
+		self.m_button46.Bind( wx.EVT_BUTTON, self.save_rp_file )
 	
 	def __del__( self ):
 		pass
@@ -1009,6 +1191,27 @@ class ctrlFrame ( wx.Frame ):
 		event.Skip()
 	
 	def run_controller_script( self, event ):
+		event.Skip()
+	
+	def reroot_above( self, event ):
+		event.Skip()
+	
+	def pivot_clock( self, event ):
+		event.Skip()
+	
+	def pivot_ctrclock( self, event ):
+		event.Skip()
+	
+	def expand_clade_out( self, event ):
+		event.Skip()
+	
+	def expand_clade_in( self, event ):
+		event.Skip()
+	
+	def redraw_tree( self, event ):
+		event.Skip()
+	
+	def save_rp_file( self, event ):
 		event.Skip()
 	
 

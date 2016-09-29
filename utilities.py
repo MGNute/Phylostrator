@@ -17,14 +17,23 @@ def get_random_color(incr=None):
     rgb=colorsys.hsv_to_rgb(H,S,V)
     return rgb
 
+def write_list_to_file(mylist,filepath):
+    myf=open(filepath,'w')
 
-def color_scale_3_set(total):
+    for i in mylist:
+        myf.write(i + '\n')
+
+    myf.close()
+
+def color_scale_set(total):
     lower_lim = .40
 
     side = int(float(total) ** .333 + 1)
     gap = 1.0 / float(side)
 
     ineliglbe_pts = int((lower_lim - gap * 5 / 6) / gap + 1) ** 3
+    ineliglbe_pts += 1 #white is not allowed
+
     while side ** 3 - ineliglbe_pts < total:
         side += 1
         gap = 1.0 / float(side)
@@ -42,7 +51,7 @@ def color_scale_3_set(total):
         for j in backrange:
             for k in backrange:
                 newc = (coords[i], coords[j], coords[k])
-                if max(newc) > lower_lim:
+                if max(newc) > lower_lim and min(i,j,k)<max(backrange):
                     locus.append(newc)
 
     sss = side * side * side - ineliglbe_pts
@@ -51,7 +60,6 @@ def color_scale_3_set(total):
     for i in perm:
         finals.append(locus[len(perm) - i - 1])
     return finals
-
 
 def get_ideal_permutation(els):
     random.seed(100)
