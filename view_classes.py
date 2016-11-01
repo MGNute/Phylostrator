@@ -842,60 +842,6 @@ class PhylogenyBufferedWindow(BufferedWindow):
     def DrawCairoFigure(self,event=None):
         print "Not using CairoBufferedWindow"
 
-class HOCRbufferedWindow(BufferedWindow):
-    def __init__(self,parent,*args, **kwargs):
-        # self.DrawData=self.MakeNewData()
-        # BufferedWindow.__init__(self,parent,*args,**kwargs)
-
-
-        self.DrawData={'ticks': my_globals.ticks, 'racers':my_globals.racers }
-        # self.DrawData=self.MakeNewData()
-        # print args
-        # print kwargs
-        BufferedWindow.__init__(self,parent, *args, **kwargs)
-
-    def convert_time_to_window(self,time_coords,tc2=None):
-        '''
-        :param time_coords: comes in the form (time, position on racecourse)
-        :return:
-        '''
-        topleft=(50,100)
-        h=400
-        w=1800
-        mintime=my_globals.ticks[0][1]
-        numticks=len(my_globals.ticks)
-        maxtime=my_globals.ticks[numticks-1][1]
-
-        y=int((1-time_coords[1])*h+topleft[1])
-        x=int(topleft[0] + w*(time_coords[0]-mintime)/(maxtime-mintime))
-        if tc2==None:
-            return (x,y)
-        else:
-            y2=int((1-tc2[1])*h+topleft[1])
-            x2=int(topleft[0] + w*(time_coords[0]-mintime)/(maxtime-mintime))
-            return(x,y,x2,y2)
-
-
-    def Draw(self,dc):
-        dc.SetBackground(wx.Brush("White"))
-        dc.Clear()
-
-
-        dc.DrawLine(50,100,1850,100)
-        dc.DrawLine(50,500,1850,500)
-        for i in self.DrawData['ticks']:
-            lab=i[0]
-            t=i[1]
-            x,y=self.convert_time_to_window((t,0))
-            dc.DrawLine(x,y,x,y+10)
-            tw,th=dc.GetTextExtent(lab)
-            dc.DrawRotatedText(lab,x+int(th/2),y+10,270)
-
-        for i in self.DrawData['racers']:
-            x1,y1=self.convert_time_to_window((i[0],0))
-            x2,y2=self.convert_time_to_window((i[1],1))
-            dc.DrawLine(x1,y1,x2,y2)
-
 # class ViewAreaSelectorPanel(BufferedWindow):
 class ValuePickerScrolledPanel(wx.lib.scrolledpanel.ScrolledPanel):
 

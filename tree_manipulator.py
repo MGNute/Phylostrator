@@ -219,6 +219,11 @@ class Radial_Phylogram():
         r=pr.next()
 
         self.node_labels[r.label]['x']=(0.0,0.0)
+        r.location = (0.0,0.0)
+        r.deflect_angle = 0.
+        r.wedge_angle = 2*math.pi
+        r.edge_segment_angle = 0.
+        r.right_wedge_border = 0.
         self.node_labels[r.label]['w']=2*math.pi
         self.node_labels[r.label]['t']=0.0
         self.node_labels[r.label]['nu']=0.0
@@ -232,10 +237,13 @@ class Radial_Phylogram():
             # i.edge_length = 0.001 # debug
             ww=float(len(i.leaf_nodes()))/leafct*2*math.pi
             self.node_labels[i.label]['w']=ww   # wedge angle
-            self.node_labels[i.label]['t']=self.node_labels[i.parent_node.label]['nu'] # angle of right wedge border
+            i.wedge_angle=ww
+            i.right_wedge_border =self.node_labels[i.parent_node.label]['nu']
+            self.node_labels[i.label]['t']=i.right_wedge_border # angle of right wedge border
             # theta_vals.append(self.node_labels[i.label]['t'])
             self.node_labels[i.label]['nu']=self.node_labels[i.label]['t']
             thetav=self.node_labels[i.parent_node.label]['nu']+ww/2
+            i.edge_segment_angle=thetav
             self.node_labels[i.label]['theta']=thetav
             # theta_vals2.append(i.label)
             self.node_labels[i.parent_node.label]['nu']+=ww
@@ -243,32 +251,68 @@ class Radial_Phylogram():
             delta=i.edge_length
             x1=xu[0]+delta*math.cos(thetav)
             x2=xu[1]+delta*math.sin(thetav)
+            i.location = (x1,x2)
+            i.deflect_angle = thetav - self.node_labels[i.parent_node.label]['theta']
             # theta_vals3.append(self.node_labels[i.label]['t'])
             # x1_orig = xu[0] + delta * math.cos(thetav)
             # x2_orig = xu[1] + delta * math.sin(thetav)
             # x1 = x1_orig*math.cos(self.rotation)-x2_orig*math.sin(self.rotation)
             # x2 = x1_orig*math.sin(self.rotation)+x2_orig*math.cos(self.rotation)
             self.node_labels[i.label]['x']=(x1,x2)
-        # print theta_vals[0:50]
-        # print theta_vals2[0:50]
-        # print theta_vals3[0:50]
-        # print "Debug 1:"  # DEBUG 3
-        # self.print_right_angles()
+
+        for i in self.myt.preorder_internal_node_iter():
+            w = i.wedge_angle
+            for j in i.child_node_iter():
+                j.percent_of_parent_wedge=j.wedge_angle/w
+
+    def relocate_subtree_by_deflect_angle(self,node):
+        '''
+        runs a preorder node iteration and uses the current deflection angles of each node to replace
+        its current location with a new location.
+        :param node:
+        :return:
+        '''
+        for i in node.preorder_iter():
+            t0 = i.parent_node.edge_segment_angle
+            x0 = i.parent_node.location
+            t1 = i.deflect_angle + t0
+            x1x = x0[0]+i.edge_length*math.cos(t1)
+            x1y = x0[1]+i.edge_length*math.sin(t1)
+            i.location = (x1x,x1y)
+
+    def relocate_subtree_by_wedge_properties(self,node):
+        preo = node.preorder_iter()
+        nd = preo.next()
+        temp_nu={}
+        temp_nu[nd.id]=nd.right_wedge_border
+        for i in preo:
+            i.wedge_angle = i.percent_of_parent_wedge*i.parent_node.wedge_angle
+            i.right_wedge_border = temp_nu[i.parent_node.id]
+            temp_nu[i.parent_node.id]+=i.wedge_angle
+            temp_nu[i.id]=i.right_wedge_border
+            i.edge_segment_angle = i.right_wedge_border + i.wedge_angle/2
+
+            xu = i.parent_node.location
+            delta = i.edge_length
+            x1 = xu[0] + delta * math.cos(i.edge_segment_angle)
+            x2 = xu[1] + delta * math.sin(i.edge_segment_angle)
+            i.location=(x1,x2)
+            i.deflect_angle = i.edge_segment_angle-i.parent_node.edge_segment_angle
 
 
-    def print_right_angles(self):
-        ct = 0
-        first_fifty=[]
-        ffl=[]
-        for i in self.myt.preorder_node_iter():
-            first_fifty.append(self.node_labels[i.label]['t'])
-            ffl.append(i.label)
-            ct +=1
-            if ct > 50:
-                print first_fifty
-                print ffl
-                return None
+    def get_de_facto_spread_angle(self,node):
+        start = node.parent_node.location
+        angles = []
+        for i in node.leaf_iter():
+            xi = i.location
+            ang = math.atan2(xi[1]-start[1],xi[0]-start[0])
+            if ang < 0:
+                ang = 2*math.pi - ang
+            angles.append(ang)
+        return min(angles), max(angles)
 
+    def angle_spread_extension(self):
+        pass
 
     def get_max_dims(self):
         xma=float(0)
@@ -342,8 +386,11 @@ class Radial_Phylogram():
 
         lab=1
         alllabs=set([])
+        ct = 0
         for i in self.myt.postorder_node_iter():
             oldlab=i.label
+            i.id = ct
+            ct+=1
             # i.label='label' + str(lab)
             # lab+=1
             # if i.is_leaf()==True:

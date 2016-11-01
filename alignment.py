@@ -314,9 +314,12 @@ class MultipleSequenceAlignment():
 
         self.segment_endpoints=[]
         for i in t.postorder_edge_iter():
-            if i.length is not None:
+            if i.length is not None and i.length>0.0:
                 v1=self.tree_vertices[i.head_node]
-                v2=self.tree_vertices[i.head_node.parent_node]
+                try:
+                    v2=self.tree_vertices[i.head_node.parent_node]
+                except:
+                    print i.length
                 self.segment_endpoints.append((v1[0],v1[1],v2[0],v1[1]))
                 self.segment_endpoints.append((v2[0],v1[1],v2[0],v2[1]))
 

@@ -7,7 +7,7 @@ import dendropy
 # import controller
 # import aux_view_classes as avc
 # from view import *
-import my_globals
+# import my_globals
 import numpy as np
 global colors
 import tree_manipulator as tm
@@ -42,7 +42,7 @@ class DrawPanelDBT(wx.Panel):
         self.SizeUpdate()
 
     #-------------------------------------------------------------------------
-    def OnPaint(self, event):
+    def OnPaint(self, event=None):
         # Just draw prepared bitmap
         wx.BufferedPaintDC(self, self.buffer)
         # wx.BufferedPaintDC(self, self.surf.get_data())
