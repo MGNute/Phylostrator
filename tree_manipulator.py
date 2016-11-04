@@ -249,8 +249,13 @@ class Radial_Phylogram():
             self.node_labels[i.parent_node.label]['nu']+=ww
             xu=self.node_labels[i.parent_node.label]['x']
             delta=i.edge_length
-            x1=xu[0]+delta*math.cos(thetav)
-            x2=xu[1]+delta*math.sin(thetav)
+            try:
+                x1=xu[0]+delta*math.cos(thetav)
+                x2=xu[1]+delta*math.sin(thetav)
+            except:
+                print 'thetav is %d' % thetav
+                x1=xu[0]
+                x2=xu[1]
             i.location = (x1,x2)
             i.deflect_angle = thetav - self.node_labels[i.parent_node.label]['theta']
             # theta_vals3.append(self.node_labels[i.label]['t'])
@@ -471,6 +476,11 @@ class Radial_Phylogram():
         self.node_labels[a.label]['t']=right_edge_radians
         self.node_labels[a.label]['nu']=right_edge_radians
         ref_ct = float(len(a.leaf_nodes()))
+        # a=nd
+        # self.node_labels[a.label]['w']=width_radians
+        # self.node_labels[a.label]['t']=right_edge_radians
+        # self.node_labels[a.label]['nu']=right_edge_radians
+        # ref_ct = float(len(a.leaf_nodes()))
 
         for i in pr:
             # k+=1

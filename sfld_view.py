@@ -74,6 +74,34 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer3 = wx.BoxSizer( wx.VERTICAL )
 		
+		bSizer41 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.lblFile2 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Config File", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_LEFT )
+		self.lblFile2.Wrap( -1 )
+		self.lblFile2.SetFont( wx.Font( 9, 74, 90, 92, False, "Arial" ) )
+		self.lblFile2.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
+		
+		bSizer41.Add( self.lblFile2, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer41.AddSpacer( ( 43, 0), 0, wx.EXPAND, 5 )
+		
+		self.m_FilePicker_config = wx.FilePickerCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.Size( 500,-1 ), wx.FLP_DEFAULT_STYLE )
+		self.m_FilePicker_config.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+		
+		bSizer41.Add( self.m_FilePicker_config, 0, wx.ALL, 5 )
+		
+		self.btn_import_tree1 = wx.Button( self.m_panel2, wx.ID_ANY, u"Save", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer41.Add( self.btn_import_tree1, 0, wx.ALL, 5 )
+		
+		self.m_checkBox51 = wx.CheckBox( self.m_panel2, wx.ID_ANY, u"Use Config", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_checkBox51.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer41.Add( self.m_checkBox51, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer3.Add( bSizer41, 0, 0, 5 )
+		
 		bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
 		
 		self.lblFile = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Tree File", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_LEFT )
@@ -153,34 +181,16 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer7.Add( bSizer13, 1, wx.EXPAND, 5 )
 		
-		bSizer18 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		self.m_checkBox1 = wx.CheckBox( self.m_panel2, wx.ID_ANY, u"Snapshot Mode", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_RIGHT )
-		self.m_checkBox1.SetValue(True) 
-		self.m_checkBox1.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_CAPTIONTEXT ) )
-		self.m_checkBox1.SetToolTipString( u"When checked, clicking \"Save\" will save the image with the file name above, then add a number to the end of it, which will be incremented every time \"Save\" is clicked" )
-		
-		bSizer18.Add( self.m_checkBox1, 0, wx.ALIGN_CENTER_VERTICAL|wx.TOP|wx.BOTTOM|wx.RIGHT, 5 )
-		
-		self.m_staticline8 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_VERTICAL )
-		bSizer18.Add( self.m_staticline8, 0, wx.EXPAND |wx.ALL, 5 )
-		
-		self.m_staticText14 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Folder:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText14.Wrap( -1 )
-		self.m_staticText14.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
-		
-		bSizer18.Add( self.m_staticText14, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_dirPicker1 = wx.DirPickerCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, u"Select a folder", wx.DefaultPosition, wx.Size( 430,-1 ), wx.DIRP_DEFAULT_STYLE )
-		self.m_dirPicker1.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
-		
-		bSizer18.Add( self.m_dirPicker1, 0, wx.ALL, 5 )
-		
-		
-		bSizer7.Add( bSizer18, 1, wx.EXPAND, 5 )
-		
 		
 		bSizer3.Add( bSizer7, 0, wx.EXPAND, 5 )
+		
+		self.m_staticline16 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		bSizer3.Add( self.m_staticline16, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		bSizer48 = wx.BoxSizer( wx.VERTICAL )
+		
+		
+		bSizer3.Add( bSizer48, 1, wx.EXPAND, 5 )
 		
 		
 		self.m_panel2.SetSizer( bSizer3 )
@@ -282,7 +292,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer11.Add( bSizer5, 0, wx.EXPAND, 5 )
 		
-		self.m_FilePicker_annotation = wx.FilePickerCtrl( self.m_panel4, wx.ID_ANY, u"C:\\Users\\miken\\Grad School Stuff\\Research\\Phylogenetics\\Metagenomics\\tipp\\refpkg\\16S_bacteria.refpkg\\annotation.txt", u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
+		self.m_FilePicker_annotation = wx.FilePickerCtrl( self.m_panel4, wx.ID_ANY, u"C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\kra-primate-project\\kra-primate\\tree_placement_2\\annotation.txt", u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
 		self.m_FilePicker_annotation.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
 		
 		bSizer11.Add( self.m_FilePicker_annotation, 0, wx.ALL|wx.EXPAND, 5 )
@@ -426,7 +436,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel4.SetSizer( bSizer10 )
 		self.m_panel4.Layout()
 		bSizer10.Fit( self.m_panel4 )
-		self.m_notebook1.AddPage( self.m_panel4, u"Taxon Annotation", False )
+		self.m_notebook1.AddPage( self.m_panel4, u"Taxon Annotation", True )
 		self.m_panel41 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_panel41.SetBackgroundColour( wx.Colour( 200, 200, 200 ) )
 		
@@ -455,7 +465,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer111.Add( bSizer511, 0, wx.EXPAND, 5 )
 		
-		self.m_filePicker5 = wx.FilePickerCtrl( self.m_panel41, wx.ID_ANY, u"C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\kra-primate-project\\kra-primate\\tree_placement\\place_repset_placement.json", u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
+		self.m_filePicker5 = wx.FilePickerCtrl( self.m_panel41, wx.ID_ANY, u"C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\kra-primate-project\\kra-primate\\tree_placement_2\\place_repset_placement.json", u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
 		bSizer111.Add( self.m_filePicker5, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		self.m_staticline20 = wx.StaticLine( self.m_panel41, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
@@ -473,7 +483,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer111.Add( bSizer51, 0, wx.EXPAND, 5 )
 		
-		self.m_FilePicker_annotation1 = wx.FilePickerCtrl( self.m_panel41, wx.ID_ANY, u"C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\kra-primate-project\\kra-primate\\tree_placement\\sepp_obs_id_annotation.txt", u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
+		self.m_FilePicker_annotation1 = wx.FilePickerCtrl( self.m_panel41, wx.ID_ANY, u"C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\kra-primate-project\\kra-primate\\tree_placement_2\\sepp_annotation.txt", u"Select a file", u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
 		self.m_FilePicker_annotation1.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
 		
 		bSizer111.Add( self.m_FilePicker_annotation1, 0, wx.ALL|wx.EXPAND, 5 )
@@ -656,158 +666,10 @@ class ctrlFrame ( wx.Frame ):
 		self.m_ExtraAnnotation.Layout()
 		bSizer512.Fit( self.m_ExtraAnnotation )
 		self.m_notebook1.AddPage( self.m_ExtraAnnotation, u"Extra Annotation", False )
-		self.m_Alignment = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		bSizer181 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		bSizer19 = wx.BoxSizer( wx.VERTICAL )
-		
-		bSizer21 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		self.m_staticText141 = wx.StaticText( self.m_Alignment, wx.ID_ANY, u"Starting Column (Reference):", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText141.Wrap( -1 )
-		bSizer21.Add( self.m_staticText141, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_startCol = wx.SpinCtrl( self.m_Alignment, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10000, 80 )
-		bSizer21.Add( self.m_startCol, 0, wx.ALL, 5 )
-		
-		
-		bSizer19.Add( bSizer21, 0, wx.EXPAND, 5 )
-		
-		self.m_staticline81 = wx.StaticLine( self.m_Alignment, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-		bSizer19.Add( self.m_staticline81, 0, wx.EXPAND |wx.ALL, 5 )
-		
-		bSizer22 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		self.m_staticText15 = wx.StaticText( self.m_Alignment, wx.ID_ANY, u"Window Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText15.Wrap( -1 )
-		self.m_staticText15.SetFont( wx.Font( 9, 74, 90, 92, False, "Arial" ) )
-		
-		bSizer22.Add( self.m_staticText15, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_staticText16 = wx.StaticText( self.m_Alignment, wx.ID_ANY, u"height", wx.DefaultPosition, wx.Size( 50,-1 ), wx.ALIGN_RIGHT )
-		self.m_staticText16.Wrap( -1 )
-		bSizer22.Add( self.m_staticText16, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_textHeight = wx.TextCtrl( self.m_Alignment, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,-1 ), 0 )
-		self.m_textHeight.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
-		self.m_textHeight.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
-		self.m_textHeight.Enable( False )
-		
-		bSizer22.Add( self.m_textHeight, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_staticText161 = wx.StaticText( self.m_Alignment, wx.ID_ANY, u"width", wx.DefaultPosition, wx.Size( 50,-1 ), wx.ALIGN_RIGHT )
-		self.m_staticText161.Wrap( -1 )
-		bSizer22.Add( self.m_staticText161, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_textWidth = wx.TextCtrl( self.m_Alignment, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,-1 ), 0 )
-		self.m_textWidth.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
-		self.m_textWidth.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOW ) )
-		self.m_textWidth.Enable( False )
-		
-		bSizer22.Add( self.m_textWidth, 0, wx.ALL, 5 )
-		
-		
-		bSizer19.Add( bSizer22, 0, wx.EXPAND, 5 )
-		
-		bSizer23 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		self.m_addCirclesSlowTxt = wx.StaticText( self.m_Alignment, wx.ID_ANY, u"LoadFromPickled", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_addCirclesSlowTxt.Wrap( -1 )
-		self.m_addCirclesSlowTxt.SetFont( wx.Font( 9, 74, 90, 92, False, "Arial" ) )
-		
-		bSizer23.Add( self.m_addCirclesSlowTxt, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_chkAddSlow = wx.CheckBox( self.m_Alignment, wx.ID_ANY, u"yes", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_chkAddSlow.SetValue(True) 
-		bSizer23.Add( self.m_chkAddSlow, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_spinCtrl2 = wx.SpinCtrl( self.m_Alignment, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.SP_ARROW_KEYS, 0, 10000, 0 )
-		bSizer23.Add( self.m_spinCtrl2, 0, wx.ALL, 5 )
-		
-		
-		bSizer19.Add( bSizer23, 0, wx.EXPAND, 5 )
-		
-		self.m_staticline9 = wx.StaticLine( self.m_Alignment, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
-		bSizer19.Add( self.m_staticline9, 0, wx.EXPAND |wx.ALL, 5 )
-		
-		self.m_staticText21 = wx.StaticText( self.m_Alignment, wx.ID_ANY, u"Snapshot Mode:", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText21.Wrap( -1 )
-		bSizer19.Add( self.m_staticText21, 0, wx.ALL, 5 )
-		
-		bSizer25 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		self.m_staticText20 = wx.StaticText( self.m_Alignment, wx.ID_ANY, u"path", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText20.Wrap( -1 )
-		bSizer25.Add( self.m_staticText20, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_dirPicker2 = wx.DirPickerCtrl( self.m_Alignment, wx.ID_ANY, u"C:\\Users\\Michael\\Dropbox\\Grad School\\Phylogenetics\\work\\baliphy-pseudo\\aln_view", u"Select a folder", wx.DefaultPosition, wx.DefaultSize, wx.DIRP_DEFAULT_STYLE )
-		bSizer25.Add( self.m_dirPicker2, 1, wx.ALL|wx.EXPAND, 5 )
-		
-		
-		bSizer19.Add( bSizer25, 0, wx.EXPAND, 5 )
-		
-		bSizer24 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		self.m_staticText19 = wx.StaticText( self.m_Alignment, wx.ID_ANY, u"prefix", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText19.Wrap( -1 )
-		bSizer24.Add( self.m_staticText19, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_textCtrl8 = wx.TextCtrl( self.m_Alignment, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer24.Add( self.m_textCtrl8, 1, wx.ALL|wx.EXPAND, 5 )
-		
-		
-		bSizer19.Add( bSizer24, 0, wx.EXPAND, 5 )
-		
-		bSizer26 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		
-		bSizer26.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
-		
-		self.m_button9 = wx.Button( self.m_Alignment, wx.ID_ANY, u"Save Snapshot", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer26.Add( self.m_button9, 0, wx.ALL, 5 )
-		
-		
-		bSizer19.Add( bSizer26, 0, wx.EXPAND, 5 )
-		
-		
-		bSizer19.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
-		
-		
-		bSizer181.Add( bSizer19, 1, wx.EXPAND, 5 )
-		
-		bSizer20 = wx.BoxSizer( wx.VERTICAL )
-		
-		
-		bSizer20.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
-		
-		
-		bSizer181.Add( bSizer20, 1, wx.EXPAND, 5 )
-		
-		
-		self.m_Alignment.SetSizer( bSizer181 )
-		self.m_Alignment.Layout()
-		bSizer181.Fit( self.m_Alignment )
-		self.m_notebook1.AddPage( self.m_Alignment, u"Alignment", False )
 		self.m_panel8 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer15 = wx.BoxSizer( wx.VERTICAL )
 		
-		self.m_staticText10 = wx.StaticText( self.m_panel8, wx.ID_ANY, u"Commands", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText10.Wrap( -1 )
-		bSizer15.Add( self.m_staticText10, 0, wx.ALL|wx.EXPAND, 5 )
-		
-		self.m_textCtrl3 = wx.TextCtrl( self.m_panel8, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_textCtrl3.SetMinSize( wx.Size( 500,50 ) )
-		
-		bSizer15.Add( self.m_textCtrl3, 0, wx.ALL|wx.EXPAND, 5 )
-		
 		bSizer16 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		self.m_staticText12 = wx.StaticText( self.m_panel8, wx.ID_ANY, u"Prefix", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText12.Wrap( -1 )
-		bSizer16.Add( self.m_staticText12, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_textCtrl5 = wx.TextCtrl( self.m_panel8, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer16.Add( self.m_textCtrl5, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_button5 = wx.Button( self.m_panel8, wx.ID_ANY, u"Run Controller Script", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer16.Add( self.m_button5, 0, wx.ALL, 5 )
@@ -850,6 +712,61 @@ class ctrlFrame ( wx.Frame ):
 		
 		
 		bSizer89.Add( bSizer911, 0, 0, 5 )
+		
+		self.m_staticline161 = wx.StaticLine( self.m_panel82, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		bSizer89.Add( self.m_staticline161, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		bSizer9711 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText7812 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"PNG Width", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText7812.Wrap( -1 )
+		self.m_staticText7812.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer9711.Add( self.m_staticText7812, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textPngWidth = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"1200", wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
+		bSizer9711.Add( self.m_textPngWidth, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer9711.AddSpacer( ( 20, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_staticText78111 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Height", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText78111.Wrap( -1 )
+		self.m_staticText78111.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer9711.Add( self.m_staticText78111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textPngHeight = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"1200", wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
+		bSizer9711.Add( self.m_textPngHeight, 0, wx.ALL, 5 )
+		
+		
+		bSizer89.Add( bSizer9711, 0, 0, 5 )
+		
+		bSizer97111 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_textCircleAlphas = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Circle Alphas", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_textCircleAlphas.Wrap( -1 )
+		self.m_textCircleAlphas.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer97111.Add( self.m_textCircleAlphas, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textCircleAlphas = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u".75", wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
+		bSizer97111.Add( self.m_textCircleAlphas, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer97111.AddSpacer( ( 20, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_staticText781111 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"SEPP alphas", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText781111.Wrap( -1 )
+		self.m_staticText781111.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer97111.Add( self.m_staticText781111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textSeppAlphas = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u".45", wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
+		bSizer97111.Add( self.m_textSeppAlphas, 0, wx.ALL, 5 )
+		
+		
+		bSizer89.Add( bSizer97111, 0, 0, 5 )
 		
 		
 		bSizer151.Add( bSizer89, 1, wx.EXPAND, 5 )
@@ -994,7 +911,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel82.SetSizer( bSizer151 )
 		self.m_panel82.Layout()
 		bSizer151.Fit( self.m_panel82 )
-		self.m_notebook1.AddPage( self.m_panel82, u"Cairo", True )
+		self.m_notebook1.AddPage( self.m_panel82, u"Cairo", False )
 		
 		bSizer2.Add( self.m_notebook1, 1, wx.EXPAND |wx.ALL, 5 )
 		
@@ -1008,6 +925,9 @@ class ctrlFrame ( wx.Frame ):
 		# Connect Events
 		self.Bind( wx.EVT_CLOSE, self.on_frame_close )
 		self.Bind( wx.EVT_ICONIZE, self.on_frame_iconize )
+		self.m_FilePicker_config.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_file )
+		self.btn_import_tree1.Bind( wx.EVT_BUTTON, self.import_tree )
+		self.m_checkBox51.Bind( wx.EVT_CHECKBOX, self.on_toggle_config )
 		self.m_FilePicker_tree.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_file )
 		self.btn_import_tree.Bind( wx.EVT_BUTTON, self.import_tree )
 		self.m_dirPicker3.Bind( wx.EVT_DIRPICKER_CHANGED, self.set_working_folder )
@@ -1049,9 +969,6 @@ class ctrlFrame ( wx.Frame ):
 		self.m_checkBox3.Bind( wx.EVT_CHECKBOX, self.set_pendant_branch_checked )
 		self.m_button71.Bind( wx.EVT_BUTTON, self.sepp_valpicker_clear )
 		self.m_button81.Bind( wx.EVT_BUTTON, self.sepp_valpicker_load )
-		self.m_startCol.Bind( wx.EVT_SPINCTRL, self.change_starting_column )
-		self.m_spinCtrl2.Bind( wx.EVT_SPINCTRL, self.add_circles )
-		self.m_button9.Bind( wx.EVT_BUTTON, self.save_alignment_image )
 		self.m_button5.Bind( wx.EVT_BUTTON, self.run_controller_script )
 		self.m_button36.Bind( wx.EVT_BUTTON, self.reroot_above )
 		self.m_button37.Bind( wx.EVT_BUTTON, self.pivot_clock )
@@ -1077,6 +994,11 @@ class ctrlFrame ( wx.Frame ):
 	
 	def import_tree( self, event ):
 		event.Skip()
+	
+	def on_toggle_config( self, event ):
+		event.Skip()
+	
+	
 	
 	def set_working_folder( self, event ):
 		event.Skip()
@@ -1179,15 +1101,6 @@ class ctrlFrame ( wx.Frame ):
 		event.Skip()
 	
 	def sepp_valpicker_load( self, event ):
-		event.Skip()
-	
-	def change_starting_column( self, event ):
-		event.Skip()
-	
-	def add_circles( self, event ):
-		event.Skip()
-	
-	def save_alignment_image( self, event ):
 		event.Skip()
 	
 	def run_controller_script( self, event ):

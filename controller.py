@@ -23,7 +23,7 @@ class Options():
         self.cfg.read('init_settings.cfg')
         self.init_tree = self.cfg.get('main','initial_tree')
         self.init_annotation = self.cfg.get('main', 'initial_tree')
-        self.jitter_radius = self.cfg.getint('main','jitter_radius')
+        self.jitter_radius = self.cfg.getint('cairo','jitter_radius')
         self.temp_subtree_path = self.cfg.get('main','temp_subtree_path')
 
 class Controller():
@@ -358,7 +358,7 @@ class SEPPController():
                 sz = self.SeppValuePickerCtrl_ref.value_pickers[0].size
                 if with_pendants == True:
                     self.sepp_draw_circles.append((x1, clr[0], clr[1], clr[2], sz, None))
-                    self.bw_ref.ExtraDrawSegments.append((x1, x0))
+                    self.bw_ref.ExtraDrawSegments.append((x1, x0, clr))
                 else:
                     self.sepp_draw_circles.append((x0, clr[0], clr[1], clr[2], sz, None))
 
@@ -407,7 +407,7 @@ class SEPPController():
                     sz = self.selected_annotation_values[i[ann_col]][1]
                     if with_pendants==True:
                         self.sepp_draw_circles.append((x1,clr[0],clr[1],clr[2],sz,None))
-                        self.bw_ref.ExtraDrawSegments.append((x1,x0))
+                        self.bw_ref.ExtraDrawSegments.append((x1,x0,clr))
                     else:
                         self.sepp_draw_circles.append((x0,clr[0],clr[1],clr[2],sz,None))
 
@@ -460,7 +460,8 @@ class SEPPController():
         else:
             frac = place[3] / e_len
             circ_x = (frac * hx[0] + (1 - frac) * tx[0], frac * hx[1] + (1 - frac) * tx[1])
-            pen_x = (circ_x[0] + (hx[1]-tx[1])/e_len*place[4],circ_x[1]-(hx[0]-tx[0])/e_len*place[4])
+            pen_x = (circ_x[0] + (hx[1]-tx[1])/e_len*place[4] / 4. ,circ_x[1]-(hx[0]-tx[0])/e_len*place[4] / 4.)
+            # pen_x = (pen_x[0], pen_x[1])
             return pen_x
 
 class AlignmentController(Controller):

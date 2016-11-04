@@ -1,5 +1,6 @@
 from controller import Controller
 import colorsys, wx
+import utilities
 __author__ = 'Michael'
 
 def color_scale(value):
@@ -16,19 +17,23 @@ def color_scale(value):
     return rgb_out
 
 def script_function(bw_ref):
-    from my_globals import amato_qiime_root
+    # from my_globals import amato_qiime_root
     import os, json
-    myf=open(os.path.join(amato_qiime_root,'place_repset_placement.json'),'r')
+    myf=open(os.path.join('C:/Users/miken/Dropbox/Grad School/Phylogenetics/work/kra-primate-project/kra-primate/tree_placement_2/','place_repset_placement.json'),'r')
     stra=myf.read()
     myf.close()
     place = json.loads(stra)
 
-    myotus=['New.ReferenceOTU264','New.ReferenceOTU28','New.ReferenceOTU296','New.ReferenceOTU22','4326866',
-            'New.ReferenceOTU58','New.ReferenceOTU87','180999','300394','296278','New.CleanUp.ReferenceOTU124',
-            '211066','269913','4366524','New.ReferenceOTU2628','New.ReferenceOTU51','308498','110836','147182',
-            'New.CleanUp.ReferenceOTU401','291011','New.ReferenceOTU66','340642','111771','New.CleanUp.ReferenceOTU4697',
-            'New.CleanUp.ReferenceOTU241','New.ReferenceOTU134','4314124','721569','105813','New.CleanUp.ReferenceOTU1989',
-            '195029','New.ReferenceOTU160','4419504','269532','301375','640999','918313','New.ReferenceOTU154']
+    outpath='C:/Users/miken/Dropbox/Grad School/Phylogenetics/work/kra-primate-project/kra-primate/tree_placement_2/all_unlabeled'
+
+    myotus=utilities.get_list_from_file('list_of_unlabeled.txt')
+
+    # for i in myotus:
+    #     mypa = os.path.join(outpath,i,'.jpg')
+    #     for pl in place['placements']:
+    #         for j in pl['nm']:
+    #             if i == j[0]:
+    #                 for p in pl['p']:
 
     placements={}
     for i in place['placements']:

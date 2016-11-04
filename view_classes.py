@@ -649,12 +649,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
         dc.SetBackground(wx.Brush("White"))
         dc.Clear()
         dc.SetPen(wx.Pen(wx.Colour(0,0,0)))
-        self.h=self._Buffer.Height
-        self.w=self._Buffer.Width
-        xyrange=(self.top_left[0],self.bottom_right[0],self.bottom_right[1],self.top_left[1])
-        self.c.bw_aspect_ratio=float(self.w)/float(self.h)
-        self.line_list = []
-        self.set_coordinate_transform()
+        self.pre_draw_perspective_setting()
         for i in self.DrawData['segments']:
             # x1 = convert_coordinates(xyrange,(self.w,self.h),(i[0],i[1]))
             # x2 = convert_coordinates(xyrange, (self.w, self.h), (i[2], i[3]))
@@ -682,6 +677,14 @@ class PhylogenyBufferedWindow(BufferedWindow):
         if self.c.zoom_panel.viewer_loaded==True:
             self.c.zoom_panel.set_box_coords()
             self.c.zoom_panel.Update()
+
+    def pre_draw_perspective_setting(self):
+        self.h = self._Buffer.Height
+        self.w = self._Buffer.Width
+        xyrange = (self.top_left[0], self.bottom_right[0], self.bottom_right[1], self.top_left[1])
+        self.c.bw_aspect_ratio = float(self.w) / float(self.h)
+        self.line_list = []
+        self.set_coordinate_transform()
 
     def DrawLegend(self,dc):
         curr_brush = dc.GetBrush()
@@ -724,7 +727,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
         dc.SetPen(curr_pen)
 
     def DrawExtraCircles(self,dc,circle_set=None):
-        jr = my_globals.jitter_radius
+        jr = opts.jitter_radius
         curr_brush = dc.GetBrush()
         curr_pen = dc.GetPen()
         if circle_set is None:
@@ -1017,32 +1020,7 @@ class ViewAreaSelectorPanel(wx.Panel):
             offsety = self.clickup[1]-self.click[1]
             self.reset_view_square(offset=(offsetx,offsety))
 
-    # def Draw(self,dc):
-    #     self.sz=dc.GetSize()
-    #
-    #     dc.DrawBitmap(self.current_bitmap,0,0)
-    #     col = wx.Colour(100, 100, 100, 0.5)
-    #     br = wx.Brush(col, wx.TRANSPARENT)
-    #     pn = wx.Pen(wx.Colour(255, 0, 0),2,wx.SOLID)
-    #     x = int(self.sz[0] * self.xmin)
-    #     y = int(self.sz[1] * self.ymin)
-    #     h = int(self.sz[1] * (self.zoom))
-    #     w = int(self.sz[0] * (self.zoom))
-    #     dc.SetBrush(br)
-    #     dc.SetPen(pn)
-    #     dc.DrawRectangle(x,y,w,h)
-    #     self.reposition_view_square()
-
     def on_zoompanel_paint(self,event):
-        # print "painting"
-        # pdc=wx.PaintDC(self)
-        # pdc=wx.PaintDC(self)
-        # pdc.SetBackground(wx.Brush("white"))
-        # self.sz = pdc.GetSize()
-        # print self.GetSize()
-        # print self.sz
-        # pdc.Clear()
-        # pdc.DrawBitmap(self.current_bitmap,0,0,True)
         temp_image=wx.BitmapFromBuffer(self.current_bitmap.GetWidth(),self.current_bitmap.GetHeight(),self.imgbuffer)
         # self.memdc.Clear()
         # print "cleared memdc"
@@ -1051,51 +1029,15 @@ class ViewAreaSelectorPanel(wx.Panel):
         # print "memdc selected"
 
         self.memdc.DrawBitmap(temp_image,0,0)
-
-        # pdc.DrawBitmap(self.current_bitmap, 0, 0, False)
-        # pdc.DrawBitmap(wx.BitmapFromImage(self.myimg,3),0,0)
-
-        # pdc.DrawLineList(self.line_list)
-        # self.Update()
-        # self.pdc.DrawBitmap(self.current_bitmap, round(self.sz[1]/2.0,0), round(self.sz[0]/2.0,0))
-        # col=wx.Colour(171,171,171,100)
         col=wx.Colour(100,100,100,0.5)
         br=wx.Brush(col,wx.TRANSPARENT)
         pn=wx.Pen(wx.Colour(0,0,0))
-        # self.sz=self.pdc.GetSize()
-        # print self.sz
-        # x=int(self.sz[0]*self.xmin)
-        # y=int(self.sz[1]*self.ymin)
-        # h=int(self.sz[1]*(self.zoom))
-        # w=int(self.sz[0]*(self.zoom))
-        # print (x,y,h,w)
         self.memdc.SetBrush(br)
         self.memdc.SetPen(pn)
-        # print "memdc brushpen"
-        # print "at paint: bxmin: %s, bxmax: %s, bymin: %s, bymax: %s" % ( self.box_xmin,self.box_xmax, self.box_ymin, self.box_ymax)
         self.memdc.DrawRectangle(self.box_xmin,self.box_ymin,abs(self.box_xmax-self.box_xmin),abs(self.box_ymax-self.box_ymin))
-        # print "drew rectangle"
         self.memdc.SelectObject(wx.NullBitmap)
         dc=wx.BufferedPaintDC(self)
         dc.DrawBitmap(new_bitmap,0,0)
-        # self.reposition_view_square()
-        # self.Refresh()
-        # self.parent.Update()
-
-    # def OnSize(self,event):
-    #     # The Buffer init is done here, to make sure the buffer is always
-    #     # the same size as the Window
-    #     Size  = self.GetClientSizeTuple()
-    #
-    #
-    #     # Make new offscreen bitmap: this bitmap will always have the
-    #     # current drawing in it, so it can be used to save the image to
-    #     # a file, or whatever.
-    #     self._Buffer = wx.EmptyBitmapRGBA(Size[0],Size[1],255,255,255,wx.ALPHA_OPAQUE)
-    #     if self.viewer_loaded==True:
-    #         self.set_global_bitmap()
-    #     self.UpdateDrawing()
-
 
     def on_size_change(self,event=None):
         self.sz=self.GetSize()
@@ -1150,19 +1092,12 @@ class ViewAreaSelectorPanel(wx.Panel):
         for i in range(len(drawdata)):
             self.line_list.append((round(np.asscalar(self.pts[i,0]),0),round(np.asscalar(self.pts[i,1]),0),
                                    round(np.asscalar(self.pts[i, 2]), 0),round(np.asscalar(self.pts[i,3]),0)))
-        # for i in self.line_list[0:5]:
-        #     print i
-        # self.memdc.Clear()
-        # self.current_bitmap=wx.EmptyBitmapRGBA(self.sz[0],self.sz[1],255,255,255,wx.ALPHA_OPAQUE)
+
         self.sz=self.GetSize()
         self.current_bitmap = wx.EmptyBitmapRGBA(self.sz[0], self.sz[1], 255, 255, 255,wx.ALPHA_OPAQUE)
-        # self.current_bitmap = wx.EmptyBitmap(self.sz[0], self.sz[1])
-        # self.memdc.Clear()
         self.memdc.SelectObject(self.current_bitmap)
         self.memdc.SetPen(wx.Pen(wx.Colour(0,0,0,255),1,wx.SOLID))
         self.memdc.DrawLineList(self.line_list)
-        # self.memdc.SetBrush(wx.Brush(wx.BLUE,wx.SOLID))
-        # self.memdc.DrawCircle(200,200,50)
         self.memdc.SelectObject(wx.NullBitmap)
         self.imgbuffer = bytearray(self.sz[0]*self.sz[1]*3)
         self.current_bitmap.CopyToBuffer(self.imgbuffer)
@@ -1183,131 +1118,165 @@ class MyContextMenu(wx.Menu):
 
         item = wx.MenuItem(self, wx.NewId(), "Export Cairo Graphic")
         self.AppendItem(item)
-        self.Bind(wx.EVT_MENU, self.OnItem2, item)
+        self.Bind(wx.EVT_MENU, self.OnDrawCairo, item)
 
-        item = wx.MenuItem(self, wx.NewId(), "Item Three")
+        item = wx.MenuItem(self, wx.NewId(), "Item Three (not implemented)")
         self.AppendItem(item)
         self.Bind(wx.EVT_MENU, self.OnItem3, item)
 #
     def OnClear(self, event):
         self.phylo_bw.on_clear_extra()
 
-    def OnItem2(self, event):
-        # self.phylo_bw.DrawCairoFigure()
-        print "drawing Cairo figure not implemented"
+    def OnDrawCairo(self, event=None):
+        self.phylo_bw.DrawCairoFigure(write_to_path=True)
+        # print "drawing Cairo figure not implemented"
         # print "Item Two selected in the %s window" % self.WinName
 
     def OnItem3(self, event):
         print "Item Three selected in the window"
 
-# import cairo
-# class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
-#
-#     def __init__(self,parent,*args,**kwargs):
-#         PhylogenyBufferedWindow.__init__(self,parent,*args,**kwargs)
-#         self.image_path = 'C:\\Users\\miken\\Grad School Stuff\\Research\\Phylogenetics\\code\\Phylostrator2\\resources\\temp_new.png'
-#         self.Bind(wx.EVT_RIGHT_DCLICK, self.DrawCairoFigure)
-#
-#
-#     def DrawCairoFigure(self, event=None):
-#         WIDTH = self.Size[0]
-#         HEIGHT = self.Size[1]
-#         surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, WIDTH, HEIGHT)
-#         ctx = cairo.Context(surf)
-#         ctx.set_source_rgb(1, 1, 1)
-#         ctx.rectangle(0, 0, WIDTH, HEIGHT)
-#         ctx.fill()
-#         # ctx.set_matrix(cairo.Matrix(self.t11_inv,self.t21_inv,self.t12_inv,self.t22_inv,self.t13_inv, self.t23_inv))
-#         ctx.set_matrix(cairo.Matrix(self.t11, -self.t21, self.t12, -self.t22, self.t13, -self.t23))
-#         print ctx.get_matrix()
-#         ctx.set_line_width(.002)
-#
-#         ctx.set_source_rgb(0,0,0)
-#         for i in self.radial_phylogram.myt.preorder_edge_iter():
-#             if i.viewer_edge is not None:
-#                 x0 = i.viewer_edge.head_x
-#                 x1 = i.viewer_edge.tail_x
-#                 ctx.move_to(*x0)
-#                 ctx.line_to(*x1)
-#                 ctx.stroke()
-#
-#         if self.c.circle_sets_by_color <> None:
-#             self.DrawCirclesCairo(ctx)
-#
-#         # if len(self.ExtraDrawCircles) > 0:
-#         #     self.DrawExtraCirclesCairo(ctx)
-#         #
-#         # if self.SeppDrawCircles is not None:
-#         #     self.DrawExtraCirclesCairo(ctx, self.SeppDrawCircles)
-#         #
-#         # if len(self.ExtraDrawSegments) > 0:
-#         #     self.DrawExtraSegmentsCairo(ctx)
-#         #
-#         # if self.LegendDrawData <> None:
-#         #     self.DrawLegendCairo(ctx)
-#         surf.write_to_png(self.image_path)
-#
-#     def DrawLegendCairo(self, ctx):
-#         # curr_brush = dc.GetBrush()
-#         # # print self.LegendDrawData['entries']
-#         # # print self.LegendDrawData['entries'][0][1]
-#         # textent = dc.GetTextExtent(self.LegendDrawData['entries'][0][0])
-#         # h = self.LegendDrawData['H']
-#         # w = self.LegendDrawData['W']
-#         # gap = textent[1]
-#         # for i in self.LegendDrawData['entries']:
-#         #     dc.SetBrush(wx.Brush(i[1]))
-#         #     dc.DrawRectangle(w, h, gap, gap)
-#         #     dc.DrawText(i[0], w + gap + 2, h)
-#         #     h += (gap + 2)
-#         # dc.SetBrush(curr_brush)
-#         pass
-#
-#     def DrawCirclesCairo(self, ctx):
-#         # print "Drawing Circles"
-#         # curr_brush = dc.GetBrush()
-#         for i in self.c.circle_sets_by_color:
-#             ctx.set_source_rgba(float(i[0])/255, float(i[1])/255, float(i[2])/255, .5)
-#             # dc.SetBrush(wx.Brush(wx.Colour(i[0], i[1], i[2]), wx.SOLID))
-#             for j in self.c.circle_sets_by_color[i]:
-#                 # x = self.transform_coordinate(j[0])
-#                 ctx.new_sub_path()
-#                 ctx.arc(j[0][0],j[0][1],.007,0,2*math.pi)
-#                 ctx.fill()
-#
-#                 # print x
-#                 # dc.DrawCirclePoint(wx.Point(x[0], -x[1]), j[1])
-#         # dc.SetBrush(curr_brush)
-#
-#
-#     def DrawExtraSegmentsCairo(self, ctx):
-#         # curr_pen = dc.GetPen()
-#         # dc.SetPen(wx.Pen(wx.RED, .5))
-#         # for i in self.ExtraDrawSegments:
-#         #     x1 = self.transform_coordinate(i[0])
-#         #     x2 = self.transform_coordinate(i[1])
-#         #     dc.DrawLine(x1[0], -x1[1], x2[0], -x2[1])
-#         #     # print "drawing red line from (%s, %s) to (%s, %s)" % (x1[0],x1[1],x2[0],x2[1])
-#         # dc.SetPen(curr_pen)
-#         pass
-#
-#
-#     def DrawExtraCirclesCairo(self, ctx, circle_set=None):
-#         # jr = my_globals.jitter_radius
-#         # curr_brush = dc.GetBrush()
-#         # curr_pen = dc.GetPen()
-#         # if circle_set is None:
-#         #     circle_set = self.ExtraDrawCircles
-#         # for i in circle_set:
-#         #     x = self.transform_coordinate(i[0])
-#         #     if self.parent.control_panel.m_checkBox6.IsChecked():
-#         #         y = (float(x[0] + (random.random() - .5) / .5 * jr), float(x[1] + (random.random() - .5) / .5 * jr))
-#         #         x = (int(y[0]), int(y[1]))
-#         #     dc.SetBrush(wx.Brush(wx.Colour(i[1], i[2], i[3]), wx.SOLID))
-#         #     if len(i) > 5 and i[5] is not None:
-#         #         dc.SetPen(i[5])
-#         #
-#         #     dc.DrawCirclePoint(wx.Point(x[0], -x[1]), i[4])
-#         # dc.SetBrush(curr_brush)
-#         # dc.SetPen(curr_pen)
-#         pass
+
+'''11/2: drawing this with cairo for right now but this is only temporary.
+'''
+import cairo
+class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
+    surf=None
+    def __init__(self,parent,*args,**kwargs):
+        PhylogenyBufferedWindow.__init__(self,parent,*args,**kwargs)
+        # self.image_path = 'C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\kra-primate-project\\kra-primate\\tree_placement_2\\images\\temp_new.png'
+        self.image_path = 'work\\temp_new.png'
+        self.Bind(wx.EVT_RIGHT_DCLICK, self.DrawCairoFigure)
+        self.surf = None
+
+    def DrawCairoFigure(self, event=None, write_to_path=False):
+        # WIDTH = self.Size[0]
+        # HEIGHT = self.Size[1]
+        WIDTH = int(self.parent.control_panel.m_textPngWidth.GetValue())
+        HEIGHT = int(self.parent.control_panel.m_textPngHeight.GetValue())
+        if self.surf is not None:
+            del self.surf
+        self.surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, WIDTH, HEIGHT)
+        ctx = cairo.Context(self.surf)
+        ctx.set_source_rgb(1, 1, 1)
+        ctx.rectangle(0, 0, WIDTH, HEIGHT)
+        ctx.fill()
+        # ctx.set_matrix(cairo.Matrix(self.t11_inv,self.t21_inv,self.t12_inv,self.t22_inv,self.t13_inv, self.t23_inv))
+        ctx.set_matrix(cairo.Matrix(self.t11, -self.t21, self.t12, -self.t22, self.t13, -self.t23))
+        print ctx.get_matrix()
+        ctx.set_line_width(.004)
+
+        self.sepp_alpha = min(max(float(self.parent.control_panel.m_textSeppAlphas.GetValue()),0.0),1.0)
+        self.circle_alpha = min(max(float(self.parent.control_panel.m_textCircleAlphas.GetValue()),0.0),1.0)
+
+        ctx.set_source_rgb(0,0,0)
+        for i in self.radial_phylogram.myt.preorder_edge_iter():
+            if i.viewer_edge is not None:
+                x0 = i.viewer_edge.head_x
+                x1 = i.viewer_edge.tail_x
+                ctx.move_to(*x0)
+                ctx.line_to(*x1)
+                ctx.stroke()
+
+        if self.c.circle_sets_by_color <> None:
+            self.DrawCirclesCairo(ctx)
+
+        if len(self.ExtraDrawCircles) > 0:
+            self.DrawExtraCirclesCairo(ctx)
+
+        if self.SeppDrawCircles is not None:
+            self.DrawExtraCirclesCairo(ctx, self.SeppDrawCircles)
+
+        if len(self.ExtraDrawSegments) > 0:
+            print 'Extra Draw Segments: %d' % len(self.ExtraDrawSegments)
+            self.DrawExtraSegmentsCairo(ctx)
+
+        # if self.LegendDrawData <> None:
+        #     self.DrawLegendCairo(ctx)
+        if write_to_path==True:
+            self.surf.write_to_png(self.image_path)
+
+    def DrawLegendCairo(self, ctx):
+        # curr_brush = dc.GetBrush()
+        # # print self.LegendDrawData['entries']
+        # # print self.LegendDrawData['entries'][0][1]
+        # textent = dc.GetTextExtent(self.LegendDrawData['entries'][0][0])
+        # h = self.LegendDrawData['H']
+        # w = self.LegendDrawData['W']
+        # gap = textent[1]
+        # for i in self.LegendDrawData['entries']:
+        #     dc.SetBrush(wx.Brush(i[1]))
+        #     dc.DrawRectangle(w, h, gap, gap)
+        #     dc.DrawText(i[0], w + gap + 2, h)
+        #     h += (gap + 2)
+        # dc.SetBrush(curr_brush)
+        pass
+
+    def DrawCirclesCairo(self, ctx):
+        # print "Drawing Circles"
+        # curr_brush = dc.GetBrush()
+        for i in self.c.circle_sets_by_color:
+            ctx.set_source_rgba(float(i[0])/255., float(i[1])/255., float(i[2])/255., self.circle_alpha)
+            # dc.SetBrush(wx.Brush(wx.Colour(i[0], i[1], i[2]), wx.SOLID))
+            for j in self.c.circle_sets_by_color[i]:
+                # x = self.transform_coordinate(j[0])
+                ctx.new_sub_path()
+                ctx.arc(j[0][0],j[0][1],j[1]*.006,0,2*math.pi)
+                ctx.fill()
+
+                # print x
+                # dc.DrawCirclePoint(wx.Point(x[0], -x[1]), j[1])
+        # dc.SetBrush(curr_brush)
+
+    def DrawExtraSegmentsCairo(self, ctx):
+        # curr_pen = dc.GetPen()
+        # dc.SetPen(wx.Pen(wx.RED, .5))
+        ctx.set_line_width(.004)
+        for i in self.ExtraDrawSegments:
+        #     x1 = self.transform_coordinate(i[0])
+        #     x2 = self.transform_coordinate(i[1])
+        #     dc.DrawLine(x1[0], -x1[1], x2[0], -x2[1])
+            ctx.move_to(i[0][0],i[0][1])
+            # print i[2]
+            ctx.set_source_rgba(i[2][0]/255.,i[2][1]/255.,i[2][2]/255.,self.sepp_alpha)
+            ctx.line_to(i[1][0],i[1][1])
+            ctx.stroke()
+        #     # print "drawing red line from (%s, %s) to (%s, %s)" % (x1[0],x1[1],x2[0],x2[1])
+        # dc.SetPen(curr_pen)
+        pass
+
+
+    def DrawExtraCirclesCairo(self, ctx, circle_set=None):
+        jr = opts.jitter_radius * .005
+        # curr_brush = dc.GetBrush()
+        # curr_pen = dc.GetPen()
+        if circle_set is None:
+            circle_set = self.ExtraDrawCircles
+        for i in circle_set:
+        #     x = self.transform_coordinate(i[0])
+            x=i[0]
+            if self.parent.control_panel.m_checkBox6.IsChecked():
+                y = (float(x[0] + (random.random() - .5) / .5 * jr), float(x[1] + (random.random() - .5) / .5 * jr))
+                x = (int(y[0]), int(y[1]))
+        #     dc.SetBrush(wx.Brush(wx.Colour(i[1], i[2], i[3]), wx.SOLID))
+            ctx.set_source_rgba(i[1]/255.,i[2]/255.,i[3]/255.,self.sepp_alpha)
+            ctx.new_sub_path()
+            ctx.arc(y[0], y[1], i[4] * .006, 0, 2 * math.pi)
+            ctx.fill()
+        #     if len(i) > 5 and i[5] is not None:
+        #         dc.SetPen(i[5])
+        #
+        #     dc.DrawCirclePoint(wx.Point(x[0], -x[1]), i[4])
+        # dc.SetBrush(curr_brush)
+        # dc.SetPen(curr_pen)
+        pass
+
+    def Draw(self,dc):
+        self.pre_draw_perspective_setting()
+        self.DrawCairoFigure()
+        if self.surf is not None:
+            h = self.surf.get_height()
+            w = self.surf.get_width()
+            # self._Buffer = wx.BitmapFromBufferRGBA(w,h,self.surf.get_data())
+            self._Buffer = wx.EmptyBitmapRGBA(w,h)
+            self._Buffer.CopyFromBuffer(self.surf.get_data(),format=wx.BitmapBufferFormat_ARGB32)
+            dc.SelectObject(self._Buffer)

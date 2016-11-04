@@ -37,6 +37,7 @@ class gui_manager(sfld_view.ctrlFrame):
         self.sepp_c = controller.SEPPController()
 
         self.working_folder=None
+
         # self.cold_initialize()
 
         # self.initial_checks()
@@ -262,7 +263,7 @@ class gui_manager(sfld_view.ctrlFrame):
         sepp_fld = self.m_ComboSelectedField1.GetValue()
         self.sepp_c.active_annotation_field=sepp_fld
         self.sepp_c.get_active_unique_annotation_values()
-        unqs = self.sepp_c.active_unique_annotation_values_list
+        unqs = self.sepp_c.active_unique_annotation_values
         self.sepp_c.isfloat = False
         if self.m_checkBox5.IsChecked():
             try:
@@ -610,8 +611,8 @@ class image_manager(abstract_image_manager):
 
     def make_image_panel(self):
         self.bSizer1 = wx.BoxSizer( wx.VERTICAL )
-        self.img_panel = view_classes.PhylogenyBufferedWindow(self)
-        # self.img_panel = view_classes.CairoPhylogenyBufferedWindow(self)
+        # self.img_panel = view_classes.PhylogenyBufferedWindow(self)
+        self.img_panel = view_classes.CairoPhylogenyBufferedWindow(self)
         self.img_panel.SetForegroundColour( wx.Colour( 255, 255, 255 ) )
         self.img_panel.SetBackgroundColour( wx.Colour( 255, 255, 255 ) )
 
