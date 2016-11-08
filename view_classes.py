@@ -1182,7 +1182,6 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
     surf=None
     def __init__(self,parent,*args,**kwargs):
         PhylogenyBufferedWindow.__init__(self,parent,*args,**kwargs)
-        # self.image_path = 'C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\kra-primate-project\\kra-primate\\tree_placement_2\\images\\temp_new.png'
         self.image_path = 'work\\temp_new.png'
         self.Bind(wx.EVT_RIGHT_DCLICK, self.DrawCairoFigure)
         self.surf = None
