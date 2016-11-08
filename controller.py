@@ -2,6 +2,8 @@ __author__ = 'Michael'
 import tree_manipulator as trman
 import json, colorsys
 import ConfigParser
+from usersettingsclasses import PhylostratorUserSettings
+import os
 
 class Singleton(type):
     def __init__(cls, name, bases, dict):
@@ -16,13 +18,20 @@ class Singleton(type):
         return cls.instance
 
 
-class Options():
+class Options(PhylostratorUserSettings):
     __metaclass__ = Singleton
     def __init__(self):
+        PhylostratorUserSettings.__init__(self)
+        self.def_settings_path = os.path.join('resources','default_settings.cfg')
+        self.read_config_filepath(self.def_settings_path)
+
+
+        #deprecated and should be deleted
         self.cfg = ConfigParser.ConfigParser()
         self.cfg.read('init_settings.cfg')
+
         self.init_tree = self.cfg.get('main','initial_tree')
-        self.init_annotation = self.cfg.get('main', 'initial_tree')
+        self.init_annotation = self.cfg.get('main', 'initial_annotation_file')
         self.jitter_radius = self.cfg.getint('cairo','jitter_radius')
         self.temp_subtree_path = self.cfg.get('main','temp_subtree_path')
 

@@ -35,6 +35,9 @@ class gui_manager(sfld_view.ctrlFrame):
 
         self.c=controller.Controller()
         self.sepp_c = controller.SEPPController()
+        self.opts = controller.Options()
+        # self.opts.read_config_filepath('resources/default_settings.cfg')
+        self.populate_options_to_text_fields()
 
         self.working_folder=None
 
@@ -73,8 +76,9 @@ class gui_manager(sfld_view.ctrlFrame):
         self.c.circle_size=self.m_slider1.GetValue()
         self.layout_viewer_panel()
         self.Layout()
-        self.MoveXY(100, 100)
-        # self.MoveXY(1620,300)
+        # self.MoveXY(100, 100)
+        # self.MoveXY(1620,300) #illinois monitors
+        self.MoveXY(1920, 100)  # cincy monitors
 
 
         #TODO: This is just for the verstion where we want to do a cold initialize, otherwise have to make the image frame
@@ -83,6 +87,32 @@ class gui_manager(sfld_view.ctrlFrame):
         # self.image_frame=image_manager(self)
         # self.c.set_ImageFrame_referenece(self.image_frame)
         # self.image_frame.Show()
+
+    def populate_options_to_text_fields(self, event = None):
+        opts = self.opts
+
+        # initial file paths
+        self.m_FilePicker_tree.SetPath(os.path.abspath(opts.starting_file_paths.init_tree_path))
+        self.m_FilePicker_annotation.SetPath(os.path.abspath(opts.starting_file_paths.init_annotation_path))
+
+        # cairo panel
+        self.m_textPngWidth.SetValue(str(opts.cairo.image_width))
+        self.m_textPngHeight.SetValue(str(opts.cairo.image_height))
+        self.m_textCircleAlphas.SetValue(str(opts.cairo.node_alphas))
+        self.m_textSeppAlphas.SetValue(str(opts.cairo.sepp_alphas))
+
+    def populate_options_from_text_fields(self, event = None):
+        opts = self.opts
+
+        # initial file paths
+        opts.starting_file_paths.init_tree_path = self.m_FilePicker_tree.GetPath()
+        opts.starting_file_paths.init_annotation_path = self.m_FilePicker_annotation.GetPath()
+
+        # cairo panel
+        opts.cairo.image_width = self.m_textPngWidth.GetValue()
+        opts.cairo.image_height = self.m_textPngHeight.GetValue()
+        opts.cairo.node_alphas = self.m_textCircleAlphas.GetValue()
+        opts.cairo.sepp_alphas = self.m_textSeppAlphas.GetValue()
 
     def draw_circles( self, event=None ):
         self.sepp_c.update_circles_by_annotation()
@@ -613,8 +643,10 @@ class image_manager(abstract_image_manager):
         self.bSizer1 = wx.BoxSizer( wx.VERTICAL )
         # self.img_panel = view_classes.PhylogenyBufferedWindow(self)
         self.img_panel = view_classes.CairoPhylogenyBufferedWindow(self)
-        self.img_panel.SetForegroundColour( wx.Colour( 255, 255, 255 ) )
-        self.img_panel.SetBackgroundColour( wx.Colour( 255, 255, 255 ) )
+        # self.img_panel.SetForegroundColour( wx.Colour( 255, 255, 255 ) )
+        # self.img_panel.SetBackgroundColour( wx.Colour( 255, 255, 255 ) )
+        self.img_panel.SetForegroundColour(wx.Colour(0, 0, 0))
+        self.img_panel.SetBackgroundColour(wx.Colour(0, 0, 0))
 
         self.bSizer1.Add( self.img_panel, 1, wx.EXPAND, 0 )
         self.SetSizer( self.bSizer1 )

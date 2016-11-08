@@ -392,6 +392,19 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer11.Add( bSizer42, 0, wx.EXPAND, 5 )
 		
+		bSizer561 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticTextLegendFont = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Legend Font:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticTextLegendFont.Wrap( -1 )
+		bSizer561.Add( self.m_staticTextLegendFont, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_fontPickerLegend = wx.FontPickerCtrl( self.m_panel4, wx.ID_ANY, wx.Font( 11, 70, 90, 90, False, "Cambria" ), wx.DefaultPosition, wx.DefaultSize, wx.FNTP_DEFAULT_STYLE )
+		self.m_fontPickerLegend.SetMaxPointSize( 100 ) 
+		bSizer561.Add( self.m_fontPickerLegend, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer11.Add( bSizer561, 0, wx.EXPAND, 5 )
+		
 		
 		bSizer11.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
 		
@@ -436,7 +449,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel4.SetSizer( bSizer10 )
 		self.m_panel4.Layout()
 		bSizer10.Fit( self.m_panel4 )
-		self.m_notebook1.AddPage( self.m_panel4, u"Taxon Annotation", True )
+		self.m_notebook1.AddPage( self.m_panel4, u"Taxon Annotation", False )
 		self.m_panel41 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_panel41.SetBackgroundColour( wx.Colour( 200, 200, 200 ) )
 		
@@ -736,7 +749,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer9711.Add( self.m_staticText78111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textPngHeight = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"1200", wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
+		self.m_textPngHeight = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"950", wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
 		bSizer9711.Add( self.m_textPngHeight, 0, wx.ALL, 5 )
 		
 		
@@ -750,7 +763,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer97111.Add( self.m_textCircleAlphas, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textCircleAlphas = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u".75", wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
+		self.m_textCircleAlphas = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u".75", wx.DefaultPosition, wx.Size( 75,-1 ), wx.TE_PROCESS_ENTER )
 		bSizer97111.Add( self.m_textCircleAlphas, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
@@ -762,7 +775,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer97111.Add( self.m_staticText781111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textSeppAlphas = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u".45", wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
+		self.m_textSeppAlphas = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u".45", wx.DefaultPosition, wx.Size( 75,-1 ), wx.TE_PROCESS_ENTER )
 		bSizer97111.Add( self.m_textSeppAlphas, 0, wx.ALL, 5 )
 		
 		
@@ -911,7 +924,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel82.SetSizer( bSizer151 )
 		self.m_panel82.Layout()
 		bSizer151.Fit( self.m_panel82 )
-		self.m_notebook1.AddPage( self.m_panel82, u"Cairo", False )
+		self.m_notebook1.AddPage( self.m_panel82, u"Cairo", True )
 		
 		bSizer2.Add( self.m_notebook1, 1, wx.EXPAND |wx.ALL, 5 )
 		
@@ -970,6 +983,12 @@ class ctrlFrame ( wx.Frame ):
 		self.m_button71.Bind( wx.EVT_BUTTON, self.sepp_valpicker_clear )
 		self.m_button81.Bind( wx.EVT_BUTTON, self.sepp_valpicker_load )
 		self.m_button5.Bind( wx.EVT_BUTTON, self.run_controller_script )
+		self.m_textPngWidth.Bind( wx.EVT_TEXT, self.populate_options_from_text_fields )
+		self.m_textPngHeight.Bind( wx.EVT_TEXT, self.populate_options_from_text_fields )
+		self.m_textCircleAlphas.Bind( wx.EVT_TEXT, self.populate_options_from_text_fields )
+		self.m_textCircleAlphas.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
+		self.m_textSeppAlphas.Bind( wx.EVT_TEXT, self.populate_options_from_text_fields )
+		self.m_textSeppAlphas.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
 		self.m_button36.Bind( wx.EVT_BUTTON, self.reroot_above )
 		self.m_button37.Bind( wx.EVT_BUTTON, self.pivot_clock )
 		self.m_button38.Bind( wx.EVT_BUTTON, self.pivot_ctrclock )
@@ -1105,6 +1124,14 @@ class ctrlFrame ( wx.Frame ):
 	
 	def run_controller_script( self, event ):
 		event.Skip()
+	
+	def populate_options_from_text_fields( self, event ):
+		event.Skip()
+	
+	
+	
+	
+	
 	
 	def reroot_above( self, event ):
 		event.Skip()

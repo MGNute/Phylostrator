@@ -882,6 +882,37 @@ class ViewAreaSelectorPanel(wx.Panel):
 
         self.Refresh()
 
+    def set_box_viewer_coords(self,bxmin,bxmax,bymin,bymax):
+        self.box_xmin = bxmin
+        self.box_xmax = bxmax
+        self.box_ymin = bymin
+        self.box_ymax = bymax
+        ar = abs((self.box_xmax - self.box_xmin) / (self.box_ymax - self.box_ymin))
+        if ar > self.c.bw_aspect_ratio:
+            self.box_ymax = self.box_ymin + (self.box_xmax - self.box_xmin) / self.c.bw_aspect_ratio
+        else:
+            self.box_xmax = self.box_xmin + (self.box_ymax - self.box_ymin) * self.c.bw_aspect_ratio
+
+        xnew = np.dot(np.linalg.inv(self.trans_3x3), np.array([self.box_xmin, self.box_ymax, 1], dtype=np.float64))
+        xnew2 = np.dot(np.linalg.inv(self.trans_3x3), np.array([self.box_xmax, self.box_ymin, 1], dtype=np.float64))
+        self.xmin = np.asscalar(xnew[0])
+        self.ymin = np.asscalar(xnew[1])
+        self.ymax = np.asscalar(xnew2[1])
+        self.xmax = np.asscalar(xnew2[0])
+
+
+    def set_box_tree_coords(self,t_xmin,t_xmax,t_ymin,t_ymax):
+        self.xmin = t_xmin
+        self.xmax = t_xmax
+        self.ymin = t_ymin
+        self.ymax = t_ymax
+        a = np.dot(self.trans,np.array([self.xmin,self.ymin,1.0],dtype=np.float64)) #lower left
+        b = np.dot(self.trans, np.array([self.xmax, self.ymax, 1.0], dtype=np.float64)) # upper right
+        self.box_xmin = int(np.asscalar(a[0]))
+        self.box_ymax = int(np.asscalar(a[1]))
+        self.box_xmax = int(np.asscalar(b[0]))
+        self.box_ymin = int(np.asscalar(b[1]))
+
     def set_box_coords(self,direct=False,xmin=None,ymin=None,vzoom=None,box_xmin=None,box_ymin=None,box_xmax=None,box_ymax=None):
         '''
         Direct here means setting it using the panel coordinates rather than the treespace coordinates
@@ -993,6 +1024,9 @@ class ViewAreaSelectorPanel(wx.Panel):
     def reposition_view_square(self):
         self.set_box_coords()
 
+    def reset_viewer_to_initial(self):
+
+        pass
 
     def set_zoom_level(self,newzoom=None):
         if newzoom is not None:
@@ -1078,6 +1112,7 @@ class ViewAreaSelectorPanel(wx.Panel):
             self.global_bounding_box[0] = xmin - gap/2.0
             self.global_bounding_box[1] = xmax + gap/2.0
 
+        # trans here goes from tree-space to viewer space
         a=np.array(([self.global_bounding_box[0],self.global_bounding_box[2],1],
                    [self.global_bounding_box[0], self.global_bounding_box[3], 1],
                    [self.global_bounding_box[1],self.global_bounding_box[3],1]),dtype=np.float64)
@@ -1086,8 +1121,9 @@ class ViewAreaSelectorPanel(wx.Panel):
         ty = np.dot(ainv,np.array([h-1,0,0],dtype=np.float64))
         self.trans = np.vstack((tx,ty))
         self.trans_3x3=np.vstack((tx,ty,np.array([0,0,1],dtype=np.float64)))
+
+        # draw the tree based on the transformation matrix
         self.pts = np.hstack((np.dot(npdrawdata[:,0:3],self.trans.transpose()),np.dot(npdrawdata[:,3:6],self.trans.transpose())))
-        # print self.pts[0:50,:]
         self.line_list=[]
         for i in range(len(drawdata)):
             self.line_list.append((round(np.asscalar(self.pts[i,0]),0),round(np.asscalar(self.pts[i,1]),0),
@@ -1099,6 +1135,8 @@ class ViewAreaSelectorPanel(wx.Panel):
         self.memdc.SetPen(wx.Pen(wx.Colour(0,0,0,255),1,wx.SOLID))
         self.memdc.DrawLineList(self.line_list)
         self.memdc.SelectObject(wx.NullBitmap)
+
+        # copy it to a buffer
         self.imgbuffer = bytearray(self.sz[0]*self.sz[1]*3)
         self.current_bitmap.CopyToBuffer(self.imgbuffer)
 
@@ -1139,6 +1177,7 @@ class MyContextMenu(wx.Menu):
 '''11/2: drawing this with cairo for right now but this is only temporary.
 '''
 import cairo
+# import wx.lib.wxcairo
 class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
     surf=None
     def __init__(self,parent,*args,**kwargs):
@@ -1147,6 +1186,14 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         self.image_path = 'work\\temp_new.png'
         self.Bind(wx.EVT_RIGHT_DCLICK, self.DrawCairoFigure)
         self.surf = None
+
+    def pre_draw_perspective_setting(self):
+        self.h = opts.cairo.image_height
+        self.w = opts.cairo.image_width
+        xyrange = (self.top_left[0], self.bottom_right[0], self.bottom_right[1], self.top_left[1])
+        self.c.bw_aspect_ratio = float(self.w) / float(self.h)
+        self.line_list = []
+        self.set_coordinate_transform()
 
     def DrawCairoFigure(self, event=None, write_to_path=False):
         # WIDTH = self.Size[0]
@@ -1162,7 +1209,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         ctx.fill()
         # ctx.set_matrix(cairo.Matrix(self.t11_inv,self.t21_inv,self.t12_inv,self.t22_inv,self.t13_inv, self.t23_inv))
         ctx.set_matrix(cairo.Matrix(self.t11, -self.t21, self.t12, -self.t22, self.t13, -self.t23))
-        print ctx.get_matrix()
+        # print ctx.get_matrix()
         ctx.set_line_width(.004)
 
         self.sepp_alpha = min(max(float(self.parent.control_panel.m_textSeppAlphas.GetValue()),0.0),1.0)
@@ -1190,26 +1237,55 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
             print 'Extra Draw Segments: %d' % len(self.ExtraDrawSegments)
             self.DrawExtraSegmentsCairo(ctx)
 
-        # if self.LegendDrawData <> None:
-        #     self.DrawLegendCairo(ctx)
+        if self.LegendDrawData <> None:
+            self.DrawLegendCairo(ctx)
+
         if write_to_path==True:
             self.surf.write_to_png(self.image_path)
 
     def DrawLegendCairo(self, ctx):
-        # curr_brush = dc.GetBrush()
-        # # print self.LegendDrawData['entries']
-        # # print self.LegendDrawData['entries'][0][1]
-        # textent = dc.GetTextExtent(self.LegendDrawData['entries'][0][0])
-        # h = self.LegendDrawData['H']
-        # w = self.LegendDrawData['W']
-        # gap = textent[1]
-        # for i in self.LegendDrawData['entries']:
-        #     dc.SetBrush(wx.Brush(i[1]))
-        #     dc.DrawRectangle(w, h, gap, gap)
-        #     dc.DrawText(i[0], w + gap + 2, h)
-        #     h += (gap + 2)
-        # dc.SetBrush(curr_brush)
-        pass
+        between_legend_blocks = 3
+        blbx, blby = ctx.device_to_user_distance(between_legend_blocks,between_legend_blocks)
+
+        ft=self.parent.control_panel.m_fontPickerLegend.GetSelectedFont()
+        # cft = wx.lib.wxcairo.FontFaceFromFont(ft)
+        f_face_name = cairo.ToyFontFace(ft.GetFaceName())
+        f_sz = ft.GetPointSize()
+        ctx.set_font_face(f_face_name)
+        ctx.set_font_size(f_sz)
+
+
+
+        hd = self.LegendDrawData['H']
+        wd = self.LegendDrawData['W']
+
+        w, h = ctx.device_to_user(wd,hd)
+        ctx.move_to(h,w)
+        ma = ctx.get_matrix()
+        ft = ctx.get_font_matrix()
+        # print ft
+        # ft.scale(.05,.05)
+        ma.invert()
+        ft2 = ft.multiply(ma)
+        ft3 = cairo.Matrix(ft2[0],ft2[1],ft2[2],ft2[3],0,0)
+        # print ft2
+        # print ft3
+        ctx.set_font_matrix(ft3)
+
+        (xbear, ybear, wd, ht, dx, dy) = ctx.text_extents(self.LegendDrawData['entries'][0][0])
+        # print 'xbear: %s, ybear: %s, wd: %s, ht: %s, dx: %s, dy: %s' % (xbear, ybear, wd, ht, dx, dy)
+        gap = ht + ctx.device_to_user_distance(3,3)[0]
+
+        for i in self.LegendDrawData['entries']:
+            col=i[1]
+            ctx.set_source_rgb(col[0]/255.0, col[1]/255.0, col[2]/255.0)
+            ctx.rectangle(w,h-gap,gap,gap)
+            ctx.fill()
+            ctx.set_source_rgb(0.,0.,0.)
+            ctx.move_to(w+gap + blbx, h-gap+ht/4)
+            ctx.show_text(i[0])
+            h = h-gap-blbx
+
 
     def DrawCirclesCairo(self, ctx):
         # print "Drawing Circles"
@@ -1228,46 +1304,31 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         # dc.SetBrush(curr_brush)
 
     def DrawExtraSegmentsCairo(self, ctx):
-        # curr_pen = dc.GetPen()
-        # dc.SetPen(wx.Pen(wx.RED, .5))
+
         ctx.set_line_width(.004)
         for i in self.ExtraDrawSegments:
-        #     x1 = self.transform_coordinate(i[0])
-        #     x2 = self.transform_coordinate(i[1])
-        #     dc.DrawLine(x1[0], -x1[1], x2[0], -x2[1])
             ctx.move_to(i[0][0],i[0][1])
-            # print i[2]
             ctx.set_source_rgba(i[2][0]/255.,i[2][1]/255.,i[2][2]/255.,self.sepp_alpha)
             ctx.line_to(i[1][0],i[1][1])
             ctx.stroke()
-        #     # print "drawing red line from (%s, %s) to (%s, %s)" % (x1[0],x1[1],x2[0],x2[1])
-        # dc.SetPen(curr_pen)
+            # print "drawing red line from (%s, %s) to (%s, %s)" % (x1[0],x1[1],x2[0],x2[1])
+
         pass
 
 
     def DrawExtraCirclesCairo(self, ctx, circle_set=None):
         jr = opts.jitter_radius * .005
-        # curr_brush = dc.GetBrush()
-        # curr_pen = dc.GetPen()
         if circle_set is None:
             circle_set = self.ExtraDrawCircles
         for i in circle_set:
-        #     x = self.transform_coordinate(i[0])
             x=i[0]
             if self.parent.control_panel.m_checkBox6.IsChecked():
                 y = (float(x[0] + (random.random() - .5) / .5 * jr), float(x[1] + (random.random() - .5) / .5 * jr))
                 x = (int(y[0]), int(y[1]))
-        #     dc.SetBrush(wx.Brush(wx.Colour(i[1], i[2], i[3]), wx.SOLID))
             ctx.set_source_rgba(i[1]/255.,i[2]/255.,i[3]/255.,self.sepp_alpha)
             ctx.new_sub_path()
             ctx.arc(y[0], y[1], i[4] * .006, 0, 2 * math.pi)
             ctx.fill()
-        #     if len(i) > 5 and i[5] is not None:
-        #         dc.SetPen(i[5])
-        #
-        #     dc.DrawCirclePoint(wx.Point(x[0], -x[1]), i[4])
-        # dc.SetBrush(curr_brush)
-        # dc.SetPen(curr_pen)
         pass
 
     def Draw(self,dc):
