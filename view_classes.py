@@ -1,17 +1,21 @@
 __author__ = 'Michael'
 import wx, os.path
 import wx.lib.scrolledpanel
-import pickle, colorsys, random
+# import pickle, colorsys, random
 import dendropy
-import controller
-import aux_view_classes as avc
-from view import *
+import cairo
+# import copy
+# import controller
+# import aux_view_classes as avc
+# from view import *
 # import my_globals
-import numpy as np
+# import numpy as np
 global colors
 import tree_manipulator as tm
 from utilities import *
-from sfld_view import AddTxtDialog
+import threading
+import time
+# from sfld_view import AddTxtDialog
 
 global opts
 opts = controller.Options()
@@ -41,12 +45,26 @@ class ValuePickerControl(wx.BoxSizer):
         self.values=[]
         self.value_pickers=[]
 
+    def set_all_sizes(self,size):
+        if len(self.value_pickers)>0:
+            for i in self.value_pickers:
+                i.set_size(size)
+        self.value_pickers[0].process_size_change()
+
+    def select_all(self):
+        if len(self.value_pickers)>0:
+            for i in self.value_pickers:
+                i.m_checkBox1.SetValue(True)
+        self.value_pickers[0].process_annotationvalue_check()
+
+
     def set_values(self,vals=None):
         self.clear_all()
         if vals != None:
             self.values=vals
 
         k=0
+        # my_colors = color_scale_set(len(self.values))
 
         self.colors={}
         for i in self.values:
@@ -55,7 +73,9 @@ class ValuePickerControl(wx.BoxSizer):
             else:
                 clr=colors[k]
                 k+=1
-            self.colors[i]=clr
+            # k+=1
+            # clr = my_colors[k]
+            self.colors[i]= clr
 
 
             # a=self.ValuePicker(self.parent,i,clr,val_ctrl=self)
@@ -137,17 +157,21 @@ class ValuePicker(wx.BoxSizer):
         self.c.update_circles_by_annotation()
         self.c.trigger_refresh()
 
-    def process_color_change(self,event):
+    def process_color_change(self,event=None):
         newcolor=self.m_colourPicker1.GetColour()
         self.clr=newcolor.Get()
         self.c.update_circles_by_annotation()
         self.c.trigger_refresh()
 
-    def process_size_change(self,event):
+    def process_size_change(self,event=None):
         print "processing size change"
         self.size=int(self.m_spinCtrl.GetValue())
         self.c.update_circles_by_annotation()
         self.c.trigger_refresh()
+
+    def set_size(self,size):
+        self.size=int(size)
+        self.m_spinCtrl.SetValue(self.size)
 
 class ThreeColorScale():
     def __init__(self, parent, vals):
@@ -260,6 +284,30 @@ class SEPPValuePickerControl(ValuePickerControl):
 
         self.add_final_spacer()
 
+    def select_all(self):
+        if len(self.value_pickers)>0:
+            for i in self.value_pickers:
+                i.m_checkBox1.SetValue(True)
+        self.value_pickers[0].process_annotationvalue_check()
+
+    def unselect_all(self):
+        if len(self.value_pickers)>0:
+            for i in self.value_pickers:
+                i.m_checkBox1.SetValue(False)
+        self.value_pickers[0].process_annotationvalue_check()
+
+    def set_all_sizes(self,size):
+        if len(self.value_pickers)>0:
+            for i in self.value_pickers:
+                i.set_size(size)
+        self.value_pickers[0].process_size_change()
+
+    def set_all_colors(self,clr):
+        if len(self.value_pickers)>0:
+            for i in self.value_pickers:
+                i.set_color(clr)
+        self.value_pickers[0].process_color_change()
+
     def set_color_scale(self,vals):
         '''
         currently set up only for a 3 color scale
@@ -347,18 +395,25 @@ class SEPPValuePicker(wx.BoxSizer):
         self.c.update_circles_by_annotation()
         self.c.trigger_refresh()
 
-    def process_color_change(self,event):
+    def process_color_change(self,event=None):
         newcolor=self.m_colourPicker1.GetColour()
         self.clr=newcolor.Get()
         self.c.update_circles_by_annotation()
         self.c.trigger_refresh()
 
-    def process_size_change(self,event):
+    def process_size_change(self,event=None):
         print "processing size change"
         self.size=int(self.m_spinCtrl.GetValue())
         self.c.update_circles_by_annotation()
         self.c.trigger_refresh()
 
+    def set_size(self, size):
+        self.size = int(size)
+        self.m_spinCtrl.SetValue(self.size)
+
+    def set_color(self, color):
+        self.m_colourPicker1.SetColour(color)
+        self.clr = color.Get()
 
 
 
@@ -462,7 +517,8 @@ class PhylogenyBufferedWindow(BufferedWindow):
         self.circles=None
         self.c = controller.Controller()
         self.c.set_BufferedWindow_reference(self)
-        self.tree_path = opts.init_tree
+        # self.tree_path = opts.init_tree
+        self.tree_path = opts.starting_file_paths.init_tree_path
         self.radial_phylogram = tm.Radial_Phylogram(self.tree_path)
         # self.c.apm.state_tree_loaded=True
         self.set_initial_corners()
@@ -518,7 +574,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
         # self.parent.m_statusBar2.SetStatusText("head: %s, %s |tail: %s, %s| len: %s" % (eref[0].head_node.label,eref[0].viewer_edge.head_x,eref[0].tail_node.label,
         #                                                                                   eref[0].viewer_edge.tail_x, eref[1]),2)
         # self.parent.m_statusBar2.SetStatusText("head_x: %s\ttail_x: %s\tlen: %s" % (eref[0].viewer_edge.head_x, eref[0].viewer_edge.tail_x, eref[1]),0 )
-        self.AddToExtraDrawSegments((eref[0].viewer_edge.head_x, eref[0].viewer_edge.tail_x))
+        self.AddToExtraDrawSegments((eref[0].viewer_edge.head_x, eref[0].viewer_edge.tail_x, (255,0,0)))
         self.UpdateDrawing()
 
 
@@ -542,7 +598,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
                     eref = (i,ln)
         newtree = eref[0].head_node.extract_subtree()
         newtree_tree = dendropy.Tree(seed_node = newtree)
-        newtree_tree.write(path=opts.temp_subtree_path,schema = "newick")
+        newtree_tree.write(path=opts.starting_file_paths.temp_subtree_path,schema = "newick")
         print "wrote the tree from node %s and below to the subtree path" % eref[0].tail_node.label
 
     def on_clear_extra(self,event=None):
@@ -642,6 +698,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
 
 
     def UpdateMiscInfoOnDraw(self):
+        print 'UpdateMiscInfoOnDraw() called, view_classes.py line 645'
         self.c.image_frame.control_panel.m_textHeight.SetValue(str(self._Buffer.Height))
         self.c.image_frame.control_panel.m_textWidth.SetValue(str(self._Buffer.Width))
 
@@ -1176,15 +1233,24 @@ class MyContextMenu(wx.Menu):
 
 '''11/2: drawing this with cairo for right now but this is only temporary.
 '''
-import cairo
+
 # import wx.lib.wxcairo
 class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
     surf=None
+    draw_count = 0
+    use_tree_copy = False
+    node_labels_on = False
+    leaf_labels_on = False
+    write_image_to_path = False
+    image_path = None
+
     def __init__(self,parent,*args,**kwargs):
         PhylogenyBufferedWindow.__init__(self,parent,*args,**kwargs)
         self.image_path = 'work\\temp_new.png'
         self.Bind(wx.EVT_RIGHT_DCLICK, self.DrawCairoFigure)
         self.surf = None
+
+
 
     def pre_draw_perspective_setting(self):
         self.h = opts.cairo.image_height
@@ -1194,34 +1260,43 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         self.line_list = []
         self.set_coordinate_transform()
 
-    def DrawCairoFigure(self, event=None, write_to_path=False):
+    def DrawCairoFigure(self, event=None, newtree=None, svgsurf=None):
+        # print 'in the drawCairoFigure function'
         # WIDTH = self.Size[0]
         # HEIGHT = self.Size[1]
-        WIDTH = int(self.parent.control_panel.m_textPngWidth.GetValue())
-        HEIGHT = int(self.parent.control_panel.m_textPngHeight.GetValue())
+        # WIDTH = int(self.parent.control_panel.m_textPngWidth.GetValue())
+        # HEIGHT = int(self.parent.control_panel.m_textPngHeight.GetValue())
+
         if self.surf is not None:
             del self.surf
-        self.surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, WIDTH, HEIGHT)
+        if svgsurf == None:
+            self.surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, self.w, self.h)
+        else:
+            self.surf = svgsurf
+
         ctx = cairo.Context(self.surf)
         ctx.set_source_rgb(1, 1, 1)
-        ctx.rectangle(0, 0, WIDTH, HEIGHT)
+        ctx.rectangle(0, 0, self.w, self.h)
         ctx.fill()
         # ctx.set_matrix(cairo.Matrix(self.t11_inv,self.t21_inv,self.t12_inv,self.t22_inv,self.t13_inv, self.t23_inv))
         ctx.set_matrix(cairo.Matrix(self.t11, -self.t21, self.t12, -self.t22, self.t13, -self.t23))
-        # print ctx.get_matrix()
-        ctx.set_line_width(.004)
+        ctx.set_line_width(opts.cairo.tree_line_width)
 
         self.sepp_alpha = min(max(float(self.parent.control_panel.m_textSeppAlphas.GetValue()),0.0),1.0)
         self.circle_alpha = min(max(float(self.parent.control_panel.m_textCircleAlphas.GetValue()),0.0),1.0)
 
         ctx.set_source_rgb(0,0,0)
-        for i in self.radial_phylogram.myt.preorder_edge_iter():
-            if i.viewer_edge is not None:
-                x0 = i.viewer_edge.head_x
-                x1 = i.viewer_edge.tail_x
-                ctx.move_to(*x0)
-                ctx.line_to(*x1)
-                ctx.stroke()
+
+        # if newtree==None:
+        #     self.DrawTreeSegmentsCairo(ctx,self.radial_phylogram.myt)
+        # else:
+        #     self.DrawTreeSegmentsCairo(ctx,newtree)
+        if self.use_tree_copy==False:
+            print 'drawing segments from the live tree'
+            self.DrawTreeSegmentsCairo(ctx,self.radial_phylogram.myt)
+        else:
+            print 'drawing segments from the copy'
+            self.DrawTreeSegmentsCairo(ctx,self.radial_phylogram.myt_copy)
 
         if self.c.circle_sets_by_color <> None:
             self.DrawCirclesCairo(ctx)
@@ -1239,11 +1314,90 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         if self.LegendDrawData <> None:
             self.DrawLegendCairo(ctx)
 
-        if write_to_path==True:
-            self.surf.write_to_png(self.image_path)
+        # print 'write image to path: %s.  Image path: %s' %(self.write_image_to_path, self.image_path)
+        # if self.write_image_to_path==True:
+        #     self.surf.write_to_png(self.image_path)
+
+        self.contxt=ctx
+        if self.node_labels_on or self.leaf_labels_on:
+            self.DrawInternalNodeLabels()
+
+    def DrawTreeSegmentsCairo(self, ctx, tree):
+        # ctx.set_source_rgba(1.0, 0.0, 0.0, 1.0)
+        # ctx.new_sub_path()
+        # ctx.arc(0., 0., .1, 0, 2 * math.pi)
+        # ctx.fill()
+
+        ctx.set_source_rgba(0.0, 0.0, 0.0, 1.0)
+        for i in tree.preorder_edge_iter():
+            if i.length is not None and i.length > 0.0 and i.tail_node is not None:
+                x0 = i.head_node.location
+                x1 = i.tail_node.location
+                ctx.move_to(*x0)
+                ctx.line_to(*x1)
+                ctx.stroke()
+
+    def toggle_internal_node_labels(self):
+        self.node_labels_on = not self.node_labels_on
+        self.UpdateDrawing()
+
+    def toggle_leaf_labels(self):
+        self.leaf_labels_on= not self.leaf_labels_on
+        self.UpdateDrawing()
+
+    def DrawInternalNodeLabels(self):
+        '''
+        Writes the labels of the internal nodes of the tree.
+        '''
+        ctx = self.contxt
+        ft = self.parent.control_panel.m_fontPickerLegend.GetSelectedFont()
+        f_face_name = cairo.ToyFontFace(ft.GetFaceName())
+        f_sz = ft.GetPointSize()
+        ctx.set_font_face(f_face_name)
+        ctx.set_font_size(f_sz)
+
+        ma = ctx.get_matrix()
+        ft = ctx.get_font_matrix()
+        ma.invert()
+        ft2 = ft.multiply(ma)
+        ft3 = cairo.Matrix(ft2[0],ft2[1],ft2[2],ft2[3],0,0)
+        ctx.set_font_matrix(ft3)
+
+        ctx.move_to(0,0)
+        ctx.set_source_rgba(1.0, 0.0, 0.0, 1.0)
+        # ctx.show_text("hello")
+        # ctx.set_source_rgba(1.0, 0.0, 0.0, 1.0)
+        # ctx.rectangle(0,0,.5,.5)
+        # ctx.fill()
+
+        # print ctx.get_matrix()
+
+        # ma = ctx.get_matrix()
+        # ft3 = cairo.Matrix(ma[0], ma[1], ma[2], ma[3], 0, 0)
+        # ctx.set_font_matrix(ft3)
+        # ctx.set_source_rgb(.99,0.,0.)
+
+        if self.node_labels_on:
+            for i in self.radial_phylogram.myt.preorder_internal_node_iter():
+                if i.label is not None:
+                    # print 'location %s: label %s' % (str(i.location),i.label)
+                    ctx.move_to(i.location[0],i.location[1])
+                    ctx.show_text(i.label)
+                    ctx.fill()
+
+        if self.leaf_labels_on:
+            for i in self.radial_phylogram.myt.leaf_node_iter():
+                if i.label is not None:
+                    # print 'location %s: label %s' % (str(i.location),i.label)
+                    ctx.move_to(i.location[0], i.location[1])
+                    ctx.show_text(i.label)
+                    ctx.fill()
+
+                    # self.UpdateDrawing()
 
     def DrawLegendCairo(self, ctx):
-        between_legend_blocks = 3
+        between_legend_blocks = opts.cairo.legend_spacing
+        block_size = opts.cairo.legend_block_size
         blbx, blby = ctx.device_to_user_distance(between_legend_blocks,between_legend_blocks)
 
         ft=self.parent.control_panel.m_fontPickerLegend.GetSelectedFont()
@@ -1271,19 +1425,28 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         # print ft3
         ctx.set_font_matrix(ft3)
 
-        (xbear, ybear, wd, ht, dx, dy) = ctx.text_extents(self.LegendDrawData['entries'][0][0])
+        (xbear, ybear, wdt, ht, dx, dy) = ctx.text_extents(self.LegendDrawData['entries'][0][0])
         # print 'xbear: %s, ybear: %s, wd: %s, ht: %s, dx: %s, dy: %s' % (xbear, ybear, wd, ht, dx, dy)
         gap = ht + ctx.device_to_user_distance(3,3)[0]
 
         for i in self.LegendDrawData['entries']:
             col=i[1]
             ctx.set_source_rgb(col[0]/255.0, col[1]/255.0, col[2]/255.0)
-            ctx.rectangle(w,h-gap,gap,gap)
+            # ctx.rectangle(w,h-gap,gap,gap)
+            ctx.new_sub_path()
+            ctx.move_to(*ctx.device_to_user(wd,hd))
+            ctx.rel_line_to(*ctx.device_to_user_distance(block_size,0))
+            ctx.rel_line_to(*ctx.device_to_user_distance(0,block_size))
+            ctx.rel_line_to(*ctx.device_to_user_distance(-block_size,0))
+            ctx.close_path()
             ctx.fill()
             ctx.set_source_rgb(0.,0.,0.)
-            ctx.move_to(w+gap + blbx, h-gap+ht/4)
+            # ctx.move_to(w+gap + blbx, h-gap+ht/4)
+            ctx.move_to(*ctx.device_to_user(wd+block_size + between_legend_blocks,hd+block_size-4))
             ctx.show_text(i[0])
             h = h-gap-blbx
+            hd += block_size
+            hd += between_legend_blocks
 
 
     def DrawCirclesCairo(self, ctx):
@@ -1316,21 +1479,109 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
 
 
     def DrawExtraCirclesCairo(self, ctx, circle_set=None):
-        jr = opts.jitter_radius * .005
+        if self.parent.control_panel.m_checkBox6.IsChecked():
+            jr = opts.cairo.jitter_radius * opts.cairo.tree_line_width
+        else:
+            jr = 0
         if circle_set is None:
             circle_set = self.ExtraDrawCircles
         for i in circle_set:
             x=i[0]
-            if self.parent.control_panel.m_checkBox6.IsChecked():
-                y = (float(x[0] + (random.random() - .5) / .5 * jr), float(x[1] + (random.random() - .5) / .5 * jr))
-                x = (int(y[0]), int(y[1]))
+
+            y = (float(x[0] + (random.random() - .5) / .5 * jr), float(x[1] + (random.random() - .5) / .5 * jr))
+            # x = (int(y[0]), int(y[1]))
+
             ctx.set_source_rgba(i[1]/255.,i[2]/255.,i[3]/255.,self.sepp_alpha)
             ctx.new_sub_path()
             ctx.arc(y[0], y[1], i[4] * .006, 0, 2 * math.pi)
             ctx.fill()
         pass
 
+    def PreDrawFromThread(self):
+        self.parent.m_statusBar2.SetStatusText('Event triggered...', 1)
+        self.parent.control_panel.m_textCtrl17.SetValue('rdp_taxonomy_poct_%s_drct_%s' %(self.radial_phylogram.po_ct, self.draw_count))
+        self.image_path = os.path.join(self.parent.control_panel.m_dirPicker4.GetPath(),self.parent.control_panel.m_textCtrl17.GetValue()+'.png')
+        print '%s, %s' % (self.write_image_to_path,self.image_path)
+        # self.parent.control_panel.save_rp_file()
+        self.UpdateDrawing()
+        self.e.clear()
+        self.parent.m_statusBar2.SetStatusText('Event cleared...', 1)
+
+    def FillSpace(self):
+        # self.use_tree_copy = True
+        # self.write_image_to_path = True
+        # self.t = threading.Thread(target=self.radial_phylogram.spacefill_spread_tree_by_levelorder, args=(self,))
+
+        self.e = threading.Event()
+        self.t = threading.Thread(target=self.radial_phylogram.test_4, args=(self,self.e))
+        self.t.start()
+
+        self.daem = threading.Thread(target=self.check_event)
+        self.daem.setDaemon(True)
+        self.daem.start()
+
+        # self.radial_phylogram.test_4(self,None)
+
+        self.UpdateDrawing()
+        # self.radial_phylogram.spacefill_spread_tree_by_levelorder(self)
+
+
+        print 'Exiting Fill Space Thread'
+        # self.write_image_to_path = False
+        # self.use_tree_copy = False
+
+    def save_cairo_image(self):
+        if self.image_path[-4:]<>'.png':
+            self.image_path = self.image_path + '.png'
+        print 'Saving to file: %s' % self.image_path
+        self.surf.write_to_png(self.image_path)
+
+    def set_image_path(self,path):
+        self.image_path=path
+
+    def save_cairo_svg(self, filepath):
+        svgsurf = cairo.SVGSurface(filepath,self.w,self.h)
+        self.DrawCairoFigure(svgsurf=svgsurf)
+        svgsurf.finish()
+
+
+    def draw_red_line_pair(self,xy0,xy1):
+        self.contxt.set_source_rgba(1.0,0.0,0.0,1.0)
+        self.contxt.set_line_width(.01)
+        self.contxt.move_to(xy0[0],xy0[1])
+        self.contxt.line_to(xy0[2],xy0[3])
+        self.contxt.stroke()
+        self.contxt.set_source_rgba(0.0, 0.0, 1.0, 1.0)
+        self.contxt.set_line_width(.007)
+        self.contxt.move_to(xy1[0], xy1[1])
+        self.contxt.line_to(xy1[2], xy1[3])
+        self.contxt.stroke()
+
+    def check_event(self):
+        ct = 0
+        while True:
+            # tm = os.path.getmtime(self.image_path)
+
+            if self.e.is_set():
+                self.parent.set_status('reloading image...')
+                wx.CallAfter(self.PreDrawFromThread)
+                # time.sleep(5)
+                self.parent.set_status('')
+            # time.sleep(5)
+            # if ct % 20 ==0:
+            #     print 'event status %s' % self.e.is_set()
+            # ct +=1
+
+
+    def ReloadTreeManipulator(self):
+        del self.radial_phylogram
+        # reload(tr)
+        self.import_new_tree(self.tree_path)
+
     def Draw(self,dc):
+        self.draw_count +=1
+        print "drawing cairo: %s" % self.draw_count
+        self.c.set_cairo_draw_count_label(self.draw_count)
         self.pre_draw_perspective_setting()
         self.DrawCairoFigure()
         if self.surf is not None:
@@ -1340,3 +1591,4 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
             self._Buffer = wx.EmptyBitmapRGBA(w,h)
             self._Buffer.CopyFromBuffer(self.surf.get_data(),format=wx.BitmapBufferFormat_ARGB32)
             dc.SelectObject(self._Buffer)
+            print 'done drawing'

@@ -27,13 +27,13 @@ class Options(PhylostratorUserSettings):
 
 
         #deprecated and should be deleted
-        self.cfg = ConfigParser.ConfigParser()
-        self.cfg.read('init_settings.cfg')
+        # self.cfg = ConfigParser.ConfigParser()
+        # self.cfg.read('init_settings.cfg')
 
-        self.init_tree = self.cfg.get('main','initial_tree')
-        self.init_annotation = self.cfg.get('main', 'initial_annotation_file')
-        self.jitter_radius = self.cfg.getint('cairo','jitter_radius')
-        self.temp_subtree_path = self.cfg.get('main','temp_subtree_path')
+        # self.init_tree = self.cfg.get('main','initial_tree')
+        # self.init_annotation = self.cfg.get('main', 'initial_annotation_file')
+        # self.jitter_radius = self.cfg.getint('cairo','jitter_radius')
+        # self.temp_subtree_path = self.cfg.get('main','temp_subtree_path')
 
 class Controller():
     __metaclass__ = Singleton
@@ -63,6 +63,9 @@ class Controller():
 
     def set_BufferedWindow_reference(self,bw_pointer):
         self.buffered_window=bw_pointer
+
+    def set_cairo_draw_count_label(self,ct):
+        self.image_frame.control_panel.m_stCairoDrawCount.SetLabel('Draw Count: %s' % ct)
 
     def set_tree_rotation(self,rotation):
         self.buffered_window.set_rotation(rotation)
@@ -188,6 +191,7 @@ class SEPPController():
 
         self.sepp_annotation_file=sepp_annotation_file
         self.sepp_ann_dict={}
+        self.show_all_values=False
 
         self.active_annotation_field=None
         self.active_unique_annotation_values=set([])
@@ -215,18 +219,31 @@ class SEPPController():
         sof.close()
         self.myjson = json.loads(self.json_str)
         self.placements={}
+        self.all_placements={}
         ins = 0
         not_in = 0
         if filter_vals is None:
             for i in self.myjson['placements']:
                 for j in i['nm']:
-                    self.placements[j[0]]=i['p'][0]
+                    if isinstance(j,list):
+                        self.all_placements[j[0]]=i['p']
+                        # get the one with the largest probability:
+                        self.placements[j[0]]=reduce(lambda x,y: x if x[2] > y[2] else y, i['p'])
+
+                    else:
+                        self.all_placements[j] = i['p']
+                        self.placements[j] = reduce(lambda x,y: x if x[2] > y[2] else y, i['p'])
         else:
             for i in self.myjson['placements']:
                 if str(i['p'][0][0]) in filter_vals:
                     ins+=1
                     for j in i['nm']:
-                        self.placements[j[0]]=i['p'][0]
+                        if isinstance(j,list):
+                            self.all_placements[j[0]]=i['p']
+                            self.placements[j[0]]=reduce(lambda x,y: x if x[2] > y[2] else y, i['p'])
+                        else:
+                            self.all_placements[j] = i['p']
+                            self.placements[j] = reduce(lambda x,y: x if x[2] > y[2] else y, i['p'])
                 else:
                     not_in +=0
                     # print i['nm']
@@ -408,22 +425,59 @@ class SEPPController():
 
             if keep == True:
                 # x = self.get_location_ex_pendant(i[0])
-                x0 = self.get_location_ex_pendant(i[0])
-                x1 = self.get_location_with_pendant(i[0])
+                if self.show_all_values==False:
+                    x0 = self.get_location_ex_pendant(i[0])
+                    x1 = self.get_location_with_pendant(i[0])
 
-                if x0 is not None:
-                    clr = self.selected_annotation_values[i[ann_col]][0]
-                    sz = self.selected_annotation_values[i[ann_col]][1]
-                    if with_pendants==True:
-                        self.sepp_draw_circles.append((x1,clr[0],clr[1],clr[2],sz,None))
-                        self.bw_ref.ExtraDrawSegments.append((x1,x0,clr))
-                    else:
-                        self.sepp_draw_circles.append((x0,clr[0],clr[1],clr[2],sz,None))
+                    if x0 is not None:
+                        clr = self.selected_annotation_values[i[ann_col]][0]
+                        sz = self.selected_annotation_values[i[ann_col]][1]
+                        if with_pendants==True:
+                            self.sepp_draw_circles.append((x1,clr[0],clr[1],clr[2],sz,None))
+                            self.bw_ref.ExtraDrawSegments.append((x1,x0,clr))
+                        else:
+                            self.sepp_draw_circles.append((x0,clr[0],clr[1],clr[2],sz,None))
+                else:
+                    # TODO: make it showable with pendant branches
+                    x0 = self.get_all_locations_ex_pendant(i[0])
+                    try:
+                        places = self.all_placements[i[0]]
+                        clr = self.selected_annotation_values[i[ann_col]][0]
+                        sz = self.selected_annotation_values[i[ann_col]][1]
+
+                        for pct in range(len(places)):
+                            if x0[pct] is not None:
+                                self.sepp_draw_circles.append((x0[pct],clr[0],clr[1],clr[2],float(sz)*(float(places[pct][2])**.5)))
+                    except KeyError:
+                        pass
 
         self.bw_ref.SeppDrawCircles = self.sepp_draw_circles
 
     def trigger_refresh(self):
         self.bw_ref.UpdateDrawing()
+
+    def get_all_locations_ex_pendant(self,nm):
+        if nm not in self.placements.keys():
+            return None
+
+        places = self.all_placements[nm]
+        circles=[]
+
+        for place in places:
+            try:
+                edgevals=self.ref_tree_point_lookup[str(place[0])]
+                hx = edgevals[1]
+                tx = edgevals[2]
+                e_len = edgevals[0]
+                if e_len==0:
+                    circles.append(tx)
+                else:
+                    frac = place[3] / e_len
+                    circles.append((frac * hx[0] + (1 - frac) * tx[0], frac * hx[1] + (1 - frac) * tx[1]))
+            except KeyError:
+                circles.append(None)
+        return circles
+
 
     def get_location_ex_pendant(self,nm):
         if nm not in self.placements.keys():
@@ -434,7 +488,10 @@ class SEPPController():
         # print nm
         # print place
         # nd=self.bw_ref.radial_phylogram.myt.find_node_with_label(str(place[0]))
-        edgevals=self.ref_tree_point_lookup[str(place[0])]
+        try:
+            edgevals=self.ref_tree_point_lookup[str(place[0])]
+        except KeyError:
+            return None
 
         # hx = nd.edge.viewer_edge.head_x
         # tx = nd.edge.viewer_edge.tail_x
@@ -457,7 +514,10 @@ class SEPPController():
         # print nm
         # print place
         # nd=self.bw_ref.radial_phylogram.myt.find_node_with_label(str(place[0]))
-        edgevals=self.ref_tree_point_lookup[str(place[0])]
+        try:
+            edgevals=self.ref_tree_point_lookup[str(place[0])]
+        except KeyError:
+            return None
 
         # hx = nd.edge.viewer_edge.head_x
         # tx = nd.edge.viewer_edge.tail_x

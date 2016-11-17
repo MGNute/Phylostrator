@@ -9,9 +9,7 @@ class PNGBufferedWindow(BufferedWindow):
     def __init__(self,parent,imagepath=None,*args, **kwargs):
         self.parent=parent
         if imagepath==None:
-            # self.image_path='C:\\Users\\miken\\Grad School Stuff\\Research\\Phylogenetics\\Metagenomics\\stumpf\\example.png'
-            self.image_path='C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\kra-primate-project\\kra-primate\\tree_placement_2\\images\\temp_new.png'
-            # self.image_path='resources/temp.png'
+            self.image_path='resources/temp.png'
         else:
             self.image_path=imagepath
         self.image = None

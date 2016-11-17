@@ -339,15 +339,22 @@ class PhylostratorUserSettings(UserSettingsContainer):
         self._categories.append('starting_file_paths')
         self.cairo = UserSettingGroup('cairo')
         self._categories.append('cairo')
+        self.spread = UserSettingGroup('spread')
+        self._categories.append('spread')
 
         self.starting_file_paths.add_option('init_tree_path',UserSetting(name='init_tree_path', default='', short_name=None, help='Path to tree file to be opened on startup', subcategory=None))
         self.starting_file_paths.add_option('init_annotation_path',UserSetting(name='init_annotation_path', default='', short_name=None,help='Path to annotation file to be opened on startup',subcategory=None))
         self.starting_file_paths.add_option('temp_subtree_path',UserSetting(name='temp_subtree_path', default='', short_name=None,help='Path to tree file to be opened on startup',subcategory=None))
+        self.starting_file_paths.add_option('init_working_folder',UserSetting(name='init_working_folder', default='', short_name=None,help='Folder to be used to save images, etc...',subcategory=None))
         self.cairo.add_option('jitter_radius',IntUserSetting(name='jitter_radius', default=3, min=0, max=None, short_name=None, help='The radius to jitter circles by randomly when they are not placed on the leaves of the tree [default: 3]', subcategory=None))
         self.cairo.add_option('sepp_alphas',FloatUserSetting(name='sepp_alphas', default=0.55, min=0.0, max=1.0,short_name=None,help='Alpha values for cirlces at ends of tree placements.',subcategory=None))
         self.cairo.add_option('node_alphas',FloatUserSetting(name='node_alphas', default=0.75, min=0.0, max=1.0, short_name=None,help='Alpha values for circles at nodes.', subcategory=None))
-        self.cairo.add_option('tree_line_width',FloatUserSetting(name='tree_line_width', default=0.75, min=0.0, max=1.0, short_name=None,help='Width of the lines used to draw the tree.', subcategory=None))
+        self.cairo.add_option('tree_line_width',FloatUserSetting(name='tree_line_width', default=0.01, min=0.0, max=None, short_name=None,help='Width of the lines used to draw the tree.', subcategory=None))
         self.cairo.add_option('image_width',IntUserSetting(name='image_width', default=1500, min=0, max=None, short_name=None,help='Width of the png image.',subcategory=None))
         self.cairo.add_option('image_height',IntUserSetting(name='image_height', default=900, min=0, max=None, short_name=None,help='Height of the png image.', subcategory=None))
+        self.cairo.add_option('legend_block_size',IntUserSetting(name='legend_block_size', default=20, min=0, max=None, short_name=None,help='Height of the blocks for the legend.', subcategory=None))
+        self.cairo.add_option('legend_spacing',IntUserSetting(name='legend_spacing', default=3, min=0, max=None, short_name=None,help='Vertical spacing between legend entries', subcategory=None))
+        self.spread.add_option('max_angle',FloatUserSetting(name='max_angle', default=0.34, min=0.0, max=None, short_name=None,help='Maximum change to an edge angle in a single iteration.', subcategory=None))
+
 
         # print self.starting_file_paths.

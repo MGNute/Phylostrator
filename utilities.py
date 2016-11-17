@@ -27,12 +27,14 @@ def write_list_to_file(mylist,filepath):
 
     myf.close()
 
-def color_scale_set(total):
+def color_scale_set(total, as_ints=True):
     lower_lim = .40
 
     side = int(float(total) ** .333 + 1)
+    # print 'side length: %s' % side
     gap = 1.0 / float(side)
 
+    #get the number of ineligible points (in the dark part of the cube
     ineliglbe_pts = int((lower_lim - gap * 5 / 6) / gap + 1) ** 3
     ineliglbe_pts += 1 #white is not allowed
 
@@ -40,6 +42,7 @@ def color_scale_set(total):
         side += 1
         gap = 1.0 / float(side)
         ineliglbe_pts = int((lower_lim - gap * 5 / 6) / gap + 1) ** 3
+    # print 'adjusted # pts: %s' % (side ** 3 - ineliglbe_pts )
 
     coords = []
     for i in range(side):
@@ -57,11 +60,21 @@ def color_scale_set(total):
                     locus.append(newc)
 
     sss = side * side * side - ineliglbe_pts
-    perm = get_ideal_permutation(sss)
+    # print 'sss: %s' % sss
+    # print 'length of locus (locus): %s' % len(locus)
+    perm = get_ideal_permutation(len(locus))
     finals = []
     for i in perm:
         finals.append(locus[len(perm) - i - 1])
-    return finals
+    if as_ints==True:
+        finals2 = []
+        for i in finals:
+            finals2.append((int(i[0]*255), int(i[1]*255), int(i[2]*255)))
+        return finals2
+    else:
+        return finals
+
+
 
 def get_ideal_permutation(els):
     random.seed(100)
@@ -81,7 +94,60 @@ def get_ideal_permutation(els):
     out.append(m2 - 1)
     return out
 
-colors=[(240,163,255),(0,117,220),(153,63,0),(76,0,92),(25,25,25),(0,92,49),(43,206,72),(255,204,153),(128,128,128),(148,255,181),(143,124,0),(157,204,0),(194,0,136),(0,51,128),(255,164,5),(255,168,187),(66,102,0),(255,0,16),(94,241,242),(0,153,143),(224,255,102),(116,10,255),(153,0,0),(255,255,128),(255,255,0),(255,80,5)]
+# colors=[(240,163,255),(0,117,220),(153,63,0),(76,0,92),(25,25,25),(0,92,49),(43,206,72),(255,204,153),(128,128,128),(148,255,181),(143,124,0),(157,204,0),(194,0,136),(0,51,128),(255,164,5),(255,168,187),(66,102,0),(255,0,16),(94,241,242),(0,153,143),(224,255,102),(116,10,255),(153,0,0),(255,255,128),(255,255,0),(255,80,5)]
+
+''' citation for this color set: http://godsnotwheregodsnot.blogspot.ru/2012/09/color-distribution-methodology.html
+'''
+colors = [(1,0,103),(213,255,0),(255,0,86),(158,0,142),(14,76,161),(255,229,2),(0,95,57),(0,255,0),(149,0,58),
+          (255,147,126),(164,36,0),(0,21,68),(145,208,203),(98,14,0),(107,104,130),(0,0,255),(0,125,181),(106,130,108),
+          (0,174,126),(194,140,159),(190,153,112),(0,143,156),(95,173,78),(255,0,0),(255,0,246),(255,2,157),(104,61,59),
+          (255,116,163),(150,138,232),(152,255,82),(167,87,64),(1,255,254),(255,238,232),(254,137,0),(189,198,255),
+          (1,208,255),(187,136,0),(117,68,177),(165,255,210),(255,166,254),(119,77,0),(122,71,130),(38,52,0),(0,71,84),
+          (67,0,44),(181,0,255),(255,177,103),(255,219,102),(144,251,146),(126,45,210),(189,211,147),(229,111,254),
+          (222,255,116),(0,255,120),(0,155,255),(0,100,1),(0,118,255),(133,169,0),(0,185,23),(120,130,49),(0,255,198),
+          (255,110,65),(232,94,190),(0,0,0)]
+
+def np_do_two_segments_intersect(a,b):
+    '''
+    Returns true if segments a and b intersect. Also returns the parametric indices [t1,t2] of the intersection point, if it exists.
+    Segments are defined like: a=[x1,y1,x2,y2]
+
+    NOTE: the segments touching is not good enough. They need to intersect in the open set between the endpoints.
+    :param a:
+    :param b:
+    :return:
+    '''
+
+    #not a line, we'll call that false and move on...
+    if ((a[0]==a[2]) and (a[1]==a[3])) or ((a[0]==a[2]) and (a[1]==a[3])):
+        return False, a,b
+    if ((a[0]==b[0] and a[1]==b[1]) or (a[0]==b[2] and a[1]==b[3]) or (a[2]==b[0] and a[3]==b[1])or (a[2]==b[2] and a[3]==b[3])):
+        return False, a,b
+    m1=np.dot(np.vstack((a[2:4]-a[0:2],b[2:4]-b[0:2])).transpose(),np.array([[1,0],[0,-1]],dtype=np.float64))
+
+    m2 = b[0:2]-a[0:2]
+    try:
+        # matrix is full rank, solve away...
+        t = np.dot(np.linalg.inv(m1),m2)
+        return np.all((t>0.)*(t<1.)), t[0], t[1]
+    except np.linalg.linalg.LinAlgError:
+        # ugh, edge cases
+        if a[2]==a[0]:
+            t2 = (b[1] - a[1]) / (a[3] - a[1])
+            t4 = (b[3] - a[1]) / (a[3] - a[1])
+            return (b[0]==a[0] and ((t2>0 and t2<1) or (t4>0 and t4 <1))), a, b
+        if a[1]==a[3]:
+            t1 = (b[0] - a[0]) / (a[2] - a[0])
+            t3 = (b[2] - a[0]) / (a[2] - a[0])
+            return (b[1]==a[1] and ((t1>0 and t1<1) or (t3>0 and t3 <1))), a, b
+        t1=(b[0]-a[0])/(a[2]-a[0])
+        t2 = (b[1]-a[1]) / (a[3] - a[1])
+        t3 = (b[2] - a[0])/ (a[2] - a[0])
+        t4 = (b[3]-a[1]) / (a[3] - a[1])
+        return (t1>0 and t1==t2 and t1<1) or (t3>0 and t3==t4 and t3<1), (t1,t2,t3,t4)
+
+
+
 
 def get_list_from_file(filepath):
     myf=open(filepath,'r')
@@ -101,6 +167,143 @@ def distance_btw_points(pt1,pt2):
 
 def dot_product(v1, v2):
     return v1[0]*v2[0]+v1[1]*v2[1]
+
+def np_find_intersect_segments(segs,alghold=400):
+    '''
+    implements the sweep-line algorithm to find out if any of a list of line segments intersect.
+    :param segs:
+    :return:
+    '''
+    numpts = segs.shape[0]
+    '''These arrays are laid out as (x,y,left?,index) where left is 1 if the point is a left point
+    '''
+
+    left_pts = np.zeros((numpts,2),dtype=np.float64)
+    left_inds = np.vstack((np.zeros(numpts,dtype=np.int8),np.arange(numpts, dtype=np.int32))).transpose()
+    right_pts = np.zeros((numpts, 2), dtype=np.float64)
+    right_inds = np.vstack((np.ones(numpts,dtype=np.int8),np.arange(numpts, dtype=np.int32))).transpose()
+
+    for i in range(numpts):
+        if segs[i,0]>segs[i,2]:
+            left_pts[i, 0:2] = segs[i, 2:4]
+            right_pts[i, 0:2] = segs[i, 0:2]
+        else:
+            right_pts[i, 0:2] = segs[i, 2:4]
+            left_pts[i, 0:2] = segs[i, 0:2]
+    ordered_segs = np.hstack((left_pts,right_pts)).copy()
+    # print ordered_segs
+    # print ordered_segs.shape
+    # if True:
+    #     return
+
+    all_pts = np.vstack((left_pts,right_pts))
+    all_inds = np.vstack((left_inds,right_inds))
+    # sort_inds = all_pts[:,0].argsort().copy()
+    all_view = np.array(np.zeros(2*numpts),dtype=[('x','f8'),('y','f8'),('left','i1'),('ind','i4')])
+    all_view['x']=all_pts[:,0]
+    all_view['y'] = all_pts[:, 1]
+    all_view['left'] = all_inds[:,0]
+    all_view['ind'] = all_inds[:,1]
+    sort_inds = np.argsort(all_view,order=['x','left'])
+    # np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\sort_inds.txt',sort_inds,'%d','\t')
+    all_pts = all_pts[sort_inds]
+    all_inds = all_inds[sort_inds]
+    active_segs=None
+
+    start_pt = 0
+    wait=True
+    while(wait):
+        if all_inds[start_pt,1] != all_inds[start_pt+1,1]:
+            wait=False
+            if np_do_two_segments_intersect(ordered_segs[all_inds[start_pt,1],:],ordered_segs[all_inds[start_pt+1,1],:])==True:
+                return False,ordered_segs[all_inds[start_pt,1],:],ordered_segs[all_inds[start_pt+1,1],:]
+            active_segs = np.hstack((ordered_segs[all_inds[start_pt, 1], :], all_inds[start_pt, 1])).reshape((1, 5))
+        else:
+            start_pt +=2
+            if start_pt >= all_inds.shape[0]:
+                # print 'condition: start'
+                return True, None, None
+
+    for i in range(start_pt+1,2*numpts):
+        # print '---- iteration %s ----' % i
+        # print active_segs
+        # print '\n'
+        # print 'pausing, press (q) to continue'
+        # qtag= None
+        # if alghold is None or i>alghold:
+            # while qtag<>'q':
+            # qtag=raw_input()
+        nact = int(active_segs.shape[0])
+        if all_inds[i,0]==0:
+            k=sum(active_segs[:,1]<all_pts[i,1])
+            # print 'k: %s' %k
+
+            pt = ordered_segs[all_inds[i,1],:]
+            active_segs=np.insert(active_segs,k,np.hstack((ordered_segs[all_inds[i,1],:],all_inds[i,1])),0)
+            # active_inds[all_inds[i,1]]=k
+
+            #check predecessor and check successor:
+            # if i >= 106 and i <= 108:
+            #     print k
+            #     print pt
+            #     print nact
+            #     print active_segs[k-1,0:4]
+                # print active_segs[k+1,0:4]
+            if k>0:
+                pred = active_segs[k-1,0:4]
+                # print pt; print pred;
+                time_to_quit=np_do_two_segments_intersect(pt,pred)
+                if time_to_quit[0]==True:
+                    # print 'condition: 1) left point collided with predecessor'
+                    # print time_to_quit
+                    return False, pt ,pred
+            if k<(nact-1):
+
+                succ = active_segs[k+1,0:4]
+                # print pt; print pred;
+                time_to_quit=np_do_two_segments_intersect(pt,succ)
+                if time_to_quit[0]==True:
+                    # print 'condition: 2) left point collided with successor'
+                    # print time_to_quit
+                    return False, pt, succ
+
+
+        else:
+            # try:
+            # k=active_inds.pop(all_inds[i,1])
+            try:
+                k=np.asscalar(np.where(active_segs[:,4]==all_inds[i,1])[0])
+            except:
+                print 'error at that ascalar command'
+                # print np.where(active_segs[:,4]==all_inds[i,1])[0]
+                # print active_segs[:,4]
+                # print i
+                # print all_inds[i,1]
+                import sys
+                sys.exit(0)
+            # print 'k: %s' % k
+            # except:
+            # print k
+            # print active_segs
+            # print i
+            # print all_inds
+            if k < (nact-1) and k > 0:
+                time_to_quit=np_do_two_segments_intersect(active_segs[k-1,0:4],active_segs[k+1,0:4])
+                if time_to_quit[0]==True:
+                    # print 'condition: 3) predecessor, successor collided on removal'
+                    # print time_to_quit
+                    return False, active_segs[k-1,0:4],active_segs[k+1,0:4]
+            # print active_segs.shape
+            active_segs=np.delete(active_segs,k,0)
+        # print active_segs
+    return True, None, None
+
+
+
+
+
+
+    pass
 
 def distance_to_line_segment(segx1, segx2, pt):
     diff = (segx2[0]-segx1[0],segx2[1]-segx1[1])
@@ -248,61 +451,6 @@ def convert_coordinates_new(max_dims,disprange,x1,x2):
     x1n = (t11 * x1[0] + t12 * x1[1] + t13, t21 * x1[0] + t22 * x1[1] + t23)
     x2n = (t11 * x2[0] + t12 * x2[1] + t13, t21 * x2[0] + t22 * x2[1] + t23)
     return get_line_on_screen(x1n,x2n,h,w)
-
-
-
-# def get_line_on_screen_old(xyrange,disprange,x1,x2):
-#     '''
-#     Converts coordinates from the x-y plan based on the range "xyrange" (xmin, xmax, ymin, ymax) to the display coordinates
-#
-#     :param xyrange: (xmin, xmax, ymin, ymax)
-#     :param disprange: (w , h) (indexed at 0, so max output will be (w-1, h-1)
-#     :param x1, x2: (x,y) coordinates of endpoints of the segment
-#     :return: display coords (on numpy scale) or None if it's out of the display range
-#     '''
-#     x1n_tf=convert_coordinates(xyrange,disprange,x1)
-#     x2n_tf=convert_coordinates(xyrange,disprange,x2)
-#     print x1n_tf
-#     print x2n_tf
-#
-#     H=disprange[1]
-#     W=disprange[0]
-#     if (x1n_tf[0]<0 and x2n_tf[0]<0) or (x1n_tf[0] > W-1 and x2n_tf[0] > W-1) or (x1n_tf[1]<0 and x2n_tf[1] < 0) or (x1n_tf[1] > H-1 and x2n_tf > H-1):
-#         return None
-#     elif x1n_tf[2]==True and x2n_tf[2]==True:
-#         return (x1n_tf[0],x1n_tf[1],x2n_tf[0],x2n_tf[1])
-#     else:
-#         x1n = (x1n_tf[0], x1n_tf[1])
-#         x2n = (x2n_tf[0], x2n_tf[1])
-#         # vec=(x1n[0]-x2n[0],x1n[1]-x2n[1])
-#         # x1_to_topleft=(-x1n[0],-x1n[1])
-#         # x1_to_topright=(W-1-x1n[0],-x1n[1])
-#         # x1_to_bottomright=(W-1-x1n[0],H-1-x1n[1])
-#         # x1_to_bottomleft = (-x1n[0],H-1-x1n[1])
-#         # inside_topleft=vec[0]*x1_to_topleft[1]-vec[1]*x1_to_topleft[0]
-#         # inside_topright = vec[0] * x1_to_topright[1] - vec[1] * x1_to_topright[0]
-#         # inside_bottomleft=vec[0]*x1_to_bottomleft[1]-vec[1]*x1_to_bottomleft[0]
-#         # inside_bottomright = vec[0] * x1_to_bottomright[1] - vec[1] * x1_to_bottomright[0]
-#         pts = []
-#         pts.append(x1n)
-#         pts.append(x2n)
-#         if x1n[0]<>x2n[0]:
-#             leftside_ht=x1n[1]+(x2n[1]-x1n[1])*(0-x1n[0])/(x2n[0]-x1n[0])
-#             pts.append((0,leftside_ht))
-#             rightside_ht=x1n[1]+(x2n[1]-x1n[1])*((W-1)-x1n[0])/(x2n[0]-x1n[0])
-#             pts.append((0,rightside_ht))
-#         if x1n[1]<>x2n[1]:
-#             topside_wd=x1n[0]+(x2n[0]-x1n[0])*(0-x1n[1])/(x2n[1]-x1n[1])
-#             pts.append((topside_wd,0))
-#             bottomside_wd = x1n[0] + (x2n[0] - x1n[0]) * ((H-1) - x1n[1]) / (x2n[1] - x1n[1])
-#             pts.append((bottomside_wd,0))
-#
-#
-#         newpts = get_valid_points(pts,H,W)
-#         if len(newpts)==0:
-#             return None
-#         else:
-#             return (newpts[0][0],newpts[0][1],newpts[1][0],newpts[1][1])
 
 def rotate(x,theta):
     '''

@@ -122,6 +122,9 @@ class ctrlFrame ( wx.Frame ):
 		self.btn_import_tree = wx.Button( self.m_panel2, wx.ID_ANY, u"Import", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer4.Add( self.btn_import_tree, 0, wx.ALL, 5 )
 		
+		self.m_button372 = wx.Button( self.m_panel2, wx.ID_ANY, u"Export", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer4.Add( self.m_button372, 0, wx.ALL, 5 )
+		
 		
 		bSizer3.Add( bSizer4, 0, wx.EXPAND, 5 )
 		
@@ -169,14 +172,17 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer13.Add( self.m_staticText9, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textImageSaveTarget = wx.TextCtrl( self.m_panel2, wx.ID_ANY, u"(file name)", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_textImageSaveTarget = wx.TextCtrl( self.m_panel2, wx.ID_ANY, u"(file name)", wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER )
 		self.m_textImageSaveTarget.SetToolTipString( u"file is saved in the working directory above automatically" )
 		self.m_textImageSaveTarget.SetMaxSize( wx.Size( 300,-1 ) )
 		
 		bSizer13.Add( self.m_textImageSaveTarget, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_button1 = wx.Button( self.m_panel2, wx.ID_ANY, u"Save", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button1 = wx.Button( self.m_panel2, wx.ID_ANY, u"Save PNG", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer13.Add( self.m_button1, 0, wx.ALL, 5 )
+		
+		self.m_button44 = wx.Button( self.m_panel2, wx.ID_ANY, u"Save SVG", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer13.Add( self.m_button44, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
 		bSizer7.Add( bSizer13, 1, wx.EXPAND, 5 )
@@ -187,7 +193,55 @@ class ctrlFrame ( wx.Frame ):
 		self.m_staticline16 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		bSizer3.Add( self.m_staticline16, 0, wx.EXPAND |wx.ALL, 5 )
 		
-		bSizer48 = wx.BoxSizer( wx.VERTICAL )
+		bSizer48 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		bSizer53 = wx.BoxSizer( wx.VERTICAL )
+		
+		bSizer562 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_button27 = wx.Button( self.m_panel2, wx.ID_ANY, u"Draw Cairo", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer562.Add( self.m_button27, 0, wx.ALL, 5 )
+		
+		
+		bSizer53.Add( bSizer562, 1, wx.EXPAND, 5 )
+		
+		
+		bSizer48.Add( bSizer53, 1, wx.EXPAND, 5 )
+		
+		self.m_staticline191 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_VERTICAL )
+		bSizer48.Add( self.m_staticline191, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		bSizer57 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_staticText61 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Write Image as SVG File:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText61.Wrap( -1 )
+		self.m_staticText61.SetFont( wx.Font( 11, 72, 90, 92, False, "Cambria" ) )
+		self.m_staticText61.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
+		
+		bSizer57.Add( self.m_staticText61, 0, wx.ALL, 5 )
+		
+		bSizer131 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText91 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"File Name", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText91.Wrap( -1 )
+		self.m_staticText91.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
+		
+		bSizer131.Add( self.m_staticText91, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textSvgSaveTarget = wx.TextCtrl( self.m_panel2, wx.ID_ANY, u"(file name)", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_textSvgSaveTarget.SetToolTipString( u"file is saved in the working directory above automatically" )
+		self.m_textSvgSaveTarget.SetMaxSize( wx.Size( 300,-1 ) )
+		
+		bSizer131.Add( self.m_textSvgSaveTarget, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_button11 = wx.Button( self.m_panel2, wx.ID_ANY, u"Save", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer131.Add( self.m_button11, 0, wx.ALL, 5 )
+		
+		
+		bSizer57.Add( bSizer131, 0, wx.EXPAND, 5 )
+		
+		
+		bSizer48.Add( bSizer57, 1, wx.EXPAND, 5 )
 		
 		
 		bSizer3.Add( bSizer48, 1, wx.EXPAND, 5 )
@@ -196,7 +250,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel2.SetSizer( bSizer3 )
 		self.m_panel2.Layout()
 		bSizer3.Fit( self.m_panel2 )
-		self.m_notebook1.AddPage( self.m_panel2, u"Files", False )
+		self.m_notebook1.AddPage( self.m_panel2, u"Files", True )
 		self.viewer_panel = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.FULL_REPAINT_ON_RESIZE|wx.TAB_TRAVERSAL )
 		bSizer27 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -352,10 +406,10 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText711 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Circle Size (px)", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText711.Wrap( -1 )
-		bSizer1211.Add( self.m_staticText711, 0, wx.ALL, 5 )
+		bSizer1211.Add( self.m_staticText711, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_slider1 = wx.Slider( self.m_panel4, wx.ID_ANY, 2, 1, 10, wx.Point( -1,-1 ), wx.DefaultSize, wx.SL_HORIZONTAL|wx.SL_LABELS|wx.SIMPLE_BORDER )
-		bSizer1211.Add( self.m_slider1, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		self.m_textCtrl24 = wx.TextCtrl( self.m_panel4, wx.ID_ANY, u"2", wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER )
+		bSizer1211.Add( self.m_textCtrl24, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_button4 = wx.Button( self.m_panel4, wx.ID_ANY, u"Trigger Redraw", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer1211.Add( self.m_button4, 0, wx.ALL, 5 )
@@ -398,12 +452,37 @@ class ctrlFrame ( wx.Frame ):
 		self.m_staticTextLegendFont.Wrap( -1 )
 		bSizer561.Add( self.m_staticTextLegendFont, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_fontPickerLegend = wx.FontPickerCtrl( self.m_panel4, wx.ID_ANY, wx.Font( 11, 70, 90, 90, False, "Cambria" ), wx.DefaultPosition, wx.DefaultSize, wx.FNTP_DEFAULT_STYLE )
+		self.m_fontPickerLegend = wx.FontPickerCtrl( self.m_panel4, wx.ID_ANY, wx.Font( 14, 70, 90, 90, False, "Cambria" ), wx.DefaultPosition, wx.DefaultSize, wx.FNTP_DEFAULT_STYLE )
 		self.m_fontPickerLegend.SetMaxPointSize( 100 ) 
 		bSizer561.Add( self.m_fontPickerLegend, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
+		self.m_button26 = wx.Button( self.m_panel4, wx.ID_ANY, u"Internals", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer561.Add( self.m_button26, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
+		
+		self.m_button34 = wx.Button( self.m_panel4, wx.ID_ANY, u"Leafs", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer561.Add( self.m_button34, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
+		
 		
 		bSizer11.Add( bSizer561, 0, wx.EXPAND, 5 )
+		
+		bSizer63 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_staticText50 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Legend Block Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText50.Wrap( -1 )
+		bSizer63.Add( self.m_staticText50, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textLegendBlock = wx.TextCtrl( self.m_panel4, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER )
+		bSizer63.Add( self.m_textLegendBlock, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_staticText51 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Legend Spacing", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText51.Wrap( -1 )
+		bSizer63.Add( self.m_staticText51, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_textLegendSpacing = wx.TextCtrl( self.m_panel4, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER )
+		bSizer63.Add( self.m_textLegendSpacing, 0, wx.ALL, 5 )
+		
+		
+		bSizer11.Add( bSizer63, 0, wx.EXPAND, 5 )
 		
 		
 		bSizer11.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
@@ -426,6 +505,9 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_button8 = wx.Button( self.m_panel4, wx.ID_ANY, u"Load Values", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer17.Add( self.m_button8, 0, wx.ALL, 5 )
+		
+		self.m_button411 = wx.Button( self.m_panel4, wx.ID_ANY, u"Select All", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer17.Add( self.m_button411, 0, wx.ALL, 5 )
 		
 		
 		bSizer12.Add( bSizer17, 0, 0, 5 )
@@ -568,15 +650,18 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer12111 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_staticText7111 = wx.StaticText( self.m_panel41, wx.ID_ANY, u"Circle Size (px)", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText7111 = wx.StaticText( self.m_panel41, wx.ID_ANY, u"Circle Props: Size (px)", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText7111.Wrap( -1 )
-		bSizer12111.Add( self.m_staticText7111, 0, wx.ALL, 5 )
+		bSizer12111.Add( self.m_staticText7111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_slider11 = wx.Slider( self.m_panel41, wx.ID_ANY, 2, 1, 10, wx.Point( -1,-1 ), wx.DefaultSize, wx.SL_HORIZONTAL|wx.SL_LABELS|wx.SIMPLE_BORDER )
-		bSizer12111.Add( self.m_slider11, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		self.m_textCtrl25 = wx.TextCtrl( self.m_panel41, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER )
+		bSizer12111.Add( self.m_textCtrl25, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_button41 = wx.Button( self.m_panel41, wx.ID_ANY, u"Trigger Redraw", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer12111.Add( self.m_button41, 0, wx.ALL, 5 )
+		
+		self.m_colourPicker2 = wx.ColourPickerCtrl( self.m_panel41, wx.ID_ANY, wx.Colour( 255, 0, 0 ), wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
+		bSizer12111.Add( self.m_colourPicker2, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
 		bSizer111.Add( bSizer12111, 0, wx.EXPAND, 5 )
@@ -590,6 +675,9 @@ class ctrlFrame ( wx.Frame ):
 		self.m_checkBox6 = wx.CheckBox( self.m_panel41, wx.ID_ANY, u"Jitter Attachment Point", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_checkBox6.SetValue(True) 
 		bSizer111.Add( self.m_checkBox6, 0, wx.ALL, 5 )
+		
+		self.m_checkSeppShowAll = wx.CheckBox( self.m_panel41, wx.ID_ANY, u"Show All Placement Locations (alt: show top 1)", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer111.Add( self.m_checkSeppShowAll, 0, wx.ALL, 5 )
 		
 		self.m_staticline71 = wx.StaticLine( self.m_panel41, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		bSizer111.Add( self.m_staticline71, 0, wx.EXPAND |wx.ALL, 5 )
@@ -615,6 +703,12 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_button81 = wx.Button( self.m_panel41, wx.ID_ANY, u"Load Values", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer171.Add( self.m_button81, 0, wx.ALL, 5 )
+		
+		self.m_button42 = wx.Button( self.m_panel41, wx.ID_ANY, u"Select All", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer171.Add( self.m_button42, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_button43 = wx.Button( self.m_panel41, wx.ID_ANY, u"Unselect All", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer171.Add( self.m_button43, 0, wx.ALL, 5 )
 		
 		
 		bSizer122.Add( bSizer171, 0, 0, 5 )
@@ -688,7 +782,27 @@ class ctrlFrame ( wx.Frame ):
 		bSizer16.Add( self.m_button5, 0, wx.ALL, 5 )
 		
 		
-		bSizer15.Add( bSizer16, 0, 0, 5 )
+		bSizer15.Add( bSizer16, 0, wx.EXPAND, 5 )
+		
+		self.m_staticline18 = wx.StaticLine( self.m_panel8, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		bSizer15.Add( self.m_staticline18, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		bSizer54 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_button28 = wx.Button( self.m_panel8, wx.ID_ANY, u"Test 1", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer54.Add( self.m_button28, 0, wx.ALL, 5 )
+		
+		self.m_button29 = wx.Button( self.m_panel8, wx.ID_ANY, u"Test 2", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer54.Add( self.m_button29, 0, wx.ALL, 5 )
+		
+		self.m_button30 = wx.Button( self.m_panel8, wx.ID_ANY, u"Test 3", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer54.Add( self.m_button30, 0, wx.ALL, 5 )
+		
+		self.m_button31 = wx.Button( self.m_panel8, wx.ID_ANY, u"Test 4", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer54.Add( self.m_button31, 0, wx.ALL, 5 )
+		
+		
+		bSizer15.Add( bSizer54, 1, wx.EXPAND, 5 )
 		
 		
 		self.m_panel8.SetSizer( bSizer15 )
@@ -708,8 +822,8 @@ class ctrlFrame ( wx.Frame ):
 		self.m_staticText74.Wrap( -1 )
 		bSizer91.Add( self.m_staticText74, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textCtrl30 = wx.TextCtrl( self.m_panel82, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer91.Add( self.m_textCtrl30, 0, wx.ALL, 5 )
+		self.m_textTreeLineWidth = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u".004", wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER )
+		bSizer91.Add( self.m_textTreeLineWidth, 0, wx.ALL, 5 )
 		
 		
 		bSizer89.Add( bSizer91, 0, 0, 5 )
@@ -737,7 +851,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer9711.Add( self.m_staticText7812, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textPngWidth = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"1200", wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
+		self.m_textPngWidth = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"1500", wx.DefaultPosition, wx.Size( 75,-1 ), wx.TE_PROCESS_ENTER )
 		bSizer9711.Add( self.m_textPngWidth, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
@@ -749,7 +863,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer9711.Add( self.m_staticText78111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textPngHeight = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"950", wx.DefaultPosition, wx.Size( 75,-1 ), 0 )
+		self.m_textPngHeight = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"900", wx.DefaultPosition, wx.Size( 75,-1 ), wx.TE_PROCESS_ENTER )
 		bSizer9711.Add( self.m_textPngHeight, 0, wx.ALL, 5 )
 		
 		
@@ -780,6 +894,21 @@ class ctrlFrame ( wx.Frame ):
 		
 		
 		bSizer89.Add( bSizer97111, 0, 0, 5 )
+		
+		bSizer55 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_button32 = wx.Button( self.m_panel82, wx.ID_ANY, u"Draw Cairo", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer55.Add( self.m_button32, 0, wx.ALL, 5 )
+		
+		self.m_stCairoDrawCount = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Draw Count: ", wx.DefaultPosition, wx.Size( 100,-1 ), 0 )
+		self.m_stCairoDrawCount.Wrap( -1 )
+		bSizer55.Add( self.m_stCairoDrawCount, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_button33 = wx.Button( self.m_panel82, wx.ID_ANY, u"Reload Tree Module", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer55.Add( self.m_button33, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer89.Add( bSizer55, 0, wx.EXPAND, 5 )
 		
 		
 		bSizer151.Add( bSizer89, 1, wx.EXPAND, 5 )
@@ -887,7 +1016,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_button46 = wx.Button( self.m_panel82, wx.ID_ANY, u"Save RP File", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer107.Add( self.m_button46, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_dirPicker4 = wx.DirPickerCtrl( self.m_panel82, wx.ID_ANY, wx.EmptyString, u"Select a folder", wx.DefaultPosition, wx.DefaultSize, wx.DIRP_DEFAULT_STYLE )
+		self.m_dirPicker4 = wx.DirPickerCtrl( self.m_panel82, wx.ID_ANY, u"C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\rdp_images", u"Select a folder", wx.DefaultPosition, wx.DefaultSize, wx.DIRP_DEFAULT_STYLE )
 		bSizer107.Add( self.m_dirPicker4, 1, wx.ALL, 5 )
 		
 		
@@ -908,6 +1037,32 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer99.Add( bSizer56, 0, wx.EXPAND, 5 )
 		
+		self.m_staticline17 = wx.StaticLine( self.m_panel82, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		bSizer99.Add( self.m_staticline17, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		bSizer52 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_button25 = wx.Button( self.m_panel82, wx.ID_ANY, u"Fill Space", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer52.Add( self.m_button25, 0, wx.ALL, 5 )
+		
+		self.m_button35 = wx.Button( self.m_panel82, wx.ID_ANY, u"Save Cairo Image", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer52.Add( self.m_button35, 0, wx.ALL, 5 )
+		
+		
+		bSizer99.Add( bSizer52, 0, 0, 5 )
+		
+		self.m_staticText40 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText40.Wrap( -1 )
+		bSizer99.Add( self.m_staticText40, 0, wx.ALL, 5 )
+		
+		self.m_staticText412 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText412.Wrap( -1 )
+		bSizer99.Add( self.m_staticText412, 0, wx.ALL, 5 )
+		
+		self.m_staticText42 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText42.Wrap( -1 )
+		bSizer99.Add( self.m_staticText42, 0, wx.ALL, 5 )
+		
 		
 		bSizer96.Add( bSizer99, 1, wx.EXPAND, 5 )
 		
@@ -924,7 +1079,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel82.SetSizer( bSizer151 )
 		self.m_panel82.Layout()
 		bSizer151.Fit( self.m_panel82 )
-		self.m_notebook1.AddPage( self.m_panel82, u"Cairo", True )
+		self.m_notebook1.AddPage( self.m_panel82, u"Cairo", False )
 		
 		bSizer2.Add( self.m_notebook1, 1, wx.EXPAND |wx.ALL, 5 )
 		
@@ -943,8 +1098,13 @@ class ctrlFrame ( wx.Frame ):
 		self.m_checkBox51.Bind( wx.EVT_CHECKBOX, self.on_toggle_config )
 		self.m_FilePicker_tree.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_file )
 		self.btn_import_tree.Bind( wx.EVT_BUTTON, self.import_tree )
+		self.m_button372.Bind( wx.EVT_BUTTON, self.save_tree_as_newick )
 		self.m_dirPicker3.Bind( wx.EVT_DIRPICKER_CHANGED, self.set_working_folder )
-		self.m_button1.Bind( wx.EVT_LEFT_UP, self.SaveCurrentImage )
+		self.m_textImageSaveTarget.Bind( wx.EVT_TEXT_ENTER, self.set_cairo_image_path )
+		self.m_button1.Bind( wx.EVT_BUTTON, self.save_cairo_image )
+		self.m_button44.Bind( wx.EVT_BUTTON, self.save_as_svg_from_png_filename )
+		self.m_button27.Bind( wx.EVT_BUTTON, self.on_draw_cairo_click )
+		self.m_button11.Bind( wx.EVT_BUTTON, self.save_as_svg_click )
 		self.viewer_panel.Bind( wx.EVT_PAINT, self.on_zoompanel_holder_paint )
 		self.m_spinBtn2.Bind( wx.EVT_SPIN_DOWN, self.zoom_out_10pct )
 		self.m_spinBtn2.Bind( wx.EVT_SPIN_UP, self.zoom_in_10pct )
@@ -961,13 +1121,18 @@ class ctrlFrame ( wx.Frame ):
 		self.m_listBox31.Bind( wx.EVT_LISTBOX, self.process_filter1 )
 		self.m_listBox21.Bind( wx.EVT_LISTBOX, self.process_filter2 )
 		self.m_comboBox61.Bind( wx.EVT_COMBOBOX, self.load_filter2 )
-		self.m_slider1.Bind( wx.EVT_SCROLL, self.trigger_redraw )
+		self.m_textCtrl24.Bind( wx.EVT_TEXT_ENTER, self.reset_all_circle_sizes )
 		self.m_button4.Bind( wx.EVT_BUTTON, self.trigger_redraw )
 		self.m_checkBox4.Bind( wx.EVT_CHECKBOX, self.on_show_legend_check )
 		self.m_textCtrl12.Bind( wx.EVT_TEXT_ENTER, self.move_legend )
 		self.m_textCtrl13.Bind( wx.EVT_TEXT_ENTER, self.move_legend )
+		self.m_button26.Bind( wx.EVT_BUTTON, self.on_draw_internal_labels_click )
+		self.m_button34.Bind( wx.EVT_BUTTON, self.on_draw_leaf_labels )
+		self.m_textLegendBlock.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
+		self.m_textLegendSpacing.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
 		self.m_button7.Bind( wx.EVT_BUTTON, self.valpicker_clear )
 		self.m_button8.Bind( wx.EVT_BUTTON, self.valpicker_load )
+		self.m_button411.Bind( wx.EVT_BUTTON, self.on_select_all_annotation_values )
 		self.btn_import_annotation1.Bind( wx.EVT_BUTTON, self.sepp_import_annotation )
 		self.m_ComboSelectedField1.Bind( wx.EVT_COMBOBOX, self.sepp_populate_annotation_values )
 		self.m_ComboSelectedField1.Bind( wx.EVT_TEXT, self.sepp_populate_annotation_values )
@@ -977,18 +1142,27 @@ class ctrlFrame ( wx.Frame ):
 		self.m_listBox3.Bind( wx.EVT_LISTBOX, self.sepp_process_filter1 )
 		self.m_listBox2.Bind( wx.EVT_LISTBOX, self.sepp_process_filter2 )
 		self.m_comboBox6.Bind( wx.EVT_COMBOBOX, self.sepp_load_filter2 )
-		self.m_slider11.Bind( wx.EVT_SCROLL, self.trigger_redraw )
+		self.m_textCtrl25.Bind( wx.EVT_TEXT_ENTER, self.sepp_set_uniform_size )
 		self.m_button41.Bind( wx.EVT_BUTTON, self.trigger_redraw )
+		self.m_colourPicker2.Bind( wx.EVT_COLOURPICKER_CHANGED, self.sepp_set_uniform_color )
 		self.m_checkBox3.Bind( wx.EVT_CHECKBOX, self.set_pendant_branch_checked )
+		self.m_checkSeppShowAll.Bind( wx.EVT_CHECKBOX, self.sepp_show_all_check )
 		self.m_button71.Bind( wx.EVT_BUTTON, self.sepp_valpicker_clear )
 		self.m_button81.Bind( wx.EVT_BUTTON, self.sepp_valpicker_load )
+		self.m_button42.Bind( wx.EVT_BUTTON, self.sepp_select_all )
+		self.m_button43.Bind( wx.EVT_BUTTON, self.sepp_unselect_all )
 		self.m_button5.Bind( wx.EVT_BUTTON, self.run_controller_script )
-		self.m_textPngWidth.Bind( wx.EVT_TEXT, self.populate_options_from_text_fields )
-		self.m_textPngHeight.Bind( wx.EVT_TEXT, self.populate_options_from_text_fields )
-		self.m_textCircleAlphas.Bind( wx.EVT_TEXT, self.populate_options_from_text_fields )
+		self.m_button28.Bind( wx.EVT_BUTTON, self.on_test_1_click )
+		self.m_button29.Bind( wx.EVT_BUTTON, self.on_test_2_click )
+		self.m_button30.Bind( wx.EVT_BUTTON, self.on_test_3_click )
+		self.m_button31.Bind( wx.EVT_BUTTON, self.on_test_4_click )
+		self.m_textTreeLineWidth.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
+		self.m_textPngWidth.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
+		self.m_textPngHeight.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
 		self.m_textCircleAlphas.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
-		self.m_textSeppAlphas.Bind( wx.EVT_TEXT, self.populate_options_from_text_fields )
 		self.m_textSeppAlphas.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
+		self.m_button32.Bind( wx.EVT_BUTTON, self.on_draw_cairo_click )
+		self.m_button33.Bind( wx.EVT_BUTTON, self.on_reload_tree_module )
 		self.m_button36.Bind( wx.EVT_BUTTON, self.reroot_above )
 		self.m_button37.Bind( wx.EVT_BUTTON, self.pivot_clock )
 		self.m_button38.Bind( wx.EVT_BUTTON, self.pivot_ctrclock )
@@ -996,6 +1170,8 @@ class ctrlFrame ( wx.Frame ):
 		self.m_button381.Bind( wx.EVT_BUTTON, self.expand_clade_in )
 		self.m_button45.Bind( wx.EVT_BUTTON, self.redraw_tree )
 		self.m_button46.Bind( wx.EVT_BUTTON, self.save_rp_file )
+		self.m_button25.Bind( wx.EVT_BUTTON, self.on_fill_space_click )
+		self.m_button35.Bind( wx.EVT_BUTTON, self.save_cairo_image )
 	
 	def __del__( self ):
 		pass
@@ -1019,10 +1195,25 @@ class ctrlFrame ( wx.Frame ):
 	
 	
 	
+	def save_tree_as_newick( self, event ):
+		event.Skip()
+	
 	def set_working_folder( self, event ):
 		event.Skip()
 	
-	def SaveCurrentImage( self, event ):
+	def set_cairo_image_path( self, event ):
+		event.Skip()
+	
+	def save_cairo_image( self, event ):
+		event.Skip()
+	
+	def save_as_svg_from_png_filename( self, event ):
+		event.Skip()
+	
+	def on_draw_cairo_click( self, event ):
+		event.Skip()
+	
+	def save_as_svg_click( self, event ):
 		event.Skip()
 	
 	def on_zoompanel_holder_paint( self, event ):
@@ -1069,9 +1260,11 @@ class ctrlFrame ( wx.Frame ):
 	def load_filter2( self, event ):
 		event.Skip()
 	
-	def trigger_redraw( self, event ):
+	def reset_all_circle_sizes( self, event ):
 		event.Skip()
 	
+	def trigger_redraw( self, event ):
+		event.Skip()
 	
 	def on_show_legend_check( self, event ):
 		event.Skip()
@@ -1080,10 +1273,23 @@ class ctrlFrame ( wx.Frame ):
 		event.Skip()
 	
 	
+	def on_draw_internal_labels_click( self, event ):
+		event.Skip()
+	
+	def on_draw_leaf_labels( self, event ):
+		event.Skip()
+	
+	def populate_options_from_text_fields( self, event ):
+		event.Skip()
+	
+	
 	def valpicker_clear( self, event ):
 		event.Skip()
 	
 	def valpicker_load( self, event ):
+		event.Skip()
+	
+	def on_select_all_annotation_values( self, event ):
 		event.Skip()
 	
 	def sepp_import_annotation( self, event ):
@@ -1111,9 +1317,17 @@ class ctrlFrame ( wx.Frame ):
 	def sepp_load_filter2( self, event ):
 		event.Skip()
 	
+	def sepp_set_uniform_size( self, event ):
+		event.Skip()
 	
+	
+	def sepp_set_uniform_color( self, event ):
+		event.Skip()
 	
 	def set_pendant_branch_checked( self, event ):
+		event.Skip()
+	
+	def sepp_show_all_check( self, event ):
 		event.Skip()
 	
 	def sepp_valpicker_clear( self, event ):
@@ -1122,16 +1336,35 @@ class ctrlFrame ( wx.Frame ):
 	def sepp_valpicker_load( self, event ):
 		event.Skip()
 	
+	def sepp_select_all( self, event ):
+		event.Skip()
+	
+	def sepp_unselect_all( self, event ):
+		event.Skip()
+	
 	def run_controller_script( self, event ):
 		event.Skip()
 	
-	def populate_options_from_text_fields( self, event ):
+	def on_test_1_click( self, event ):
+		event.Skip()
+	
+	def on_test_2_click( self, event ):
+		event.Skip()
+	
+	def on_test_3_click( self, event ):
+		event.Skip()
+	
+	def on_test_4_click( self, event ):
 		event.Skip()
 	
 	
 	
 	
 	
+	
+	
+	def on_reload_tree_module( self, event ):
+		event.Skip()
 	
 	def reroot_above( self, event ):
 		event.Skip()
@@ -1153,6 +1386,10 @@ class ctrlFrame ( wx.Frame ):
 	
 	def save_rp_file( self, event ):
 		event.Skip()
+	
+	def on_fill_space_click( self, event ):
+		event.Skip()
+	
 	
 
 ###########################################################################
