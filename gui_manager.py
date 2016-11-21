@@ -94,6 +94,8 @@ class gui_manager(sfld_view.ctrlFrame):
     def on_reload_tree_module( self, event ):
         self.c.buffered_window.ReloadTreeManipulator()
 
+    def on_show_root_check( self, event = None):
+        self.c.buffered_window.show_root = self.m_checkBoxShowRoot.IsChecked()
 
     def populate_options_to_text_fields(self, event = None):
         # print 'options to text'
@@ -108,6 +110,8 @@ class gui_manager(sfld_view.ctrlFrame):
         self.m_FilePicker_annotation.SetPath(os.path.abspath(opts.starting_file_paths.init_annotation_path))
         self.m_dirPicker3.SetPath(os.path.abspath(opts.starting_file_paths.init_working_folder))
         self.set_working_folder()
+        self.m_filePicker5.SetPath(os.path.abspath(opts.starting_file_paths.sepp_placement_path))
+        self.m_FilePicker_annotation1.SetPath(os.path.abspath(opts.starting_file_paths.sepp_annotation_path))
 
 
         # cairo panel
@@ -130,6 +134,8 @@ class gui_manager(sfld_view.ctrlFrame):
         opts.starting_file_paths.init_tree_path = self.m_FilePicker_tree.GetPath()
         opts.starting_file_paths.init_annotation_path = self.m_FilePicker_annotation.GetPath()
         opts.starting_file_paths.init_working_folder = self.m_dirPicker3.GetPath()
+        opts.starting_file_paths.sepp_placement_path = self.m_filePicker5.GetPath()
+        opts.starting_file_paths.sepp_annotation_path = self.m_FilePicker_annotation1.GetPath()
 
         # cairo panel
         opts.cairo.image_width = float(self.m_textPngWidth.GetValue())

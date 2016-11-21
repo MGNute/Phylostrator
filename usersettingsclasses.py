@@ -346,6 +346,8 @@ class PhylostratorUserSettings(UserSettingsContainer):
         self.starting_file_paths.add_option('init_annotation_path',UserSetting(name='init_annotation_path', default='', short_name=None,help='Path to annotation file to be opened on startup',subcategory=None))
         self.starting_file_paths.add_option('temp_subtree_path',UserSetting(name='temp_subtree_path', default='', short_name=None,help='Path to tree file to be opened on startup',subcategory=None))
         self.starting_file_paths.add_option('init_working_folder',UserSetting(name='init_working_folder', default='', short_name=None,help='Folder to be used to save images, etc...',subcategory=None))
+        self.starting_file_paths.add_option('sepp_placement_path',UserSetting(name='sepp_placement_path', default='', short_name=None,help='Path to the SEPP placement JSON file...',subcategory=None))
+        self.starting_file_paths.add_option('sepp_annotation_path',UserSetting(name='sepp_annotation_path', default='', short_name=None,help='Path to the SEPP annotation file...',subcategory=None))
         self.cairo.add_option('jitter_radius',IntUserSetting(name='jitter_radius', default=3, min=0, max=None, short_name=None, help='The radius to jitter circles by randomly when they are not placed on the leaves of the tree [default: 3]', subcategory=None))
         self.cairo.add_option('sepp_alphas',FloatUserSetting(name='sepp_alphas', default=0.55, min=0.0, max=1.0,short_name=None,help='Alpha values for cirlces at ends of tree placements.',subcategory=None))
         self.cairo.add_option('node_alphas',FloatUserSetting(name='node_alphas', default=0.75, min=0.0, max=1.0, short_name=None,help='Alpha values for circles at nodes.', subcategory=None))

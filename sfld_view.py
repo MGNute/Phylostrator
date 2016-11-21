@@ -250,7 +250,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel2.SetSizer( bSizer3 )
 		self.m_panel2.Layout()
 		bSizer3.Fit( self.m_panel2 )
-		self.m_notebook1.AddPage( self.m_panel2, u"Files", True )
+		self.m_notebook1.AddPage( self.m_panel2, u"Files", False )
 		self.viewer_panel = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.FULL_REPAINT_ON_RESIZE|wx.TAB_TRAVERSAL )
 		bSizer27 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -484,6 +484,18 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer11.Add( bSizer63, 0, wx.EXPAND, 5 )
 		
+		self.m_staticline201 = wx.StaticLine( self.m_panel4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
+		bSizer11.Add( self.m_staticline201, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		bSizer60 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_checkBoxShowRoot = wx.CheckBox( self.m_panel4, wx.ID_ANY, u"Show Root", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_checkBoxShowRoot.SetValue(True) 
+		bSizer60.Add( self.m_checkBoxShowRoot, 1, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		bSizer11.Add( bSizer60, 0, wx.EXPAND, 5 )
+		
 		
 		bSizer11.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
 		
@@ -531,7 +543,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel4.SetSizer( bSizer10 )
 		self.m_panel4.Layout()
 		bSizer10.Fit( self.m_panel4 )
-		self.m_notebook1.AddPage( self.m_panel4, u"Taxon Annotation", False )
+		self.m_notebook1.AddPage( self.m_panel4, u"Taxon Annotation", True )
 		self.m_panel41 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_panel41.SetBackgroundColour( wx.Colour( 200, 200, 200 ) )
 		
@@ -1130,6 +1142,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_button34.Bind( wx.EVT_BUTTON, self.on_draw_leaf_labels )
 		self.m_textLegendBlock.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
 		self.m_textLegendSpacing.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
+		self.m_checkBoxShowRoot.Bind( wx.EVT_CHECKBOX, self.on_show_root_check )
 		self.m_button7.Bind( wx.EVT_BUTTON, self.valpicker_clear )
 		self.m_button8.Bind( wx.EVT_BUTTON, self.valpicker_load )
 		self.m_button411.Bind( wx.EVT_BUTTON, self.on_select_all_annotation_values )
@@ -1282,6 +1295,9 @@ class ctrlFrame ( wx.Frame ):
 	def populate_options_from_text_fields( self, event ):
 		event.Skip()
 	
+	
+	def on_show_root_check( self, event ):
+		event.Skip()
 	
 	def valpicker_clear( self, event ):
 		event.Skip()

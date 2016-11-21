@@ -1243,6 +1243,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
     leaf_labels_on = False
     write_image_to_path = False
     image_path = None
+    show_root = False
 
     def __init__(self,parent,*args,**kwargs):
         PhylogenyBufferedWindow.__init__(self,parent,*args,**kwargs)
@@ -1323,10 +1324,11 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
             self.DrawInternalNodeLabels()
 
     def DrawTreeSegmentsCairo(self, ctx, tree):
-        # ctx.set_source_rgba(1.0, 0.0, 0.0, 1.0)
-        # ctx.new_sub_path()
-        # ctx.arc(0., 0., .1, 0, 2 * math.pi)
-        # ctx.fill()
+        if self.show_root==True:
+            ctx.set_source_rgba(1.0, 0.0, 0.0, 1.0)
+            ctx.new_sub_path()
+            ctx.arc(0., 0., 6*opts.cairo.tree_line_width, 0, 2 * math.pi)
+            ctx.fill()
 
         ctx.set_source_rgba(0.0, 0.0, 0.0, 1.0)
         for i in tree.preorder_edge_iter():
@@ -1452,13 +1454,14 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
     def DrawCirclesCairo(self, ctx):
         # print "Drawing Circles"
         # curr_brush = dc.GetBrush()
+        px_unit = opts.cairo.tree_line_width
         for i in self.c.circle_sets_by_color:
             ctx.set_source_rgba(float(i[0])/255., float(i[1])/255., float(i[2])/255., self.circle_alpha)
             # dc.SetBrush(wx.Brush(wx.Colour(i[0], i[1], i[2]), wx.SOLID))
             for j in self.c.circle_sets_by_color[i]:
                 # x = self.transform_coordinate(j[0])
                 ctx.new_sub_path()
-                ctx.arc(j[0][0],j[0][1],j[1]*.006,0,2*math.pi)
+                ctx.arc(j[0][0],j[0][1],j[1]*px_unit,0,2*math.pi)
                 ctx.fill()
 
                 # print x
@@ -1479,6 +1482,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
 
 
     def DrawExtraCirclesCairo(self, ctx, circle_set=None):
+        px_unit = opts.cairo.tree_line_width
         if self.parent.control_panel.m_checkBox6.IsChecked():
             jr = opts.cairo.jitter_radius * opts.cairo.tree_line_width
         else:
@@ -1493,7 +1497,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
 
             ctx.set_source_rgba(i[1]/255.,i[2]/255.,i[3]/255.,self.sepp_alpha)
             ctx.new_sub_path()
-            ctx.arc(y[0], y[1], i[4] * .006, 0, 2 * math.pi)
+            ctx.arc(y[0], y[1], i[4] * px_unit, 0, 2 * math.pi)
             ctx.fill()
         pass
 
