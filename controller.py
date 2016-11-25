@@ -111,6 +111,10 @@ class Controller():
                 self.leaf_coords[j]['size']=i[2]
         self.get_circle_sets_by_color()
 
+    def update_leaf_node_coords(self):
+        self.buffered_window.radial_phylogram.get_leaf_node_coords()
+        self.leaf_coords=self.buffered_window.radial_phylogram.leaf_node_coords
+
     def get_circle_sets_by_color(self):
         '''
         this is the final helper function for the circle drawing that gets a bunch of (color, list of coordinates) pairs
@@ -143,6 +147,7 @@ class Controller():
 
     def import_annotation(self,ann_path):
         node_labs = set(self.buffered_window.radial_phylogram.node_labels.keys())
+        self.update_leaf_node_coords()
         self.annotation = trman.AnnotationData(ann_path,node_labs)
         self.annotation_fields = self.annotation.headers
 

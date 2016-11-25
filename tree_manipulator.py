@@ -3,7 +3,7 @@ __author__ = 'Michael'
 import math
 import dendropy
 from view import *
-from utilities import rotate, np_find_intersect_segments
+from utilities import *
 import copy
 import wx
 import numpy as np
@@ -222,8 +222,11 @@ class Radial_Phylogram():
         # theta_vals=[]
         # theta_vals2=[]
         # theta_vals3=[]
+
+        self.node_ct = 0
         self.prepare_tree()
         for i in self.myt.postorder_node_iter():
+            self.node_ct +=1
             if i.is_leaf()==True:
                 self.node_labels[i.label]['l']=1
             else:
@@ -286,6 +289,18 @@ class Radial_Phylogram():
             for j in i.child_node_iter():
                 j.percent_of_parent_wedge=j.wedge_angle/w
 
+        ct = 0
+        self.pts_nparr = np.zeros((self.node_ct,2),dtype=np.float64)
+        eip = []
+        for i in self.myt.preorder_node_iter():
+            i.index = ct
+            self.pts_nparr[i.index,:]=i.location
+            if i.parent_node is not None:
+                eip.append((i.index,i.parent_node.index))
+            ct +=1
+        self.edges_as_node_pairs = np.asarray(eip,dtype=np.int32)
+        # print self.edges_as_node_pairs.shape
+
     def make_tree_copy(self,parent, evt):
         # if self.myt_copy is not None:
         #     del self.myt_copy
@@ -308,6 +323,7 @@ class Radial_Phylogram():
             x1x = x0[0]+i.edge_length*math.cos(t1)
             x1y = x0[1]+i.edge_length*math.sin(t1)
             i.location = (x1x,x1y)
+            self.pts_nparr[i.index, :] = i.location
 
     def relocate_subtree_by_edge_segment_angle(self,node=None):
         '''
@@ -323,6 +339,7 @@ class Radial_Phylogram():
                 x1x = x0[0]+i.edge_length*math.cos(t1)
                 x1y = x0[1]+i.edge_length*math.sin(t1)
                 i.location = (x1x,x1y)
+                self.pts_nparr[i.index,:]= i.location
         else:
             pr = self.myt.preorder_node_iter()
             pr.next()
@@ -332,6 +349,7 @@ class Radial_Phylogram():
                 x1x = x0[0]+i.edge_length*math.cos(t1)
                 x1y = x0[1]+i.edge_length*math.sin(t1)
                 i.location = (x1x,x1y)
+                self.pts_nparr[i.index, :] = i.location
 
     def spacefill_spread_tree_by_levelorder(self, parent):
         '''
@@ -386,7 +404,8 @@ class Radial_Phylogram():
         self.relocate_subtree_by_wedge_properties(test_nd)
 
     def test_3(self):
-
+        self.set_segments_as_nparr()
+        print np_find_intersect_segments_test(self.segments_as_nparr)
         pass
 
     def test_4(self, parent=None, myevt = None):
@@ -408,13 +427,8 @@ class Radial_Phylogram():
         # using all delaunay distances, not just leaves:
         M = np.zeros((ndct, ndct), dtype=np.float64)  # for K leaves, M is [(2K-2) X (2K-2)]
 
-
-        # dxdt = np.zeros(ndct, dtype=np.float64)
-        # dydt = np.zeros(ndct, dtype=np.float64)
         lens = np.zeros(ndct, dtype=np.float64)
         thetas = np.zeros(ndct, dtype=np.float64)
-
-
 
         # Make the 'M' matrix:
         if GLOBAL_DEBUG==True:
@@ -440,7 +454,6 @@ class Radial_Phylogram():
         if do_M==True:
             # storing the M matrix and the pts object in the tree for later.
             self.myt.m_matrix=M
-            # self.myt.numpy_points_objects = pts
 
         # np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\test-M.txt', M, '%.2f', '\t')
 
@@ -454,8 +467,8 @@ class Radial_Phylogram():
             print 'getting the gradient vector'
         gradients = self.get_delaunay_gradients(M, lens, node_order, pts, seg_inds,
                                                 thetas, ndct, pts_nparr, leaf_to_edge_segs)
-        np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\test-gradients.txt', gradients,
-                   '%.2f', '\t')
+        # np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\test-gradients.txt', gradients,
+        #            '%.2f', '\t')
         if GLOBAL_DEBUG == True:
             print 'done with delaunay gradients'
 
@@ -464,7 +477,7 @@ class Radial_Phylogram():
 
         step = .01
         # max_angle_change = np.pi / (float(ndct)/2.)
-        max_angle_change = .017
+        max_angle_change = .017*10
         self.po_ct = 0
 
         ok_to_continue = True
@@ -473,17 +486,27 @@ class Radial_Phylogram():
         # trying the all at once method:
         eff_grads = np.dot(2*np.identity(ndct,dtype=np.float64)-M.transpose(),gradients)
         np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\test-effgrads.txt',eff_grads,'%.2f', '\t')
+
         # ct +=0
         for i in self.myt.preorder_node_iter():
-            i.edge_segment_angle += min(max(-max_angle_change, step * eff_grads[i.index]), max_angle_change)
-            # i.edge_segment_angle += min(max(-max_angle_change, step * gradients[i.index]), max_angle_change)
+            last_edge_angles = self.get_tree_restore_point(ndct)
+            i.edge_segment_angle += min(max(-max_angle_change, step * gradients[i.index]), max_angle_change)
             self.relocate_subtree_by_edge_segment_angle()
-            print 'index: %s -- gradient %s -- angle change %s' % (i.index, gradients[i.index],min(max(-max_angle_change, step * gradients[i.index]), max_angle_change))
+            self.set_segments_as_nparr()
+            if np_find_intersect_segments(self.segments_as_nparr) == False:
+                print "breaking because we found an intersection"
+                print np_find_intersect_segments_allpy(self.segments_as_nparr)
+                self.set_tree_to_last_restore_point(last_edge_angles)
+                break
+
+
+            # print 'index: %s -- gradient %s -- angle change %s' % (i.index, gradients[i.index],min(max(-max_angle_change, step * gradients[i.index]), max_angle_change))
             myevt.set()
-            # time.sleep(0.2)
-            # q=raw_input()
-            # if q == 'q':
-            #     break
+            # time.sleep(0.1)
+
+            q=raw_input()
+            if q == 'q':
+                break
         self.relocate_subtree_by_edge_segment_angle()
         # self.make_tree_copy(parent,myevt)
 
@@ -576,6 +599,37 @@ class Radial_Phylogram():
         parent.parent.set_status('Ready')
         print 'exiting space fill function'
 
+    def set_segments_as_nparr(self):
+        edge_ct = self.edges_as_node_pairs.shape[0]
+        self.segments_as_nparr = np.zeros((edge_ct,4),dtype=np.float64)
+        self.segments_as_nparr[:, 0:2] = self.pts_nparr[self.edges_as_node_pairs[:, 0],:]
+        self.segments_as_nparr[:, 2:4] = self.pts_nparr[self.edges_as_node_pairs[:, 1],:]
+
+    def fix_missing_edge_lengths(self):
+        lens = []
+        pr = self.myt.preorder_node_iter()
+        pr.next()
+        for i in pr:
+            if i.edge.length is not None:
+                i.edge.orig_edge_length = i.edge.length
+                lens.append(i.edge.length)
+            else:
+                i.edge.orig_edge_length = None
+        mean_len = np.mean(np.asarray(lens,dtype=np.float64))
+        pr = self.myt.preorder_node_iter()
+        pr.next()
+        pr.next()
+        for i in pr:
+            if i.edge.length is None or i.edge.length==0:
+                i.edge.length = mean_len
+
+        # leaflens=[]
+        # for i in self.myt.leaf_node_iter():
+        #     leaflens.append(i.edge_length)
+        # print leaflens
+
+
+
     def get_tree_restore_point(self, ndct):
         last_edge_angles = np.zeros(ndct,dtype=np.float64)
         pr = self.myt.preorder_node_iter()
@@ -614,6 +668,7 @@ class Radial_Phylogram():
         pr.next()
         for i in pr:
             pts_nparr[i.index,:]=i.location
+            self.pts_nparr[i.index,:]=i.location
         toc = datetime.datetime.now()
         # print 'Points numpy array updated. Time: %s' % (toc - tic)
 
@@ -639,19 +694,11 @@ class Radial_Phylogram():
 
     def get_delaunay_gradients(self, M, lens, node_order, pts, seg_inds, thetas, ndct, pts_nparr, leaf_to_edge_segs=None):
 
-        # DEBUG:
-        # debug_file = open('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\br_uikquh.txt', 'w')
-        # debug_file.write('N/E\tsegment\tdx\tdy\tdist\n')
-        # test_nd_ind = pts['uikquh']['index']
-        # print 'ddrrcy node index: %s' % test_nd_ind
-        # test_nd_ref = self.node_refs[test_nd_ind]
-
         tic = datetime.datetime.now()
         dLdx = np.zeros(ndct, dtype=np.float64)
         dLdy = np.zeros(ndct, dtype=np.float64)
 
         nsegs = seg_inds.shape[0]
-
 
         s1 = pts_nparr[seg_inds[:,0]]
         s2 = pts_nparr[seg_inds[:,1]]
@@ -870,8 +917,8 @@ class Radial_Phylogram():
             angles.append(ang)
         return min(angles), max(angles)
 
-    def angle_spread_extension(self):
-        pass
+    # def angle_spread_extension(self):
+    #     pass
 
     def get_max_dims(self):
         xma=float(0)
@@ -976,19 +1023,19 @@ class Radial_Phylogram():
             self.node_labels[i.label]={'x':None, 'l':None, 'w':None, 't':None, 'nu':None, 'theta':0, 'old_label':oldlab, 'taxon_label':taxname}
 
 
-    def get_selected(self,tx):
-        #TODO: Make sure this is deprecated
-        # print 'getting x coords for selected taxa'
-        settx=set(tx)
-        self.selected=[]
-        # ct = 0
-        for i in self.myt.leaf_node_iter():
-            # ct +=1
-            # if ct % 1000==0:
-            #     print str(i.taxon.label) + ' - ' + type(i.taxon.label)
-            if str(i.taxon.label) in settx:
-                self.selected.append(self.node_labels[i.label]['x'])
-        return self.selected
+    # def get_selected(self,tx):
+    #     #TODO: Make sure this is deprecated
+    #     # print 'getting x coords for selected taxa'
+    #     settx=set(tx)
+    #     self.selected=[]
+    #     # ct = 0
+    #     for i in self.myt.leaf_node_iter():
+    #         # ct +=1
+    #         # if ct % 1000==0:
+    #         #     print str(i.taxon.label) + ' - ' + type(i.taxon.label)
+    #         if str(i.taxon.label) in settx:
+    #             self.selected.append(self.node_labels[i.label]['x'])
+    #     return self.selected
 
     def get_leaf_node_coords(self):
         '''
@@ -1005,25 +1052,22 @@ class Radial_Phylogram():
             self.leaf_node_coords[i.taxon.label]=args.copy()
             del args
 
-    def get_view_nodes(self):
-        '''
-        DEPRECATED
-        :return: big list of veiwer nodes
-        '''
-        print 'get_vew_nodes() called, tree_manipulator.py, line 483'
-        view_nodes={}
-        for i in self.myt.preorder_node_iter():
-            vn=ViewerNode(x=self.node_labels[i.label]['x'],node_ref=i,theta=self.node_labels[i.label]['theta'])
-            view_nodes[i.label] = vn
-        return view_nodes
+    # def get_view_nodes(self):
+    #     '''
+    #     DEPRECATED
+    #     :return: big list of veiwer nodes
+    #     '''
+    #     print 'get_vew_nodes() called, tree_manipulator.py, line 483'
+    #     view_nodes={}
+    #     for i in self.myt.preorder_node_iter():
+    #         vn=ViewerNode(x=self.node_labels[i.label]['x'],node_ref=i,theta=self.node_labels[i.label]['theta'])
+    #         view_nodes[i.label] = vn
+    #     return view_nodes
 
     def refresh_all(self):
         self.get_radial_phylogram()
         self.get_segments()
         self.get_max_dims()
-
-    # def deform_clade_by_wedge_and_radians_dummy(self, myedge, width_radians, right_edge_radians):
-    #     pass
 
     def deform_clade_by_wedge_and_radians(self,myedge,width_radians, right_edge_radians):
         nd = myedge.head_node

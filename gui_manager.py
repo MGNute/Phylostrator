@@ -81,7 +81,7 @@ class gui_manager(sfld_view.ctrlFrame):
         self.Layout()
         # self.MoveXY(100, 100)
         # self.MoveXY(1620,300) #illinois monitors
-        self.MoveXY(1920, 100)  # cincy monitors
+        self.MoveXY(2420, 100)  # cincy monitors
 
 
         #TODO: This is just for the verstion where we want to do a cold initialize, otherwise have to make the image frame
@@ -246,8 +246,11 @@ class gui_manager(sfld_view.ctrlFrame):
         self.value_picker.clear_all()
 
     def valpicker_load( self, event ):
-        # self.value_picker
+        self.value_picker.set_values()
         pass
+
+    def on_unselect_all_annotation_values(self,event):
+        self.value_picker.unselect_all()
 
     def on_select_all_annotation_values( self, event ):
         self.value_picker.select_all()
@@ -422,6 +425,10 @@ class gui_manager(sfld_view.ctrlFrame):
         except:
             pass
 
+    def on_fix_missing_edge_lengths_click( self, event ):
+        self.c.buffered_window.radial_phylogram.fix_missing_edge_lengths()
+        self.c.buffered_window.radial_phylogram.get_radial_phylogram()
+        self.c.buffered_window.UpdateDrawing()
 
     def on_show_legend_check( self, event=None ):
         if self.m_checkBox4.IsChecked():
@@ -573,6 +580,7 @@ class gui_manager(sfld_view.ctrlFrame):
 
     def on_fill_space_click( self, event=None ):
         self.c.buffered_window.FillSpace()
+        self.c.update_leaf_node_coords()
 
     def on_draw_cairo_click( self, event = None):
         self.c.buffered_window.pre_draw_perspective_setting()

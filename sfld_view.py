@@ -9,6 +9,7 @@
 
 import wx
 import wx.xrc
+import wx.propgrid as pg
 import wx.grid
 
 ###########################################################################
@@ -102,32 +103,6 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer3.Add( bSizer41, 0, 0, 5 )
 		
-		bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		self.lblFile = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Tree File", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_LEFT )
-		self.lblFile.Wrap( -1 )
-		self.lblFile.SetFont( wx.Font( 9, 74, 90, 92, False, "Arial" ) )
-		self.lblFile.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
-		
-		bSizer4.Add( self.lblFile, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		
-		bSizer4.AddSpacer( ( 43, 0), 0, wx.EXPAND, 5 )
-		
-		self.m_FilePicker_tree = wx.FilePickerCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.Size( 500,-1 ), wx.FLP_DEFAULT_STYLE )
-		self.m_FilePicker_tree.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
-		
-		bSizer4.Add( self.m_FilePicker_tree, 0, wx.ALL, 5 )
-		
-		self.btn_import_tree = wx.Button( self.m_panel2, wx.ID_ANY, u"Import", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer4.Add( self.btn_import_tree, 0, wx.ALL, 5 )
-		
-		self.m_button372 = wx.Button( self.m_panel2, wx.ID_ANY, u"Export", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer4.Add( self.m_button372, 0, wx.ALL, 5 )
-		
-		
-		bSizer3.Add( bSizer4, 0, wx.EXPAND, 5 )
-		
 		self.m_staticline1 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		bSizer3.Add( self.m_staticline1, 0, wx.EXPAND |wx.ALL, 5 )
 		
@@ -150,6 +125,8 @@ class ctrlFrame ( wx.Frame ):
 		bSizer3.Add( bSizer6, 0, wx.EXPAND, 5 )
 		
 		self.m_dirPicker3 = wx.DirPickerCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, u"Select a folder", wx.DefaultPosition, wx.DefaultSize, wx.DIRP_DEFAULT_STYLE )
+		self.m_dirPicker3.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
+		
 		bSizer3.Add( self.m_dirPicker3, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		self.m_staticline3 = wx.StaticLine( self.m_panel2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
@@ -251,6 +228,83 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel2.Layout()
 		bSizer3.Fit( self.m_panel2 )
 		self.m_notebook1.AddPage( self.m_panel2, u"Files", False )
+		self.m_panel11 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		self.m_panel11.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
+		self.m_panel11.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
+		
+		bSizer61 = wx.BoxSizer( wx.VERTICAL )
+		
+		bSizer4 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.lblFile = wx.StaticText( self.m_panel11, wx.ID_ANY, u"Tree File", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_LEFT )
+		self.lblFile.Wrap( -1 )
+		self.lblFile.SetFont( wx.Font( 9, 74, 90, 92, False, "Arial" ) )
+		self.lblFile.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
+		
+		bSizer4.Add( self.lblFile, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_FilePicker_tree = wx.FilePickerCtrl( self.m_panel11, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.Size( 500,-1 ), wx.FLP_DEFAULT_STYLE )
+		self.m_FilePicker_tree.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
+		
+		bSizer4.Add( self.m_FilePicker_tree, 0, wx.ALL, 5 )
+		
+		self.btn_import_tree = wx.Button( self.m_panel11, wx.ID_ANY, u"Import", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer4.Add( self.btn_import_tree, 0, wx.ALL, 5 )
+		
+		self.m_button372 = wx.Button( self.m_panel11, wx.ID_ANY, u"Export (Nwk)", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer4.Add( self.m_button372, 0, wx.ALL, 5 )
+		
+		
+		bSizer61.Add( bSizer4, 0, wx.EXPAND, 5 )
+		
+		bSizer62 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		bSizer631 = wx.BoxSizer( wx.VERTICAL )
+		
+		bSizer65 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		self.m_checkBox8 = wx.CheckBox( self.m_panel11, wx.ID_ANY, u"Unit Edge Lngths", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_checkBox8.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
+		
+		bSizer65.Add( self.m_checkBox8, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_button431 = wx.Button( self.m_panel11, wx.ID_ANY, u"Fix Missing Edge Lengths", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer65.Add( self.m_button431, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		bSizer631.Add( bSizer65, 0, wx.EXPAND, 5 )
+		
+		
+		bSizer62.Add( bSizer631, 1, wx.EXPAND, 5 )
+		
+		self.m_staticline21 = wx.StaticLine( self.m_panel11, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_VERTICAL )
+		bSizer62.Add( self.m_staticline21, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		bSizer64 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_propertyGridManager1 = pg.PropertyGridManager(self.m_panel11, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.propgrid.PGMAN_DEFAULT_STYLE)
+		self.m_propertyGridManager1.SetExtraStyle( wx.propgrid.PG_EX_MODE_BUTTONS ) 
+		
+		self.m_propertyGridPage1 = self.m_propertyGridManager1.AddPage( u"Page", wx.NullBitmap );
+		self.m_propertyGridItem1 = self.m_propertyGridPage1.Append( pg.StringProperty( u"File", u"File" ) ) 
+		self.m_propertyGridItem2 = self.m_propertyGridPage1.Append( pg.IntProperty( u"# Taxa", u"# Taxa" ) ) 
+		self.m_propertyGridItem3 = self.m_propertyGridPage1.Append( pg.FloatProperty( u"X min", u"X min" ) ) 
+		self.m_propertyGridItem4 = self.m_propertyGridPage1.Append( pg.FloatProperty( u"X max", u"X max" ) ) 
+		self.m_propertyGridItem5 = self.m_propertyGridPage1.Append( pg.FloatProperty( u"Y min", u"Y min" ) ) 
+		self.m_propertyGridItem6 = self.m_propertyGridPage1.Append( pg.FloatProperty( u"Y max", u"Y max" ) ) 
+		bSizer64.Add( self.m_propertyGridManager1, 0, wx.ALL|wx.EXPAND, 5 )
+		
+		
+		bSizer62.Add( bSizer64, 1, wx.EXPAND, 5 )
+		
+		
+		bSizer61.Add( bSizer62, 1, wx.EXPAND, 5 )
+		
+		
+		self.m_panel11.SetSizer( bSizer61 )
+		self.m_panel11.Layout()
+		bSizer61.Fit( self.m_panel11 )
+		self.m_notebook1.AddPage( self.m_panel11, u"Tree", True )
 		self.viewer_panel = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.FULL_REPAINT_ON_RESIZE|wx.TAB_TRAVERSAL )
 		bSizer27 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -512,14 +566,17 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer17.Add( self.m_staticText8, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_button7 = wx.Button( self.m_panel4, wx.ID_ANY, u"Clear Values", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button7 = wx.Button( self.m_panel4, wx.ID_ANY, u"Clear", wx.DefaultPosition, wx.Size( 50,-1 ), 0 )
 		bSizer17.Add( self.m_button7, 0, wx.ALL, 5 )
 		
-		self.m_button8 = wx.Button( self.m_panel4, wx.ID_ANY, u"Load Values", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_button8 = wx.Button( self.m_panel4, wx.ID_ANY, u"Load", wx.DefaultPosition, wx.Size( 50,-1 ), 0 )
 		bSizer17.Add( self.m_button8, 0, wx.ALL, 5 )
 		
 		self.m_button411 = wx.Button( self.m_panel4, wx.ID_ANY, u"Select All", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer17.Add( self.m_button411, 0, wx.ALL, 5 )
+		
+		self.m_button421 = wx.Button( self.m_panel4, wx.ID_ANY, u"Unselect All", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer17.Add( self.m_button421, 0, wx.ALL, 5 )
 		
 		
 		bSizer12.Add( bSizer17, 0, 0, 5 )
@@ -543,7 +600,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel4.SetSizer( bSizer10 )
 		self.m_panel4.Layout()
 		bSizer10.Fit( self.m_panel4 )
-		self.m_notebook1.AddPage( self.m_panel4, u"Taxon Annotation", True )
+		self.m_notebook1.AddPage( self.m_panel4, u"Taxon Annotation", False )
 		self.m_panel41 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_panel41.SetBackgroundColour( wx.Colour( 200, 200, 200 ) )
 		
@@ -1108,15 +1165,16 @@ class ctrlFrame ( wx.Frame ):
 		self.m_FilePicker_config.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_file )
 		self.btn_import_tree1.Bind( wx.EVT_BUTTON, self.import_tree )
 		self.m_checkBox51.Bind( wx.EVT_CHECKBOX, self.on_toggle_config )
-		self.m_FilePicker_tree.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_file )
-		self.btn_import_tree.Bind( wx.EVT_BUTTON, self.import_tree )
-		self.m_button372.Bind( wx.EVT_BUTTON, self.save_tree_as_newick )
 		self.m_dirPicker3.Bind( wx.EVT_DIRPICKER_CHANGED, self.set_working_folder )
 		self.m_textImageSaveTarget.Bind( wx.EVT_TEXT_ENTER, self.set_cairo_image_path )
 		self.m_button1.Bind( wx.EVT_BUTTON, self.save_cairo_image )
 		self.m_button44.Bind( wx.EVT_BUTTON, self.save_as_svg_from_png_filename )
 		self.m_button27.Bind( wx.EVT_BUTTON, self.on_draw_cairo_click )
 		self.m_button11.Bind( wx.EVT_BUTTON, self.save_as_svg_click )
+		self.m_FilePicker_tree.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_file )
+		self.btn_import_tree.Bind( wx.EVT_BUTTON, self.import_tree )
+		self.m_button372.Bind( wx.EVT_BUTTON, self.save_tree_as_newick )
+		self.m_button431.Bind( wx.EVT_BUTTON, self.on_fix_missing_edge_lengths_click )
 		self.viewer_panel.Bind( wx.EVT_PAINT, self.on_zoompanel_holder_paint )
 		self.m_spinBtn2.Bind( wx.EVT_SPIN_DOWN, self.zoom_out_10pct )
 		self.m_spinBtn2.Bind( wx.EVT_SPIN_UP, self.zoom_in_10pct )
@@ -1146,6 +1204,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_button7.Bind( wx.EVT_BUTTON, self.valpicker_clear )
 		self.m_button8.Bind( wx.EVT_BUTTON, self.valpicker_load )
 		self.m_button411.Bind( wx.EVT_BUTTON, self.on_select_all_annotation_values )
+		self.m_button421.Bind( wx.EVT_BUTTON, self.on_unselect_all_annotation_values )
 		self.btn_import_annotation1.Bind( wx.EVT_BUTTON, self.sepp_import_annotation )
 		self.m_ComboSelectedField1.Bind( wx.EVT_COMBOBOX, self.sepp_populate_annotation_values )
 		self.m_ComboSelectedField1.Bind( wx.EVT_TEXT, self.sepp_populate_annotation_values )
@@ -1206,11 +1265,6 @@ class ctrlFrame ( wx.Frame ):
 	def on_toggle_config( self, event ):
 		event.Skip()
 	
-	
-	
-	def save_tree_as_newick( self, event ):
-		event.Skip()
-	
 	def set_working_folder( self, event ):
 		event.Skip()
 	
@@ -1227,6 +1281,14 @@ class ctrlFrame ( wx.Frame ):
 		event.Skip()
 	
 	def save_as_svg_click( self, event ):
+		event.Skip()
+	
+	
+	
+	def save_tree_as_newick( self, event ):
+		event.Skip()
+	
+	def on_fix_missing_edge_lengths_click( self, event ):
 		event.Skip()
 	
 	def on_zoompanel_holder_paint( self, event ):
@@ -1306,6 +1368,9 @@ class ctrlFrame ( wx.Frame ):
 		event.Skip()
 	
 	def on_select_all_annotation_values( self, event ):
+		event.Skip()
+	
+	def on_unselect_all_annotation_values( self, event ):
 		event.Skip()
 	
 	def sepp_import_annotation( self, event ):

@@ -2,7 +2,7 @@ import math
 import numpy as np
 import random
 import colorsys
-
+import platform
 
 
 
@@ -168,12 +168,26 @@ def distance_btw_points(pt1,pt2):
 def dot_product(v1, v2):
     return v1[0]*v2[0]+v1[1]*v2[1]
 
-def np_find_intersect_segments(segs,alghold=400):
+if platform.system()=='Windows':
+    import c_utilities as cutils
+    def np_find_intersect_segments(segs):
+        return cutils.np_find_intersect_segments_c(segs)
+
+    def np_find_intersect_segments_test(segs):
+        return cutils.np_find_intersect_segments_c_test(segs)
+
+else:
+    def np_find_intersect_segments(segs):
+        res = np_find_intersect_segments_allpy(segs)
+        return res[0]
+
+def np_find_intersect_segments_allpy(segs):
     '''
     implements the sweep-line algorithm to find out if any of a list of line segments intersect.
     :param segs:
     :return:
     '''
+
     numpts = segs.shape[0]
     '''These arrays are laid out as (x,y,left?,index) where left is 1 if the point is a left point
     '''
@@ -183,29 +197,31 @@ def np_find_intersect_segments(segs,alghold=400):
     right_pts = np.zeros((numpts, 2), dtype=np.float64)
     right_inds = np.vstack((np.ones(numpts,dtype=np.int8),np.arange(numpts, dtype=np.int32))).transpose()
 
-    for i in range(numpts):
-        if segs[i,0]>segs[i,2]:
-            left_pts[i, 0:2] = segs[i, 2:4]
-            right_pts[i, 0:2] = segs[i, 0:2]
-        else:
-            right_pts[i, 0:2] = segs[i, 2:4]
-            left_pts[i, 0:2] = segs[i, 0:2]
+    left_pts[:, 0] = np.where(segs[:, 0] > segs[:, 2], segs[:, 2], segs[:, 0])
+    left_pts[:, 1] = np.where(segs[:, 0] > segs[:, 2], segs[:, 3], segs[:, 1])
+    right_pts[:, 0] = np.where(segs[:, 0] > segs[:, 2], segs[:, 0], segs[:, 2])
+    right_pts[:, 1] = np.where(segs[:, 0] > segs[:, 2], segs[:, 1], segs[:, 3])
+    # for i in range(numpts):
+    #     if segs[i,0]>segs[i,2]:
+    #         left_pts[i, 0:2] = segs[i, 2:4]
+    #         right_pts[i, 0:2] = segs[i, 0:2]
+    #     else:
+    #         right_pts[i, 0:2] = segs[i, 2:4]
+    #         left_pts[i, 0:2] = segs[i, 0:2]
     ordered_segs = np.hstack((left_pts,right_pts)).copy()
     # print ordered_segs
-    # print ordered_segs.shape
-    # if True:
-    #     return
+
 
     all_pts = np.vstack((left_pts,right_pts))
     all_inds = np.vstack((left_inds,right_inds))
-    # sort_inds = all_pts[:,0].argsort().copy()
+
     all_view = np.array(np.zeros(2*numpts),dtype=[('x','f8'),('y','f8'),('left','i1'),('ind','i4')])
     all_view['x']=all_pts[:,0]
     all_view['y'] = all_pts[:, 1]
     all_view['left'] = all_inds[:,0]
     all_view['ind'] = all_inds[:,1]
     sort_inds = np.argsort(all_view,order=['x','left'])
-    # np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\sort_inds.txt',sort_inds,'%d','\t')
+
     all_pts = all_pts[sort_inds]
     all_inds = all_inds[sort_inds]
     active_segs=None
@@ -225,46 +241,24 @@ def np_find_intersect_segments(segs,alghold=400):
                 return True, None, None
 
     for i in range(start_pt+1,2*numpts):
-        # print '---- iteration %s ----' % i
-        # print active_segs
-        # print '\n'
-        # print 'pausing, press (q) to continue'
-        # qtag= None
-        # if alghold is None or i>alghold:
-            # while qtag<>'q':
-            # qtag=raw_input()
         nact = int(active_segs.shape[0])
         if all_inds[i,0]==0:
             k=sum(active_segs[:,1]<all_pts[i,1])
-            # print 'k: %s' %k
 
             pt = ordered_segs[all_inds[i,1],:]
             active_segs=np.insert(active_segs,k,np.hstack((ordered_segs[all_inds[i,1],:],all_inds[i,1])),0)
-            # active_inds[all_inds[i,1]]=k
-
-            #check predecessor and check successor:
-            # if i >= 106 and i <= 108:
-            #     print k
-            #     print pt
-            #     print nact
-            #     print active_segs[k-1,0:4]
-                # print active_segs[k+1,0:4]
             if k>0:
                 pred = active_segs[k-1,0:4]
-                # print pt; print pred;
                 time_to_quit=np_do_two_segments_intersect(pt,pred)
                 if time_to_quit[0]==True:
-                    # print 'condition: 1) left point collided with predecessor'
-                    # print time_to_quit
+
                     return False, pt ,pred
             if k<(nact-1):
 
                 succ = active_segs[k+1,0:4]
-                # print pt; print pred;
+
                 time_to_quit=np_do_two_segments_intersect(pt,succ)
                 if time_to_quit[0]==True:
-                    # print 'condition: 2) left point collided with successor'
-                    # print time_to_quit
                     return False, pt, succ
 
 
@@ -275,35 +269,15 @@ def np_find_intersect_segments(segs,alghold=400):
                 k=np.asscalar(np.where(active_segs[:,4]==all_inds[i,1])[0])
             except:
                 print 'error at that ascalar command'
-                # print np.where(active_segs[:,4]==all_inds[i,1])[0]
-                # print active_segs[:,4]
-                # print i
-                # print all_inds[i,1]
+
                 import sys
                 sys.exit(0)
-            # print 'k: %s' % k
-            # except:
-            # print k
-            # print active_segs
-            # print i
-            # print all_inds
             if k < (nact-1) and k > 0:
                 time_to_quit=np_do_two_segments_intersect(active_segs[k-1,0:4],active_segs[k+1,0:4])
                 if time_to_quit[0]==True:
-                    # print 'condition: 3) predecessor, successor collided on removal'
-                    # print time_to_quit
                     return False, active_segs[k-1,0:4],active_segs[k+1,0:4]
-            # print active_segs.shape
             active_segs=np.delete(active_segs,k,0)
-        # print active_segs
     return True, None, None
-
-
-
-
-
-
-    pass
 
 def distance_to_line_segment(segx1, segx2, pt):
     diff = (segx2[0]-segx1[0],segx2[1]-segx1[1])

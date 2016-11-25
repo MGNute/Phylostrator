@@ -57,6 +57,11 @@ class ValuePickerControl(wx.BoxSizer):
                 i.m_checkBox1.SetValue(True)
         self.value_pickers[0].process_annotationvalue_check()
 
+    def unselect_all(self):
+        if len(self.value_pickers)>0:
+            for i in self.value_pickers:
+                i.m_checkBox1.SetValue(False)
+        self.value_pickers[0].process_annotationvalue_check()
 
     def set_values(self,vals=None):
         self.clear_all()
@@ -83,6 +88,7 @@ class ValuePickerControl(wx.BoxSizer):
             self.Add(a,0, wx.EXPAND, 5)
             self.value_pickers.append(a)
 
+        # print [i.value for i in self.value_pickers]
         self.add_final_spacer()
 
     def add_final_spacer(self):
@@ -548,10 +554,10 @@ class PhylogenyBufferedWindow(BufferedWindow):
         minlen = 99999999.0
         eref = None
         ct = 0
-        for i in self.radial_phylogram.myt.preorder_edge_iter():
-            if i.viewer_edge is not None:
+        for i in self.radial_phylogram.myt.preorder_node_iter():
+            if i.parent_node is not None:
                 # ct +=1
-                ln = distance_to_line_segment(i.viewer_edge.head_x, i.viewer_edge.tail_x, tscoord)
+                ln = distance_to_line_segment(i.location, i.parent_node.location, tscoord)
                 # ln = distance_to_line_segment(i.head_node.viewer_node.ts_x, i.tail_node.viewer_node.ts_x, tscoord)
                 if ln < minlen:
                     ct +=1
@@ -560,12 +566,14 @@ class PhylogenyBufferedWindow(BufferedWindow):
                     eref = (i,ln)
         # print "checked %s edges" % ct
 
-        pos1 = "(%.2f, %.2f)" % eref[0].head_node.viewer_node.ts_x
-        pos2 = "(%.2f, %.2f)" % eref[0].tail_node.viewer_node.ts_x
+        # pos1 = "(%.2f, %.2f)" % eref[0].head_node.viewer_node.ts_x
+        # pos2 = "(%.2f, %.2f)" % eref[0].tail_node.viewer_node.ts_x
+        pos1 = "(%.2f, %.2f)" % eref[0].location
+        pos2 = "(%.2f, %.2f)" % eref[0].parent_node.location
         # self.parent.m_statusBar2.SetStatusText("head: %s, %s |tail: %s, %s| len: %s" % (eref[0].head_node.label,eref[0].head_node.viewer_node.ts_x,eref[0].tail_node.label,
         #                                                                                   eref[0].tail_node.viewer_node.ts_x, eref[1]),2)
-        self.parent.m_statusBar2.SetStatusText("head: %s, %s |tail: %s, %s| len: %s" % (eref[0].head_node.label,
-                                                                                        pos1, eref[0].tail_node.label,
+        self.parent.m_statusBar2.SetStatusText("head: %s, %s |tail: %s, %s| len: %s" % (eref[0].label,
+                                                                                        pos1, eref[0].parent_node.label,
                                                                                           pos2, eref[1]),2)
         self.active_edge=eref[0]
         self.activate_edge(eref[0])
@@ -1502,14 +1510,14 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         pass
 
     def PreDrawFromThread(self):
-        self.parent.m_statusBar2.SetStatusText('Event triggered...', 1)
-        self.parent.control_panel.m_textCtrl17.SetValue('rdp_taxonomy_poct_%s_drct_%s' %(self.radial_phylogram.po_ct, self.draw_count))
-        self.image_path = os.path.join(self.parent.control_panel.m_dirPicker4.GetPath(),self.parent.control_panel.m_textCtrl17.GetValue()+'.png')
-        print '%s, %s' % (self.write_image_to_path,self.image_path)
+        # self.parent.m_statusBar2.SetStatusText('Event triggered...', 1)
+        # self.parent.control_panel.m_textCtrl17.SetValue('rdp_taxonomy_poct_%s_drct_%s' %(self.radial_phylogram.po_ct, self.draw_count))
+        # self.image_path = os.path.join(self.parent.control_panel.m_dirPicker4.GetPath(),self.parent.control_panel.m_textCtrl17.GetValue()+'.png')
+        # print '%s, %s' % (self.write_image_to_path,self.image_path)
         # self.parent.control_panel.save_rp_file()
         self.UpdateDrawing()
         self.e.clear()
-        self.parent.m_statusBar2.SetStatusText('Event cleared...', 1)
+        # self.parent.m_statusBar2.SetStatusText('Event cleared...', 1)
 
     def FillSpace(self):
         # self.use_tree_copy = True
