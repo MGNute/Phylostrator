@@ -525,7 +525,12 @@ class PhylogenyBufferedWindow(BufferedWindow):
         self.c.set_BufferedWindow_reference(self)
         # self.tree_path = opts.init_tree
         self.tree_path = opts.starting_file_paths.init_tree_path
-        self.radial_phylogram = tm.Radial_Phylogram(self.tree_path)
+        if os.path.isfile(self.tree_path):
+            self.radial_phylogram = tm.Radial_Phylogram(self.tree_path)
+        else:
+            opts.starting_file_paths.init_tree_path = 'resources/pastajob.tre'
+            self.tree_path = opts.starting_file_paths.init_tree_path
+            self.radial_phylogram = tm.Radial_Phylogram(self.tree_path)
         # self.c.apm.state_tree_loaded=True
         self.set_initial_corners()
         self.zoom=1.0
@@ -582,7 +587,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
         # self.parent.m_statusBar2.SetStatusText("head: %s, %s |tail: %s, %s| len: %s" % (eref[0].head_node.label,eref[0].viewer_edge.head_x,eref[0].tail_node.label,
         #                                                                                   eref[0].viewer_edge.tail_x, eref[1]),2)
         # self.parent.m_statusBar2.SetStatusText("head_x: %s\ttail_x: %s\tlen: %s" % (eref[0].viewer_edge.head_x, eref[0].viewer_edge.tail_x, eref[1]),0 )
-        self.AddToExtraDrawSegments((eref[0].viewer_edge.head_x, eref[0].viewer_edge.tail_x, (255,0,0)))
+        self.AddToExtraDrawSegments((eref[0].location, eref[0].parent_node.location, (255,0,0)))
         self.UpdateDrawing()
 
 
@@ -624,11 +629,11 @@ class PhylogenyBufferedWindow(BufferedWindow):
     def activate_edge(self,ed, pos1=None, pos2=None):
         self.active_edge = ed
         self.parent.control_panel.m_textCtrl33.SetValue(
-            "head: %s, %s |tail: %s, %s| len: %s" % (ed.head_node.label,
-                                                     pos1, ed.tail_node.label,
+            "head: %s, %s |tail: %s, %s| len: %s" % (ed.label,
+                                                     pos1, ed.parent_node.label,
                                                      pos2, ed))
-        self.parent.control_panel.m_textCtrl331.SetValue(str(self.radial_phylogram.node_labels[ed.head_node.label]['w']))
-        self.parent.control_panel.m_textCtrl3311.SetValue(str(self.radial_phylogram.node_labels[ed.head_node.label]['t']))
+        self.parent.control_panel.m_textCtrl331.SetValue(str(self.radial_phylogram.node_labels[ed.label]['w']))
+        self.parent.control_panel.m_textCtrl3311.SetValue(str(self.radial_phylogram.node_labels[ed.label]['t']))
 
     def deactivate_edge(self):
         self.active_edge = None

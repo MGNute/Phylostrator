@@ -1,12 +1,30 @@
 import numpy as np
 import ctypes as C
-import os
+import os, platform
 
 np.seterr(divide='ignore')
 
-sweepline = C.CDLL('resources/cutils/avl_sweep_line.dll')
+if platform.system()=='Windows':
+    sweepline = C.CDLL('resources/cutils/avl_sweep_line.dll')
+elif platform.system()=='Darwin':
+    sweepline = C.CDLL('resources/cutils/avl_sweep_line.dylib')
+
 sweepline.sweepLineIntersect.restype = C.c_int
 sweepline.sweepLineIntersect.argtypes = [C.POINTER(C.c_double), C.POINTER(C.c_int), C.POINTER(C.c_int), C.c_int]
+
+if platform.system()=='Windows':
+    treeops = C.CDLL('resources/cutils/treeops.dll')
+elif platform.system()=='Darwin':
+    treeops = C.CDLL('resources/cutils/treeops.dylib')
+
+treeops.centerCladeRotationally.restype = C.c_void_p
+treeops.centerCladeRotationally.argtypes = [C.POINTER(C.c_double),C.POINTER(C.c_int),C.POINTER(C.c_double),
+                                            C.POINTER(C.c_double),C.POINTER(C.c_double),C.c_int, C.c_int]
+# treeops.testCheckRotationAngle.restype = C.c_void_p
+
+def testCheck():
+    treeops.testCheckRotationAngle()
+
 
 def np_find_intersect_segments_c(segs):
     numpts = segs.shape[0]
@@ -113,3 +131,11 @@ def np_find_intersect_segments_c_test(segs):
         return False
     else:
         return True
+
+def centerCladeRot(pts, topo, edge_angles, deflect, lengths, numpts, node):
+    treeops.centerCladeRotationally(pts.ctypes.data_as(C.POINTER(C.c_double)),
+                                    topo.ctypes.data_as(C.POINTER(C.c_int)),
+                                    edge_angles.ctypes.data_as(C.POINTER(C.c_double)),
+                                    deflect.ctypes.data_as(C.POINTER(C.c_double)),
+                                    lengths.ctypes.data_as(C.POINTER(C.c_double)),
+                                    numpts,node)

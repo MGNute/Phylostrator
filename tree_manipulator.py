@@ -10,6 +10,7 @@ import numpy as np
 import scipy.spatial as spat
 import sys
 import datetime, time
+import c_utilities
 
 GLOBAL_DEBUG = True
 
@@ -81,7 +82,7 @@ class Radial_Phylogram():
         self.leaf_node_coords={}
         self.selected_color=None
         self.rotation=0
-        if tp is not None:
+        if tp is not None and tp<>'':
             self.set_treepath(tp)
         # self.print_right_angles()
 
@@ -404,8 +405,51 @@ class Radial_Phylogram():
         self.relocate_subtree_by_wedge_properties(test_nd)
 
     def test_3(self):
-        self.set_segments_as_nparr()
-        print np_find_intersect_segments_test(self.segments_as_nparr)
+        # self.set_segments_as_nparr()
+        # print np_find_intersect_segments_test(self.segments_as_nparr)
+        numnodes = int(self.pts_nparr.shape[0])
+        self.deflect_angles = np.zeros((numnodes,1),dtype=np.float64)
+        self.edge_angles = np.zeros((numnodes,1),dtype=np.float64)
+        self.lengths = np.zeros((numnodes,1),dtype=np.float64)
+        self.topo = -1*np.ones((numnodes,3),dtype=np.int32)
+        for i in self.myt.preorder_node_iter():
+            self.edge_angles[i.index]=i.edge_segment_angle
+            self.deflect_angles[i.index]=i.deflect_angle
+            if i.edge_length is not None:
+                self.lengths[i.index]=i.edge_length
+            if i.parent_node is not None:
+                self.topo[i.index,0]=i.parent_node.index
+            if len(i.child_nodes())>0:
+                self.topo[i.index,1]=i.child_nodes()[0].index
+            if len(i.child_nodes())>1:
+                self.topo[i.index,2]=i.child_nodes()[1].index
+            if len(i.child_nodes())>2 and i.parent_node is None:
+                self.topo[i.index,0]=i.child_nodes()[2].index
+        # print self.pts_nparr.__array_interface__['data']
+        # print self.topo.__array_interface__['data']
+        # print self.edge_angles.__array_interface__['data']
+        # print self.deflect_angles.__array_interface__['data']
+        # print self.lengths.__array_interface__['data']
+        c_utilities.centerCladeRot(self.pts_nparr, self.topo,self.edge_angles,
+                                   self.deflect_angles, self.lengths, numnodes, 1)
+        # c_utilities.testCheck()
+
+        for i in self.myt.preorder_node_iter():
+            i.edge_segment_angle=self.edge_angles[i.index]
+            i.deflect_angle = self.deflect_angles[i.index]
+            i.location = (np.asscalar(self.pts_nparr[i.index,0]),np.asscalar(self.pts_nparr[i.index,1]))
+
+
+        # testing
+        # nn=np.asarray(numnodes,dtype=np.int32)
+        # nn.tofile('resources/cutils/num_nodes.bin')
+        # self.topo.tofile('resources/cutils/topo.bin')
+        # self.pts_nparr.tofile('resources/cutils/pts_nparr.bin')
+        # self.edge_angles.tofile('resources/cutils/edge_angles.bin')
+        # self.deflect_angles.tofile('resources/cutils/deflect_angles.bin')
+        # self.lengths.tofile('resources/cutils/lengths.bin')
+
+
         pass
 
     def test_4(self, parent=None, myevt = None):

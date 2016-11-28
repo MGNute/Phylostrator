@@ -79,9 +79,9 @@ class gui_manager(sfld_view.ctrlFrame):
         self.c.circle_size=int(self.m_textCtrl24.GetValue())
         self.layout_viewer_panel()
         self.Layout()
-        # self.MoveXY(100, 100)
+        self.MoveXY(100, 100)
         # self.MoveXY(1620,300) #illinois monitors
-        self.MoveXY(2420, 100)  # cincy monitors
+        # self.MoveXY(2420, 100)  # cincy monitors
 
 
         #TODO: This is just for the verstion where we want to do a cold initialize, otherwise have to make the image frame

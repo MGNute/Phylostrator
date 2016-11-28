@@ -605,7 +605,8 @@ int diw(double* s1, double* s2)
     return res;
 }
 
-FOO_API int sweepLineIntersect(double* os, int* all_inds, int* keys, int num_pts)
+// FOO_API int sweepLineIntersect(double* os, int* all_inds, int* keys, int num_pts)
+int sweepLineIntersect(double* os, int* all_inds, int* keys, int num_pts)
 {
     // this function returns 0 if there is an intersection and 1 if there is not.
     int start_pt = 0;
