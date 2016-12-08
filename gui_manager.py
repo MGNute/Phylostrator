@@ -604,6 +604,8 @@ class gui_manager(sfld_view.ctrlFrame):
         self.on_draw_cairo_click()
 
     def on_test_3_click( self, event = None):
+        nn = self.c.buffered_window.radial_phylogram.node_ct
+        # for q in range(int(nn/50)+1):
         self.c.buffered_window.radial_phylogram.test_3()
         self.on_draw_cairo_click()
 

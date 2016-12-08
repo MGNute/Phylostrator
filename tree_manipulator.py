@@ -71,6 +71,8 @@ class Radial_Phylogram():
     '''
     max_dims = None
     myt_copy = None
+    node_center_index= 1
+    numnodes=None
 
 
     def __init__(self,tp=None):
@@ -407,14 +409,19 @@ class Radial_Phylogram():
     def test_3(self):
         # self.set_segments_as_nparr()
         # print np_find_intersect_segments_test(self.segments_as_nparr)
-        numnodes = int(self.pts_nparr.shape[0])
-        self.deflect_angles = np.zeros((numnodes,1),dtype=np.float64)
-        self.edge_angles = np.zeros((numnodes,1),dtype=np.float64)
-        self.lengths = np.zeros((numnodes,1),dtype=np.float64)
-        self.topo = -1*np.ones((numnodes,3),dtype=np.int32)
+        self.numnodes = int(self.pts_nparr.shape[0])
+        self.deflect_angles = np.zeros((self.numnodes,1),dtype=np.float64)
+        self.wedge_sizes = np.zeros((self.numnodes,1),dtype=np.float64)
+        self.right_wedges = np.zeros((self.numnodes,1),dtype=np.float64)
+        self.edge_angles = np.zeros((self.numnodes,1),dtype=np.float64)
+        self.lengths = np.zeros((self.numnodes,1),dtype=np.float64)
+        self.topo = -1*np.ones((self.numnodes,3),dtype=np.int32)
+
         for i in self.myt.preorder_node_iter():
             self.edge_angles[i.index]=i.edge_segment_angle
             self.deflect_angles[i.index]=i.deflect_angle
+            self.wedge_sizes[i.index] = i.wedge_angle
+            self.right_wedges[i.index] = i.right_wedge_border
             if i.edge_length is not None:
                 self.lengths[i.index]=i.edge_length
             if i.parent_node is not None:
@@ -430,14 +437,27 @@ class Radial_Phylogram():
         # print self.edge_angles.__array_interface__['data']
         # print self.deflect_angles.__array_interface__['data']
         # print self.lengths.__array_interface__['data']
-        c_utilities.centerCladeRot(self.pts_nparr, self.topo,self.edge_angles,
-                                   self.deflect_angles, self.lengths, numnodes, 1)
-        # c_utilities.testCheck()
+        # np.savetxt('resources/cutils/pts_nparr.txt',self.pts_nparr,'%f','\t')
+        # c_utilities.dbgWriteSegs(self.pts_nparr, self.topo, self.numnodes)
+
+
+        c_utilities.angleSpread(self.pts_nparr, self.topo, self.numnodes,self.deflect_angles,
+                                self.wedge_sizes, self.edge_angles, self.lengths,self.right_wedges,0)
+        # self.node_center_index = 0
+        # for i in range(50):
+        #     c_utilities.centerCladeRot(self.pts_nparr, self.topo,self.edge_angles,
+        #                                self.deflect_angles, self.lengths, self.numnodes, self.node_center_index)
+        #     self.node_center_index +=1
+            # c_utilities.testCheck()
+            # print self.pts_nparr
+            # if self.node_center_index >= self.numnodes:
+            #     self.node_center_index=0
 
         for i in self.myt.preorder_node_iter():
             i.edge_segment_angle=self.edge_angles[i.index]
             i.deflect_angle = self.deflect_angles[i.index]
             i.location = (np.asscalar(self.pts_nparr[i.index,0]),np.asscalar(self.pts_nparr[i.index,1]))
+            # time.sleep(.1)
 
 
         # testing
@@ -448,6 +468,8 @@ class Radial_Phylogram():
         # self.edge_angles.tofile('resources/cutils/edge_angles.bin')
         # self.deflect_angles.tofile('resources/cutils/deflect_angles.bin')
         # self.lengths.tofile('resources/cutils/lengths.bin')
+
+        # np.savetxt('resources/cutils/topo.txt',self.topo,'%f','\t')
 
 
         pass

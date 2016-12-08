@@ -17,9 +17,14 @@ if platform.system()=='Windows':
 elif platform.system()=='Darwin':
     treeops = C.CDLL('resources/cutils/treeops.dylib')
 
-treeops.centerCladeRotationally.restype = C.c_void_p
+# treeops.centerCladeRotationally.restype = C.c_void_p
+treeops.centerCladeRotationally.restype = None
 treeops.centerCladeRotationally.argtypes = [C.POINTER(C.c_double),C.POINTER(C.c_int),C.POINTER(C.c_double),
-                                            C.POINTER(C.c_double),C.POINTER(C.c_double),C.c_int, C.c_int]
+                                            C.POINTER(C.c_double),C.POINTER(C.c_double),C.c_int32, C.c_int32]
+treeops.angleSpreadExtension.restype = None
+treeops.angleSpreadExtension.argtypes = [C.POINTER(C.c_double),C.POINTER(C.c_int),C.c_int32,
+                                         C.POINTER(C.c_double),C.POINTER(C.c_double),C.POINTER(C.c_double),
+                                            C.POINTER(C.c_double),C.POINTER(C.c_double),C.c_int32]
 # treeops.testCheckRotationAngle.restype = C.c_void_p
 
 def testCheck():
@@ -139,3 +144,22 @@ def centerCladeRot(pts, topo, edge_angles, deflect, lengths, numpts, node):
                                     deflect.ctypes.data_as(C.POINTER(C.c_double)),
                                     lengths.ctypes.data_as(C.POINTER(C.c_double)),
                                     numpts,node)
+
+def angleSpread(pts, topo, numpts, deflect, wedge_sizes, edges, lengths, rightsides, node):
+    treeops.angleSpreadExtension(pts.ctypes.data_as(C.POINTER(C.c_double)),
+                                 topo.ctypes.data_as(C.POINTER(C.c_int)),
+                                 numpts,
+                                 deflect.ctypes.data_as(C.POINTER(C.c_double)),
+                                 wedge_sizes.ctypes.data_as(C.POINTER(C.c_double)),
+                                 edges.ctypes.data_as(C.POINTER(C.c_double)),
+                                 lengths.ctypes.data_as(C.POINTER(C.c_double)),
+                                 rightsides.ctypes.data_as(C.POINTER(C.c_double)),
+                                 node)
+
+treeops.debugWriteSegments.restype = None
+treeops.debugWriteSegments.argtypes = [C.POINTER(C.c_double),C.POINTER(C.c_int),C.c_int32]
+
+def dbgWriteSegs(pts,topo,numpts):
+    treeops.debugWriteSegments(pts.ctypes.data_as(C.POINTER(C.c_double)),
+                                 topo.ctypes.data_as(C.POINTER(C.c_int)),
+                                 numpts)
