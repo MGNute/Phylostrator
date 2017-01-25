@@ -193,10 +193,11 @@ class SEPPController():
     def __init__(self,sepp_output_file=None,sepp_annotation_file=None):
         self.sepp_output_file=sepp_output_file
         self.SeppValuePickerCtrl_ref=None
+        self.opts = Options()
 
         self.sepp_annotation_file=sepp_annotation_file
         self.sepp_ann_dict={}
-        self.show_all_values=False
+        # self.show_all_values
 
         self.active_annotation_field=None
         self.active_unique_annotation_values=set([])
@@ -430,7 +431,7 @@ class SEPPController():
 
             if keep == True:
                 # x = self.get_location_ex_pendant(i[0])
-                if self.show_all_values==False:
+                if self.opts.placement.show_all_seven_placements==False:
                     x0 = self.get_location_ex_pendant(i[0])
                     x1 = self.get_location_with_pendant(i[0])
 

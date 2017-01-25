@@ -9,7 +9,7 @@ class PNGBufferedWindow(BufferedWindow):
     def __init__(self,parent,imagepath=None,*args, **kwargs):
         self.parent=parent
         if imagepath==None:
-            self.image_path='resources/temp.png'
+            self.image_path=os.path.join(os.path.dirname(os.path.abspath(__file__)),'resources/temp.png')
         else:
             self.image_path=imagepath
         self.image = None
@@ -18,8 +18,10 @@ class PNGBufferedWindow(BufferedWindow):
         BufferedWindow.__init__(self,parent, *args, **kwargs)
         # self.SetForegroundColour( wx.Colour( 255, 255, 255,0 ) )
         # self.SetBackgroundColour( wx.Colour( 255, 255, 255,0 ) )
-        self.SetForegroundColour(wx.WHITE)
-        self.SetBackgroundColour(wx.WHITE)
+        # self.SetForegroundColour(wx.WHITE)
+        # self.SetBackgroundColour(wx.WHITE)
+        self.SetForegroundColour(wx.BLACK)
+        self.SetBackgroundColour(wx.BLACK)
 
         self.daem = threading.Thread(target=self.check_mod_time)
         self.daem.setDaemon(True)
@@ -29,7 +31,7 @@ class PNGBufferedWindow(BufferedWindow):
     def check_mod_time(self):
         while True:
             tm = os.path.getmtime(self.image_path)
-            if tm > self.mod_time:
+            if tm > self.mod_time+1:
                 self.parent.set_status('reloading image...')
                 wx.CallAfter(self.load_image)
                 time.sleep(1)
@@ -53,7 +55,8 @@ class PNGBufferedWindow(BufferedWindow):
         self.UpdateDrawing()
 
     def Draw(self,dc):
-        dc.SetBackground(wx.WHITE_BRUSH)
+        # dc.SetBackground(wx.WHITE_BRUSH)
+        dc.SetBackground(wx.BLACK_BRUSH)
         dc.Clear()
         if self.white_background==True:
             dc.SetBrush(wx.WHITE_BRUSH)
@@ -66,6 +69,7 @@ class PNGBufferedWindow(BufferedWindow):
         # print str(self.GetBackgroundColour())
 
 class pngviewer(sfld_view.imgFrame):
+    ip = False
     def __init__(self,parent):
         sfld_view.imgFrame.__init__(self,parent)
 
@@ -93,6 +97,10 @@ class pngviewer(sfld_view.imgFrame):
 
     def chg_file(self,event=None):
         fi=self.m_filePicker5.GetPath()
+        # if self.ip == False:
+        #     self.ip = True
+        #     self.make_image_panel(fi)
+        # else:
         self.img_panel.image_path=fi
         self.img_panel.UpdateDrawing()
 

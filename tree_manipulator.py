@@ -1274,7 +1274,11 @@ class AnnotationData():
                 keep = False
             if keep == True:
                 # uav.append(self.data[i][ann_col])
+                # try:
                 ann_col_val = self.data[i][ann_col]
+                # except:
+                #     print "i: %s" % i
+                #     print "ann_col: %s" % ann_col
                 if ann_col_val in setuav:
                     self.grouped[ann_col_val].append(i)
                 else:

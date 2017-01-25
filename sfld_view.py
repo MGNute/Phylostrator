@@ -180,6 +180,12 @@ class ctrlFrame ( wx.Frame ):
 		bSizer562.Add( self.m_button27, 0, wx.ALL, 5 )
 		
 		
+		bSizer562.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
+		
+		self.m_button461 = wx.Button( self.m_panel2, wx.ID_ANY, u"Save PNG, SVG and SEPP Legend", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer562.Add( self.m_button461, 0, wx.ALL, 5 )
+		
+		
 		bSizer53.Add( bSizer562, 1, wx.EXPAND, 5 )
 		
 		
@@ -227,7 +233,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel2.SetSizer( bSizer3 )
 		self.m_panel2.Layout()
 		bSizer3.Fit( self.m_panel2 )
-		self.m_notebook1.AddPage( self.m_panel2, u"Files", False )
+		self.m_notebook1.AddPage( self.m_panel2, u"Files", True )
 		self.m_panel11 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_panel11.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
 		self.m_panel11.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
@@ -246,13 +252,13 @@ class ctrlFrame ( wx.Frame ):
 		self.m_FilePicker_tree = wx.FilePickerCtrl( self.m_panel11, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.Size( 500,-1 ), wx.FLP_DEFAULT_STYLE )
 		self.m_FilePicker_tree.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
 		
-		bSizer4.Add( self.m_FilePicker_tree, 0, wx.ALL, 5 )
+		bSizer4.Add( self.m_FilePicker_tree, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.btn_import_tree = wx.Button( self.m_panel11, wx.ID_ANY, u"Import", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer4.Add( self.btn_import_tree, 0, wx.ALL, 5 )
+		bSizer4.Add( self.btn_import_tree, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_button372 = wx.Button( self.m_panel11, wx.ID_ANY, u"Export (Nwk)", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer4.Add( self.m_button372, 0, wx.ALL, 5 )
+		bSizer4.Add( self.m_button372, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
 		bSizer61.Add( bSizer4, 0, wx.EXPAND, 5 )
@@ -304,7 +310,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel11.SetSizer( bSizer61 )
 		self.m_panel11.Layout()
 		bSizer61.Fit( self.m_panel11 )
-		self.m_notebook1.AddPage( self.m_panel11, u"Tree", True )
+		self.m_notebook1.AddPage( self.m_panel11, u"Tree", False )
 		self.viewer_panel = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.FULL_REPAINT_ON_RESIZE|wx.TAB_TRAVERSAL )
 		bSizer27 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -363,6 +369,9 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_button10 = wx.Button( self.m_panel81, wx.ID_ANY, u"Redraw", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer28.Add( self.m_button10, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_wxPanelBackgroundColor = wx.ColourPickerCtrl( self.m_panel81, wx.ID_ANY, wx.Colour( 255, 255, 255 ), wx.DefaultPosition, wx.Size( 80,-1 ), wx.CLRP_DEFAULT_STYLE )
+		bSizer28.Add( self.m_wxPanelBackgroundColor, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
 		self.m_panel81.SetSizer( bSizer28 )
@@ -723,7 +732,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_staticText7111.Wrap( -1 )
 		bSizer12111.Add( self.m_staticText7111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textCtrl25 = wx.TextCtrl( self.m_panel41, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER )
+		self.m_textCtrl25 = wx.TextCtrl( self.m_panel41, wx.ID_ANY, u"25", wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER )
 		bSizer12111.Add( self.m_textCtrl25, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_button41 = wx.Button( self.m_panel41, wx.ID_ANY, u"Trigger Redraw", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -738,15 +747,37 @@ class ctrlFrame ( wx.Frame ):
 		self.m_staticline511 = wx.StaticLine( self.m_panel41, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		bSizer111.Add( self.m_staticline511, 0, wx.EXPAND |wx.ALL, 5 )
 		
+		bSizer66 = wx.BoxSizer( wx.HORIZONTAL )
+		
+		bSizer67 = wx.BoxSizer( wx.VERTICAL )
+		
 		self.m_checkBox3 = wx.CheckBox( self.m_panel41, wx.ID_ANY, u"Draw with Pendant Branch", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer111.Add( self.m_checkBox3, 0, wx.ALL, 5 )
+		bSizer67.Add( self.m_checkBox3, 0, wx.ALL, 5 )
 		
 		self.m_checkBox6 = wx.CheckBox( self.m_panel41, wx.ID_ANY, u"Jitter Attachment Point", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_checkBox6.SetValue(True) 
-		bSizer111.Add( self.m_checkBox6, 0, wx.ALL, 5 )
+		bSizer67.Add( self.m_checkBox6, 0, wx.ALL, 5 )
 		
 		self.m_checkSeppShowAll = wx.CheckBox( self.m_panel41, wx.ID_ANY, u"Show All Placement Locations (alt: show top 1)", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer111.Add( self.m_checkSeppShowAll, 0, wx.ALL, 5 )
+		self.m_checkSeppShowAll.SetValue(True) 
+		bSizer67.Add( self.m_checkSeppShowAll, 0, wx.ALL, 5 )
+		
+		
+		bSizer66.Add( bSizer67, 0, 0, 0 )
+		
+		bSizer68 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.m_button441 = wx.Button( self.m_panel41, wx.ID_ANY, u"6-color", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer68.Add( self.m_button441, 0, wx.ALL, 5 )
+		
+		self.m_saveSeppLegend = wx.Button( self.m_panel41, wx.ID_ANY, u"Save Legend", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer68.Add( self.m_saveSeppLegend, 0, wx.ALL, 5 )
+		
+		
+		bSizer66.Add( bSizer68, 1, wx.EXPAND, 5 )
+		
+		
+		bSizer111.Add( bSizer66, 0, wx.ALIGN_CENTER_HORIZONTAL, 0 )
 		
 		self.m_staticline71 = wx.StaticLine( self.m_panel41, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		bSizer111.Add( self.m_staticline71, 0, wx.EXPAND |wx.ALL, 5 )
@@ -899,12 +930,22 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer911 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_staticText741 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Tree Line Color", wx.DefaultPosition, wx.Size( 120,-1 ), 0 )
+		self.m_staticText741 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Tree Line Color", wx.DefaultPosition, wx.Size( 80,-1 ), 0 )
 		self.m_staticText741.Wrap( -1 )
 		bSizer911.Add( self.m_staticText741, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_colourPicker1 = wx.ColourPickerCtrl( self.m_panel82, wx.ID_ANY, wx.BLACK, wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
-		bSizer911.Add( self.m_colourPicker1, 0, wx.ALL, 5 )
+		self.m_treeLineColor = wx.ColourPickerCtrl( self.m_panel82, wx.ID_ANY, wx.Colour( 128, 128, 128 ), wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
+		bSizer911.Add( self.m_treeLineColor, 0, wx.ALL, 5 )
+		
+		self.m_staticline22 = wx.StaticLine( self.m_panel82, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_VERTICAL )
+		bSizer911.Add( self.m_staticline22, 0, wx.EXPAND |wx.ALL, 5 )
+		
+		self.m_staticText47 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Img Background", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText47.Wrap( -1 )
+		bSizer911.Add( self.m_staticText47, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_cairoBackgroundColor = wx.ColourPickerCtrl( self.m_panel82, wx.ID_ANY, wx.Colour( 240, 240, 240 ), wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
+		bSizer911.Add( self.m_cairoBackgroundColor, 0, wx.ALL, 5 )
 		
 		
 		bSizer89.Add( bSizer911, 0, 0, 5 )
@@ -1166,10 +1207,11 @@ class ctrlFrame ( wx.Frame ):
 		self.btn_import_tree1.Bind( wx.EVT_BUTTON, self.import_tree )
 		self.m_checkBox51.Bind( wx.EVT_CHECKBOX, self.on_toggle_config )
 		self.m_dirPicker3.Bind( wx.EVT_DIRPICKER_CHANGED, self.set_working_folder )
-		self.m_textImageSaveTarget.Bind( wx.EVT_TEXT_ENTER, self.set_cairo_image_path )
+		self.m_textImageSaveTarget.Bind( wx.EVT_TEXT, self.set_cairo_image_path )
 		self.m_button1.Bind( wx.EVT_BUTTON, self.save_cairo_image )
 		self.m_button44.Bind( wx.EVT_BUTTON, self.save_as_svg_from_png_filename )
 		self.m_button27.Bind( wx.EVT_BUTTON, self.on_draw_cairo_click )
+		self.m_button461.Bind( wx.EVT_BUTTON, self.on_save_sepp_legend_click )
 		self.m_button11.Bind( wx.EVT_BUTTON, self.save_as_svg_click )
 		self.m_FilePicker_tree.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_file )
 		self.btn_import_tree.Bind( wx.EVT_BUTTON, self.import_tree )
@@ -1183,6 +1225,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_spinBtn21.Bind( wx.EVT_SPIN_UP, self.rotate_counterclockwise )
 		self.m_textCtrl101.Bind( wx.EVT_TEXT_ENTER, self.adjust_rotation )
 		self.m_button10.Bind( wx.EVT_BUTTON, self.adjust_rotation )
+		self.m_wxPanelBackgroundColor.Bind( wx.EVT_COLOURPICKER_CHANGED, self.on_wx_panel_background_changed )
 		self.m_FilePicker_annotation.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_annotation_file )
 		self.btn_import_annotation.Bind( wx.EVT_BUTTON, self.import_annotation )
 		self.m_ComboSelectedField.Bind( wx.EVT_COMBOBOX, self.populate_annotation_values )
@@ -1219,6 +1262,8 @@ class ctrlFrame ( wx.Frame ):
 		self.m_colourPicker2.Bind( wx.EVT_COLOURPICKER_CHANGED, self.sepp_set_uniform_color )
 		self.m_checkBox3.Bind( wx.EVT_CHECKBOX, self.set_pendant_branch_checked )
 		self.m_checkSeppShowAll.Bind( wx.EVT_CHECKBOX, self.sepp_show_all_check )
+		self.m_button441.Bind( wx.EVT_BUTTON, self.on_sepp_six_color )
+		self.m_saveSeppLegend.Bind( wx.EVT_BUTTON, self.on_save_sepp_legend_click )
 		self.m_button71.Bind( wx.EVT_BUTTON, self.sepp_valpicker_clear )
 		self.m_button81.Bind( wx.EVT_BUTTON, self.sepp_valpicker_load )
 		self.m_button42.Bind( wx.EVT_BUTTON, self.sepp_select_all )
@@ -1229,6 +1274,8 @@ class ctrlFrame ( wx.Frame ):
 		self.m_button30.Bind( wx.EVT_BUTTON, self.on_test_3_click )
 		self.m_button31.Bind( wx.EVT_BUTTON, self.on_test_4_click )
 		self.m_textTreeLineWidth.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
+		self.m_treeLineColor.Bind( wx.EVT_COLOURPICKER_CHANGED, self.on_tree_line_color_change )
+		self.m_cairoBackgroundColor.Bind( wx.EVT_COLOURPICKER_CHANGED, self.on_cairo_background_change )
 		self.m_textPngWidth.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
 		self.m_textPngHeight.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
 		self.m_textCircleAlphas.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
@@ -1280,6 +1327,9 @@ class ctrlFrame ( wx.Frame ):
 	def on_draw_cairo_click( self, event ):
 		event.Skip()
 	
+	def on_save_sepp_legend_click( self, event ):
+		event.Skip()
+	
 	def save_as_svg_click( self, event ):
 		event.Skip()
 	
@@ -1312,6 +1362,9 @@ class ctrlFrame ( wx.Frame ):
 	def adjust_rotation( self, event ):
 		event.Skip()
 	
+	
+	def on_wx_panel_background_changed( self, event ):
+		event.Skip()
 	
 	def set_annotation_file( self, event ):
 		event.Skip()
@@ -1411,6 +1464,10 @@ class ctrlFrame ( wx.Frame ):
 	def sepp_show_all_check( self, event ):
 		event.Skip()
 	
+	def on_sepp_six_color( self, event ):
+		event.Skip()
+	
+	
 	def sepp_valpicker_clear( self, event ):
 		event.Skip()
 	
@@ -1438,6 +1495,12 @@ class ctrlFrame ( wx.Frame ):
 	def on_test_4_click( self, event ):
 		event.Skip()
 	
+	
+	def on_tree_line_color_change( self, event ):
+		event.Skip()
+	
+	def on_cairo_background_change( self, event ):
+		event.Skip()
 	
 	
 	

@@ -341,6 +341,8 @@ class PhylostratorUserSettings(UserSettingsContainer):
         self._categories.append('cairo')
         self.spread = UserSettingGroup('spread')
         self._categories.append('spread')
+        self.placement = UserSettingGroup('placement')
+        self._categories.append('placement')
 
         self.starting_file_paths.add_option('init_tree_path',UserSetting(name='init_tree_path', default='', short_name=None, help='Path to tree file to be opened on startup', subcategory=None))
         self.starting_file_paths.add_option('init_annotation_path',UserSetting(name='init_annotation_path', default='', short_name=None,help='Path to annotation file to be opened on startup',subcategory=None))
@@ -356,6 +358,8 @@ class PhylostratorUserSettings(UserSettingsContainer):
         self.cairo.add_option('image_height',IntUserSetting(name='image_height', default=900, min=0, max=None, short_name=None,help='Height of the png image.', subcategory=None))
         self.cairo.add_option('legend_block_size',IntUserSetting(name='legend_block_size', default=20, min=0, max=None, short_name=None,help='Height of the blocks for the legend.', subcategory=None))
         self.cairo.add_option('legend_spacing',IntUserSetting(name='legend_spacing', default=3, min=0, max=None, short_name=None,help='Vertical spacing between legend entries', subcategory=None))
+        self.cairo.add_option('tree_line_color_rgb',UserSetting(name='tree_line_color_rgb', default='240,240,240', short_name=None,help='Color of the branches of the tree.', subcategory=None))
+        self.placement.add_option('show_all_seven_placements',BoolUserSetting(name='show_all_seven_placements', default=False, short_name=None,help='True if we want to show all the placements in the tree with non-zero probability. If False, only shows the most probable', subcategory=None))
         self.spread.add_option('max_angle',FloatUserSetting(name='max_angle', default=0.34, min=0.0, max=None, short_name=None,help='Maximum change to an edge angle in a single iteration.', subcategory=None))
 
 

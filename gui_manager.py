@@ -30,6 +30,7 @@ class gui_manager(sfld_view.ctrlFrame):
     tree_file=None
     annotation_file=None
     ready = False
+    file_name_root = ''
     def __init__(self,parent):
         self.parent=parent
         sfld_view.ctrlFrame.__init__(self,parent)
@@ -79,8 +80,8 @@ class gui_manager(sfld_view.ctrlFrame):
         self.c.circle_size=int(self.m_textCtrl24.GetValue())
         self.layout_viewer_panel()
         self.Layout()
-        self.MoveXY(100, 100)
-        # self.MoveXY(1620,300) #illinois monitors
+        self.MoveXY(50, 50) # mac monitors
+        # self.MoveXY(1920,350) #illinois monitors
         # self.MoveXY(2420, 100)  # cincy monitors
 
 
@@ -93,6 +94,18 @@ class gui_manager(sfld_view.ctrlFrame):
 
     def on_reload_tree_module( self, event ):
         self.c.buffered_window.ReloadTreeManipulator()
+
+    def on_cairo_background_change( self, event=None):
+        clr = self.m_cairoBackgroundColor.GetColour()
+        clr_f = (float(clr[0])/255., float(clr[1])/255., float(clr[2])/255.)
+        self.c.buffered_window.background_color = clr_f
+        self.parent.img_panel.UpdateDrawing()
+
+    def on_wx_panel_background_changed( self, event = None):
+        self.parent.img_panel.SetForegroundColour(self.m_wxPanelBackgroundColor.GetColour())
+        self.parent.img_panel.SetBackgroundColour(self.m_wxPanelBackgroundColor.GetColour())
+        self.parent.img_panel.UpdateDrawing()
+        pass
 
     def on_show_root_check( self, event = None):
         self.c.buffered_window.show_root = self.m_checkBoxShowRoot.IsChecked()
@@ -114,6 +127,7 @@ class gui_manager(sfld_view.ctrlFrame):
         self.m_FilePicker_annotation1.SetPath(os.path.abspath(opts.starting_file_paths.sepp_annotation_path))
 
 
+
         # cairo panel
         self.m_textPngWidth.SetValue(str(opts.cairo.image_width))
         self.m_textPngHeight.SetValue(str(opts.cairo.image_height))
@@ -124,7 +138,13 @@ class gui_manager(sfld_view.ctrlFrame):
         # legend:
         self.m_textLegendBlock.SetValue(str(opts.cairo.legend_block_size))
         self.m_textLegendSpacing.SetValue(str(opts.cairo.legend_spacing))
+        t_clr=tuple([int(i) for i in opts.cairo.tree_line_color_rgb.split(',')])
+        # self.c.buffered_window.tree_line_color = (float(t_clr[0])/255., float(t_clr[1])/255., float(t_clr[2])/255.)
+        self.m_treeLineColor.SetColour(wx.Colour(*t_clr))
         # print self.m_textTreeLineWidth.GetValue()
+
+        #SEPP:
+        self.m_checkSeppShowAll.SetValue(opts.placement.show_all_seven_placements)
 
 
     def populate_options_from_text_fields(self, event = None):
@@ -147,6 +167,12 @@ class gui_manager(sfld_view.ctrlFrame):
         # legend:
         opts.cairo.legend_block_size = int(self.m_textLegendBlock.GetValue())
         opts.cairo.legend_spacing = int(self.m_textLegendSpacing.GetValue())
+        clr = self.m_treeLineColor.GetColour().Get()
+        opts.cairo.tree_line_color_rgb = '%s,%s,%s' % clr
+
+        # SEPP:
+        opts.placement.show_all_seven_placements = self.m_checkSeppShowAll.IsChecked()
+
 
         if self.ready == True:
             self.c.buffered_window.UpdateDrawing()
@@ -164,6 +190,19 @@ class gui_manager(sfld_view.ctrlFrame):
         self.set_working_folder()
         path = os.path.join(self.working_folder, self.m_textImageSaveTarget.GetValue() + '.svg')
         self.c.buffered_window.save_cairo_svg(path)
+
+    def on_tree_line_color_change( self, event = None):
+        cr = self.m_treeLineColor.GetColour()
+        # self.c.buffered_window.tree_line_color = (float(cr[0])/255., float(cr[1])/255., float(cr[2])/255.)
+        self.opts.cairo.tree_line_color_rgb = '%s,%s,%s' % cr.Get()
+        if self.ready==True:
+            self.c.buffered_window.UpdateDrawing()
+
+    def on_sepp_six_color( self, event=None ):
+        st, sto = self.sepp_value_picker.set_first_six_colors_sharp()
+        self.file_name_root = self.m_textImageSaveTarget.GetValue()
+        self.m_textImageSaveTarget.SetValue(self.file_name_root + '_%s_%s' % (st, sto))
+        self.sepp_set_uniform_size()
 
     def cold_initialize(self):
         self.set_file()
@@ -206,6 +245,12 @@ class gui_manager(sfld_view.ctrlFrame):
 
         self.value_picker.set_values(unqs)
         self.add_value_pickers()
+        if fld in ['Phylum','phylum']:
+            self.value_picker.order_by_phylum()
+
+        # TODO: get rid of this afte rthe primate project
+        # if fld in ['Family','family']:
+        #     self.value_picker.order_by_family()
         # self.m_panel5.SetSizer(self.value_picker)
         # self.value_picker_panel.Layout()
         # self.value_picker_sizer.Fit(self.m_panel5)
@@ -312,7 +357,8 @@ class gui_manager(sfld_view.ctrlFrame):
 
 
     def sepp_show_all_check( self, event ):
-        self.sepp_c.show_all_values = self.m_checkSeppShowAll.IsChecked()
+        # self.sepp_c.show_all_values = self.m_checkSeppShowAll.IsChecked()
+        self.opts.placement.show_all_seven_placements = self.m_checkSeppShowAll.IsChecked()
 
     def sepp_select_all( self, event ):
         self.sepp_value_picker.select_all()
@@ -323,21 +369,21 @@ class gui_manager(sfld_view.ctrlFrame):
     def sepp_load_filter1( self, event=None ):
         f1_field=self.m_comboBox5.GetValue()
         opts=self.sepp_c.load_filter1(f1_field)
-        print opts
+        # print opts
         self.m_listBox3.SetItems(list(opts))
         pass
 
     def sepp_load_filter2( self, event=None ):
         f2_field=self.m_comboBox6.GetValue()
         opts=self.sepp_c.load_filter2(f2_field)
-        print opts
+        # print opts
         self.m_listBox2.SetItems(list(opts))
 
-    def sepp_set_uniform_color( self, event ):
+    def sepp_set_uniform_color( self, event = None):
         clr = self.m_colourPicker2.GetColour()
         self.sepp_value_picker.set_all_colors(clr)
 
-    def sepp_set_uniform_size( self, event ):
+    def sepp_set_uniform_size( self, event = None):
         sz = self.m_textCtrl25.GetValue()
         self.sepp_value_picker.set_all_sizes(sz)
 
@@ -483,6 +529,23 @@ class gui_manager(sfld_view.ctrlFrame):
 
     def rotate_clockwise( self, event=None ):
         self.c.buffered_window.pivot_clockwise
+
+    def on_save_sepp_legend_click( self, event=None):
+        legdata = []
+        for i in self.sepp_value_picker.value_pickers:
+            if i.m_checkBox1.IsChecked():
+                v = i.value
+                c = i.clr
+                c_clr = (float(c[0])/255., float(c[1])/255., float(c[2])/255.)
+                legdata.append((v,c_clr))
+        self.c.buffered_window.SaveSeppLegend(legdata)
+
+        self.save_cairo_image()
+        self.save_as_svg_from_png_filename()
+        self.m_textImageSaveTarget.SetValue(self.file_name_root)
+
+
+
 
 
     def layout_viewer_panel(self):
@@ -748,7 +811,7 @@ class image_manager(abstract_image_manager):
         abstract_image_manager.__init__(self,parent)
         self.control_panel.adjust_zoom()
         self.control_panel.ready = True
-
+        # self.control_panel.on_cairo_background_change()
 
     def make_control_panel(self):
         self.control_panel = gui_manager(self)
@@ -772,8 +835,9 @@ class image_manager(abstract_image_manager):
         self.bSizer1 = wx.BoxSizer( wx.VERTICAL )
         # self.img_panel = view_classes.PhylogenyBufferedWindow(self)
         self.img_panel = view_classes.CairoPhylogenyBufferedWindow(self)
-        self.img_panel.SetForegroundColour( wx.Colour( 255, 255, 255 ) )
-        self.img_panel.SetBackgroundColour( wx.Colour( 255, 255, 255 ) )
+        val = 255
+        self.img_panel.SetForegroundColour( wx.Colour( val, val, val ) )
+        self.img_panel.SetBackgroundColour( wx.Colour( val, val, val ) )
         # self.img_panel.SetForegroundColour(wx.Colour(0, 0, 0))
         # self.img_panel.SetBackgroundColour(wx.Colour(0, 0, 0))
 
@@ -794,8 +858,9 @@ class AlignmentImageManager(image_manager):
     def make_image_panel(self):
         self.bSizer1 = wx.BoxSizer( wx.VERTICAL )
         self.img_panel = view_classes.AlignmentBufferedWindow(self)
-        self.img_panel.SetForegroundColour( wx.Colour( 255, 255, 255 ) )
-        self.img_panel.SetBackgroundColour( wx.Colour( 255, 255, 255 ) )
+        val = 255
+        self.img_panel.SetForegroundColour( wx.Colour( val, val, val) )
+        self.img_panel.SetBackgroundColour( wx.Colour( val, val, val ) )
 
         self.bSizer1.Add( self.img_panel, 1, wx.EXPAND, 0 )
         self.SetSizer( self.bSizer1 )

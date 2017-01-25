@@ -14,6 +14,7 @@ sweepline.sweepLineIntersect.argtypes = [C.POINTER(C.c_double), C.POINTER(C.c_in
 
 if platform.system()=='Windows':
     treeops = C.CDLL('resources/cutils/treeops.dll')
+    pass
 elif platform.system()=='Darwin':
     treeops = C.CDLL('resources/cutils/treeops.dylib')
 
@@ -156,10 +157,11 @@ def angleSpread(pts, topo, numpts, deflect, wedge_sizes, edges, lengths, rightsi
                                  rightsides.ctypes.data_as(C.POINTER(C.c_double)),
                                  node)
 
-treeops.debugWriteSegments.restype = None
-treeops.debugWriteSegments.argtypes = [C.POINTER(C.c_double),C.POINTER(C.c_int),C.c_int32]
+# treeops.debugWriteSegments.restype = None
+# treeops.debugWriteSegments.argtypes = [C.POINTER(C.c_double),C.POINTER(C.c_int),C.c_int32]
 
 def dbgWriteSegs(pts,topo,numpts):
-    treeops.debugWriteSegments(pts.ctypes.data_as(C.POINTER(C.c_double)),
-                                 topo.ctypes.data_as(C.POINTER(C.c_int)),
-                                 numpts)
+    # treeops.debugWriteSegments(pts.ctypes.data_as(C.POINTER(C.c_double)),
+    #                              topo.ctypes.data_as(C.POINTER(C.c_int)),
+    #                              numpts)
+    pass

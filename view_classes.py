@@ -109,6 +109,70 @@ class ValuePickerControl(wx.BoxSizer):
                 val_temps.append(tmp)
         self.load_values(val_temps)
 
+    def order_by_phylum(self):
+        val_temps_d={}
+        val_unk = []
+        mx = 0
+
+        for i in self.value_pickers:
+            args={'parent':self.parent, 'clr':i.clr, 'value':i.value, 'sz':i.size, 'checked':i.m_checkBox1.GetValue(), 'val_ctrl':self}
+            if i.value in phylum_orders.keys():
+                ord = phylum_orders[i.value]
+                args['clr'] = colors[ord]
+                val_temps_d[ord]=args
+                if ord>mx:
+                    mx = ord
+            else:
+                val_unk.append(args)
+
+        ct = mx+1
+        for i in val_unk:
+            i['clr']=colors[ct % 64]
+            ct +=1
+        val_temps = []
+        ct = 0
+        for i in range(mx+1):
+            if i in val_temps_d.keys():
+                val_temps.append(val_temps_d[i])
+        val_temps = val_temps + val_unk
+        for j in range(len(val_temps)):
+            val_temps[j]['clr']=colors[j]
+        self.clear_all()
+        self.load_values(val_temps)
+
+    def order_by_family(self):
+        val_temps_d={}
+        val_unk = []
+        mx = 0
+
+        for i in self.value_pickers:
+            args={'parent':self.parent, 'clr':i.clr, 'value':i.value, 'sz':i.size, 'checked':i.m_checkBox1.GetValue(), 'val_ctrl':self}
+            if i.value in clostridiales_familiy_colors.keys():
+                ord = clostridiales_familiy_colors[i.value]['order']
+                args['clr'] = clostridiales_familiy_colors[i.value]['color']
+                val_temps_d[ord]=args
+                if ord>mx:
+                    mx = ord
+            else:
+                val_unk.append(args)
+
+        ct = mx+1
+        for i in val_unk:
+            # i['clr']=colors[ct % 64]
+            i['clr']=(200,200,200)
+            ct +=1
+        val_temps = []
+        ct = 0
+        k_sort = list(val_temps_d.keys())
+        k_sort.sort()
+        for i in k_sort:
+            val_temps.append(val_temps_d[i])
+        val_temps = val_temps + val_unk
+        # for j in range(len(val_temps)):
+        #     val_temps[j]['clr']=colors[j]
+        self.clear_all()
+        self.load_values(val_temps)
+
     def load_values(self,val_temps):
 
         self.clear_all()
@@ -269,8 +333,21 @@ class SEPPValuePickerControl(ValuePickerControl):
 
     def set_values(self, vals=None):
         self.clear_all()
+        mx = max(sepp_otu_order.values())+1
         if vals != None:
-            self.values = vals
+            ord = {}
+            for i in vals:
+                if i in sepp_otu_order.keys():
+                    ord[sepp_otu_order[i]]=i
+                else:
+                    ord[mx] = i
+                    mx += 1
+
+            ks = list(ord.keys())
+            ks.sort()
+            self.values = []
+            for i in ks:
+                self.values.append(ord[i])
 
         k = 0
 
@@ -313,6 +390,37 @@ class SEPPValuePickerControl(ValuePickerControl):
             for i in self.value_pickers:
                 i.set_color(clr)
         self.value_pickers[0].process_color_change()
+
+    def set_first_six_colors_sharp(self):
+        sharp_cols = [(0,255,0),(255,0,0),(0,0,255),(255,255,0),(255,0,255),(0,255,255),(0,100,1),(255,128,0),(164,36,0)]
+        ct = 0
+        firstchecked=-1
+        next_to_check = -1
+        last_to_check = -1
+        nvals = len(self.value_pickers)
+        if nvals>0:
+            for i in range(len(self.value_pickers)):
+                if self.value_pickers[i].m_checkBox1.IsChecked():
+                    if firstchecked==-1:
+                        firstchecked=i
+                else:
+                    if firstchecked<>-1:
+                        next_to_check=i
+                        break
+            if firstchecked==-1:
+                next_to_check=0
+            self.unselect_all()
+            # print 'nvals = %s' % nvals
+            for i in range(9):
+                # print 'i + nexttocheck = %s' % (i + next_to_check)
+                if i+next_to_check<nvals:
+                    self.value_pickers[i+next_to_check].m_checkBox1.SetValue(True)
+                    v = self.value_pickers[i+next_to_check].value
+                    # self.value_pickers[i + next_to_check].set_color(wx.Colour(*sharp_cols[i]))
+                    self.value_pickers[i + next_to_check].set_color(wx.Colour(*sepp_otu_colors[v]))
+                    last_to_check = i + next_to_check
+        return next_to_check, last_to_check
+
 
     def set_color_scale(self,vals):
         '''
@@ -1257,6 +1365,10 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
     write_image_to_path = False
     image_path = None
     show_root = False
+    # background_color = (1., 1., 1.)
+    background_color = None
+    tree_line_color = (0.,0.,0.)
+
 
     def __init__(self,parent,*args,**kwargs):
         PhylogenyBufferedWindow.__init__(self,parent,*args,**kwargs)
@@ -1289,9 +1401,16 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
             self.surf = svgsurf
 
         ctx = cairo.Context(self.surf)
-        ctx.set_source_rgb(1, 1, 1)
-        ctx.rectangle(0, 0, self.w, self.h)
-        ctx.fill()
+
+        # ctx.set_source_rgb(1, 1, 1)
+        if self.background_color is not None:
+            ctx.set_source_rgb(*self.background_color)
+            ctx.rectangle(0, 0, self.w, self.h)
+            ctx.fill()
+        else:
+            ctx.set_source_rgba(1,1,1,0)
+            ctx.rectangle(0, 0, self.w, self.h)
+            ctx.fill()
         # ctx.set_matrix(cairo.Matrix(self.t11_inv,self.t21_inv,self.t12_inv,self.t22_inv,self.t13_inv, self.t23_inv))
         ctx.set_matrix(cairo.Matrix(self.t11, -self.t21, self.t12, -self.t22, self.t13, -self.t23))
         ctx.set_line_width(opts.cairo.tree_line_width)
@@ -1299,17 +1418,18 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         self.sepp_alpha = min(max(float(self.parent.control_panel.m_textSeppAlphas.GetValue()),0.0),1.0)
         self.circle_alpha = min(max(float(self.parent.control_panel.m_textCircleAlphas.GetValue()),0.0),1.0)
 
-        ctx.set_source_rgb(0,0,0)
+        self.tree_line_color = tuple([float(i)/255. for i in opts.cairo.tree_line_color_rgb.split(',')])
+        ctx.set_source_rgb(*self.tree_line_color)
 
         # if newtree==None:
         #     self.DrawTreeSegmentsCairo(ctx,self.radial_phylogram.myt)
         # else:
         #     self.DrawTreeSegmentsCairo(ctx,newtree)
         if self.use_tree_copy==False:
-            print 'drawing segments from the live tree'
+            # print 'drawing segments from the live tree'
             self.DrawTreeSegmentsCairo(ctx,self.radial_phylogram.myt)
         else:
-            print 'drawing segments from the copy'
+            # print 'drawing segments from the copy'
             self.DrawTreeSegmentsCairo(ctx,self.radial_phylogram.myt_copy)
 
         if self.c.circle_sets_by_color <> None:
@@ -1343,7 +1463,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
             ctx.arc(0., 0., 6*opts.cairo.tree_line_width, 0, 2 * math.pi)
             ctx.fill()
 
-        ctx.set_source_rgba(0.0, 0.0, 0.0, 1.0)
+        ctx.set_source_rgb(*self.tree_line_color)
         for i in tree.preorder_edge_iter():
             if i.length is not None and i.length > 0.0 and i.tail_node is not None:
                 x0 = i.head_node.location
@@ -1409,6 +1529,64 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
                     ctx.fill()
 
                     # self.UpdateDrawing()
+    def SaveSeppLegend(self, legendvals):
+        '''
+        legendvals must be a list of tuples, where each tuple is (string, (float,float,float))
+            i.e. label and color (cairo-style color).
+        :param legendvals:
+        :return:
+        '''
+        if self.image_path is not None:
+            sepp_legend_path_svg = self.image_path[:-4] + '_seppLegend.svg'
+            sepp_legend_path_png = self.image_path[:-4] + '_seppLegend.png'
+        else:
+            print "no image path selected. select that and try again."
+            return
+
+        ft = self.parent.control_panel.m_fontPickerLegend.GetSelectedFont()
+        # cft = wx.lib.wxcairo.FontFaceFromFont(ft)
+        f_face_name = cairo.ToyFontFace(ft.GetFaceName())
+        f_sz = ft.GetPointSize()
+
+        surf = cairo.SVGSurface(sepp_legend_path_svg,1000,1000)
+        ctx = cairo.Context(surf)
+        wmx=0
+        hmx = 0
+        for i in legendvals:
+            xb, yb, w, h, xa, ya = ctx.text_extents(i[0])
+            if w > wmx:
+                wmx = w
+
+        between_legend_blocks = opts.cairo.legend_spacing
+        block_size = opts.cairo.legend_block_size
+        blbx, blby = ctx.device_to_user_distance(between_legend_blocks, between_legend_blocks)
+
+        w = wmx + between_legend_blocks*3+block_size*1.5
+        h = len(legendvals)*(block_size+between_legend_blocks) + 2* between_legend_blocks
+        del surf
+        del ctx
+        surf = cairo.SVGSurface(sepp_legend_path_svg,w,h)
+        ctx = cairo.Context(surf)
+        ctx.set_font_face(f_face_name)
+        ctx.set_font_size(f_sz)
+        ctx.set_source_rgb(1,1,1)
+        ctx.rectangle(0,0,w,h)
+        ctx.fill()
+
+        ctx.move_to(between_legend_blocks,between_legend_blocks)
+
+        for i in legendvals:
+            px, py = ctx.get_current_point()
+            ctx.rectangle(px,py,block_size,block_size)
+            ctx.set_source_rgb(*i[1])
+            ctx.fill()
+            ctx.move_to(px+block_size+between_legend_blocks,py+block_size*.9)
+            ctx.set_source_rgb(0,0,0)
+            ctx.show_text(i[0])
+            ctx.fill()
+            ctx.move_to(px,py+block_size+between_legend_blocks)
+
+        surf.write_to_png(sepp_legend_path_png)
 
     def DrawLegendCairo(self, ctx):
         between_legend_blocks = opts.cairo.legend_spacing
@@ -1551,7 +1729,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         if self.image_path[-4:]<>'.png':
             self.image_path = self.image_path + '.png'
         print 'Saving to file: %s' % self.image_path
-        self.surf.write_to_png(self.image_path)
+        self.surf.write_to_png(str(self.image_path))
 
     def set_image_path(self,path):
         self.image_path=path

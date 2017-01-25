@@ -3,8 +3,10 @@ __author__ = 'Michael'
 import copy
 import dendropy
 import numpy as np
-from my_globals import *
-nt_alphabet=['A','C','G','T','U','M','N']
+# from my_globals import *
+nt_alphabet=['A','C','G','T','U','M','N','Y','K','W','R']
+foo = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+nt_alphabet = nt_alphabet + list(set(foo).difference(set(nt_alphabet)))
 
 
 def remove_all_blank_columns(fasta_dict,same_length_check=True):
@@ -346,6 +348,63 @@ class MultipleSequenceAlignment():
             tp += a
             fn += b
         return (tp,fn)
+
+class LightMutlipleSequenceAlignment(MultipleSequenceAlignment):
+
+    def __init__(self, refpath=None,treepath=None,generic_coords=False):
+        self.refpath=refpath
+        self.treepath=treepath
+        self.gappy_threshold = 0.0
+        self.ref=None
+        self.node_order=[]
+        self.generic_coords=generic_coords
+        if self.treepath<>None:
+            print 'setting treepath to %s' % treepath
+            self.set_treepath(self.treepath)
+
+        if self.refpath<>None:
+            print 'setting reference alignment to %s' % self.refpath
+            self.set_refpath()
+
+    def set_refpath(self,rp=None):
+        if rp<>None:
+            self.refpath=rp
+
+        print "Reading reference alignment..."
+        # self.ref_temp=read_from_fasta(self.refpath)
+        self.ref = read_from_fasta(self.refpath)
+        print "removing all-blank columns..."
+        # self.ref=remove_all_blank_columns(self.ref_temp)
+        self.reflen=len(self.ref[self.ref.keys()[0]])
+        self.numtaxa = len(self.ref.keys())
+        print "done setting reference alignment..."
+
+        self.ref_np = np.zeros((self.numtaxa,self.reflen),dtype=np.uint8)
+        self.populate_alignment_np()
+
+    def populate_alignment_np(self):
+        if len(self.node_order_lookup.keys())>0:
+            for i in self.ref.keys():
+                no = self.node_order_lookup[i]
+                seq = self.ref[i]
+                for j in range(self.reflen):
+                    if seq[j]<>'-':
+                        self.ref_np[no,j] = nt_alphabet.index(seq[j])+1
+
+        self.set_active_cols()
+
+    def set_active_cols(self,gappy_thresh=None):
+        if gappy_thresh is not None:
+            self.gappy_threshold = gappy_thresh
+
+        refnpgt0 = (self.ref_np>0)*1
+        print "gappy threshold is %s" % self.gappy_threshold
+        # print np.sum(refnpgt0,0)[0:100]
+        self.active_cols = np.where(np.sum(refnpgt0,0).astype(np.float64)/self.ref_np.shape[0]>=self.gappy_threshold)[0]
+        print "number of active columns is %s" % self.active_cols.shape
+
+
+
 
 
 class MSAColumn():
