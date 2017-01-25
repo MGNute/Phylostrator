@@ -2,8 +2,8 @@
 #include<stdlib.h>
 #include<math.h>
 #include "utils.h"
-#include<time.h>
-#include<stdatomic.h>
+// #include<time.h>
+// #include<stdatomic.h>
 
 #define TREEOPS_API __declspec(dllexport)
 
@@ -1157,8 +1157,10 @@ void angleSpreadExtension(double* pts, int* topo, int numpts, double* deflect_an
         // tim.tv_sec = 0;
         // tim.tv_nsec = 500000000;
         // nanosleep(&tim, &tim2); 
-        atomic_thread_fence(memory_order_acquire);
-        atomic_thread_fence(memory_order_release);
+        
+        // uncomment for mac
+        // atomic_thread_fence(memory_order_acquire);
+        // atomic_thread_fence(memory_order_release);
 
         relocateSubtreeByDeflectionAngles(deflect_angles, edge_angles, lengths, pts, topo, numpts, node);
 

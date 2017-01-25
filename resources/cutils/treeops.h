@@ -24,14 +24,14 @@ void updateMinAngles(double currangle, double* minClockwiseAngle, double* minCou
 double maxLengthToTip(double* lengths, int* topo, int index, int away_from);
 int nearestBranchToPoint(double* pts, int* topo, int numpts, double x0, double y0, int* is_away);
 int nearestBranchToNode(double* pts, int* topo, int numpts, int index, int* is_away);
-void centerCladeRotationally(double* pts, int* topo, double* edge_angles, double* deflect_angles, double* lengths, 
-                             int numpts, int node);
+// void centerCladeRotationally(double* pts, int* topo, double* edge_angles, double* deflect_angles, double* lengths, 
+                             // int numpts, int node);
 void getBranchesToSideLeaf(double* pts, int* topo, int startnode, int awayFromNode, int clockwise, double* branch_points);
 int countBranchesToSideLeaf(double* pts, int* topo, int startnode, int awayFromNode, int clockwise);
 int find45DegreeCutoffInSortedPoints(double* pts, int numpts, int below);
 void zeroOutDoubleArray(double* pts, int numpts);
 double maxLeafRotationRange(double* pts, int* topo, int numpts, int node, double* origin, double* lim_p1, double* lim_p2);
-void angleSpreadExtension(double* pts, int* topo, int numpts, double* deflect_angles, double* container_wedges, 
+TREEOPS_API void angleSpreadExtension(double* pts, int* topo, int numpts, double* deflect_angles, double* container_wedges, 
     double* edge_angles, double* lengths, double* wedge_right_sides, int node);
 
 #endif
