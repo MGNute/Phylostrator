@@ -25,7 +25,7 @@ def remove_all_blank_columns(fasta_dict,same_length_check=True):
     """
     num_seqs=len(fasta_dict.values())
     seq_len = len(fasta_dict.values()[0])
-    # print "#columns: %s" % seq_len
+    # print("#columns: %s" % seq_len)
     new_dict={}
     for i in fasta_dict.keys():
         new_dict[i]=''
@@ -33,17 +33,17 @@ def remove_all_blank_columns(fasta_dict,same_length_check=True):
     # check that all the sequences are the same length
     if same_length_check==True:
         for i in fasta_dict.values():
-            if len(i) <> seq_len:
-                # print 'The sequences were not all the same length.'
+            if len(i) != seq_len:
+                # print('The sequences were not all the same length.')
                 return -1
 
     # identify columns that are blank for every taxon
     all_blanks_list = []
-    # print "# blanks: %s" % len(all_blanks_list)
+    # print("# blanks: %s" % len(all_blanks_list))
     for i in range(seq_len):
         allblank=True
         for j in fasta_dict.values():
-            if j[i]<>'-':
+            if j[i]!='-':
                 allblank=False
                 break
         if allblank==True:
@@ -51,13 +51,13 @@ def remove_all_blank_columns(fasta_dict,same_length_check=True):
 
     non_blanks=list(set(range(seq_len)).difference(set(all_blanks_list)))
     non_blanks.sort()
-    # print "# non-blanks: %s" % len(non_blanks)
+    # print("# non-blanks: %s" % len(non_blanks))
 
 
     # remove those columns (in place, so do it in reverse order)
     # if len(all_blanks_list)>0:
     #     all_blanks_list.sort(reverse=True)
-    #     print len(all_blanks_list)
+    #     print(len(all_blanks_list))
     #
     #     for i in all_blanks_list:
     #         for k in fasta_dict.keys():
@@ -72,7 +72,7 @@ def remove_all_blank_columns(fasta_dict,same_length_check=True):
     lents=[]
     for i in new_dict.values():
         lents.append(len(i))
-    print lents
+    print(lents)
     return new_dict
 
 def nucleotide_to_int(nt):
@@ -100,7 +100,7 @@ def read_from_fasta(file_path):
     first=True
     for l in fasta:
         if l[0]=='>':
-            if first<>True:
+            if first!=True:
                 output[name]=seq
             else:
                 first=False
@@ -117,24 +117,26 @@ def check_is_leaf(a):
 
 class MultipleSequenceAlignment():
 
-    def __init__(self,refpath=None,estpath=None, treepath=None, compare_with_est=False, generic_coords=False):
+    def __init__(self,refpath=None,estpath=None, treepath=None, compare_with_est=False,
+                 generic_coords=False, data_type=None):
         self.refpath=refpath
         self.estpath=estpath
         self.treepath=treepath
+        self.data_type = data_type
         self.ref=None
         self.est=None
         self.node_order=[]
         self.generic_coords=generic_coords
-        if self.treepath<>None:
-            print 'setting treepath to %s' % treepath
+        if self.treepath!=None:
+            print('setting treepath to %s' % treepath)
             self.set_treepath(self.treepath)
 
 
-        if self.refpath<>None:
-            print 'setting reference alignment to %s' % self.refpath
+        if self.refpath!=None:
+            print('setting reference alignment to %s' % self.refpath)
             self.set_refpath()
 
-        print "Reference Alignment Length:\t%s" % self.reflen
+        print("Reference Alignment Length:\t%s" % self.reflen)
         if compare_with_est==True:
             self.finalize_ref_alignment()
             if self.estpath==None:
@@ -142,9 +144,9 @@ class MultipleSequenceAlignment():
             self.set_estpath()
             tp,fn= self.count_tp_fn()
 
-            print "Reference Homologs:\t%s" % tp
-            print "Estimated Homologs:\t%s" % self.est_homologs
-            print "Shared Homologs:\t%s" % self.shared_homologs
+            print("Reference Homologs:\t%s" % tp)
+            print("Estimated Homologs:\t%s" % self.est_homologs)
+            print("Shared Homologs:\t%s" % self.shared_homologs)
 
             self.write_column_wise_errors()
 
@@ -155,10 +157,10 @@ class MultipleSequenceAlignment():
 
 
     def get_node_order(self):
-        print "Reading reference tree and getting node order..."
+        print("Reading reference tree and getting node order...")
         self.tree=dendropy.Tree.get(path=self.treepath,schema="newick",preserve_underscores=True)
         self.numtaxa = len(self.tree.leaf_nodes())
-        print "the tree has %s taxa" % self.numtaxa
+        print("the tree has %s taxa" % self.numtaxa)
         if len(self.node_order)>0:
             self.old_node_order=copy.deepcopy(self.node_order)
         self.node_order=[]
@@ -173,10 +175,10 @@ class MultipleSequenceAlignment():
 
 
     def set_refpath(self,rp=None):
-        if rp<>None:
+        if rp!=None:
             self.refpath=rp
 
-        print "Reading reference alignment..."
+        print("Reading reference alignment...")
         self.ref_temp=read_from_fasta(self.refpath)
         self.ref=remove_all_blank_columns(self.ref_temp)
         self.reflen=len(self.ref[self.ref.keys()[0]])
@@ -189,10 +191,10 @@ class MultipleSequenceAlignment():
         self.ref_seq_colindices={}
 
         txct=0
-        print "Updating reference alignment columns..."
+        print("Updating reference alignment columns...")
         for i in self.ref.keys():
             if txct % 10 ==0:
-                print "\trow: %s" % txct
+                print("\trow: %s" % txct)
             txct+=1
 
             seq=self.ref[i]
@@ -206,14 +208,14 @@ class MultipleSequenceAlignment():
                     position+=1
 
     def finalize_ref_alignment(self):
-        print "Finalizing reference alignment..."
+        print("Finalizing reference alignment...")
         for i in range(self.reflen):
             if i % 250==0:
-                print i
+                print(i)
             self.msa_cols[i].populate_tp_matrix()
 
     def set_estpath(self):
-        print "Reading Estimated Alignment..."
+        print("Reading Estimated Alignment...")
         self.est = read_from_fasta(self.estpath)
         self.est_seq_colindices={}
         for i in self.est.keys():
@@ -228,10 +230,10 @@ class MultipleSequenceAlignment():
         self.est_homologs=0
         self.shared_homologs=0
         self.numtaxa=len(self.est.keys())
-        print "Calculating homologs and updating reference alignment..."
+        print("Calculating homologs and updating reference alignment...")
         for i in range(self.numtaxa):
             if i % 10 ==0:
-                print "\trow: %s" % i
+                print("\trow: %s" % i)
             i_colinds=self.est_seq_colindices[self.est.keys()[i]]
             i_label=self.est.keys()[i]
             for j in range(i+1,self.numtaxa):
@@ -268,7 +270,7 @@ class MultipleSequenceAlignment():
         for i in t.postorder_edge_iter():
             if i.length is not None:
                 i.length=1.0
-        # print "rerooting at midpoint..."
+        # print("rerooting at midpoint...")
         # t.reroot_at_midpoint()
         height=t.max_distance_from_root()
         incr = int(abs(top_or_right - bottom_or_left) / height)
@@ -282,7 +284,7 @@ class MultipleSequenceAlignment():
             args={}
             if check_is_leaf(i)==True:
                 # if i.taxon.label == 'Zangia_citrina_HKAS52684':
-                #     print 'at taxon Zangia_citrina_HKAS52684: order %s' % ct
+                #     print('at taxon Zangia_citrina_HKAS52684: order %s' % ct)
                 self.node_order.append(i.taxon.label)
                 self.node_order_lookup[i.taxon.label]=ct
                 order=ct
@@ -299,7 +301,7 @@ class MultipleSequenceAlignment():
                 for j in i.child_nodes():
                     cvs.append(self.tree_vertices[j])
                     # if len(self.node_added_order)<20:
-                    #     print "ch: %s, %s" % self.tree_vertices[j]
+                    #     print("ch: %s, %s" % self.tree_vertices[j])
                 for k in cvs:
                     if k[0]> maxht:
                         maxht=k[0]
@@ -321,7 +323,7 @@ class MultipleSequenceAlignment():
                 try:
                     v2=self.tree_vertices[i.head_node.parent_node]
                 except:
-                    print i.length
+                    print(i.length)
                 self.segment_endpoints.append((v1[0],v1[1],v2[0],v1[1]))
                 self.segment_endpoints.append((v2[0],v1[1],v2[0],v2[1]))
 
@@ -351,33 +353,34 @@ class MultipleSequenceAlignment():
 
 class LightMutlipleSequenceAlignment(MultipleSequenceAlignment):
 
-    def __init__(self, refpath=None,treepath=None,generic_coords=False):
+    def __init__(self, refpath=None,treepath=None,generic_coords=False,data_type=None):
         self.refpath=refpath
         self.treepath=treepath
         self.gappy_threshold = 0.0
         self.ref=None
+        self.data_type = data_type
         self.node_order=[]
         self.generic_coords=generic_coords
-        if self.treepath<>None:
-            print 'setting treepath to %s' % treepath
+        if self.treepath!=None:
+            print('setting treepath to %s' % treepath)
             self.set_treepath(self.treepath)
 
-        if self.refpath<>None:
-            print 'setting reference alignment to %s' % self.refpath
+        if self.refpath!=None:
+            print('setting reference alignment to %s' % self.refpath)
             self.set_refpath()
 
     def set_refpath(self,rp=None):
-        if rp<>None:
+        if rp!=None:
             self.refpath=rp
 
-        print "Reading reference alignment..."
+        print("Reading reference alignment...")
         # self.ref_temp=read_from_fasta(self.refpath)
         self.ref = read_from_fasta(self.refpath)
-        print "removing all-blank columns..."
+        print("removing all-blank columns...")
         # self.ref=remove_all_blank_columns(self.ref_temp)
-        self.reflen=len(self.ref[self.ref.keys()[0]])
+        self.reflen=len(self.ref[list(self.ref.keys())[0]])
         self.numtaxa = len(self.ref.keys())
-        print "done setting reference alignment..."
+        print("done setting reference alignment...")
 
         self.ref_np = np.zeros((self.numtaxa,self.reflen),dtype=np.uint8)
         self.populate_alignment_np()
@@ -388,7 +391,7 @@ class LightMutlipleSequenceAlignment(MultipleSequenceAlignment):
                 no = self.node_order_lookup[i]
                 seq = self.ref[i]
                 for j in range(self.reflen):
-                    if seq[j]<>'-':
+                    if seq[j]!='-':
                         self.ref_np[no,j] = nt_alphabet.index(seq[j])+1
 
         self.set_active_cols()
@@ -398,10 +401,10 @@ class LightMutlipleSequenceAlignment(MultipleSequenceAlignment):
             self.gappy_threshold = gappy_thresh
 
         refnpgt0 = (self.ref_np>0)*1
-        print "gappy threshold is %s" % self.gappy_threshold
-        # print np.sum(refnpgt0,0)[0:100]
+        print("gappy threshold is %s" % self.gappy_threshold)
+        # print(np.sum(refnpgt0,0)[0:100])
         self.active_cols = np.where(np.sum(refnpgt0,0).astype(np.float64)/self.ref_np.shape[0]>=self.gappy_threshold)[0]
-        print "number of active columns is %s" % self.active_cols.shape
+        print("number of active columns is %s" % self.active_cols.shape)
 
 
 

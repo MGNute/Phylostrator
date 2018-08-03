@@ -13,7 +13,7 @@ def color_scale(value):
         H=.6+(value-.5)/.8-int(.2+(value-.5)/.8)
     rgb=colorsys.hsv_to_rgb(H,S,V)
     rgb_out=(int(255*rgb[0]),int(255*rgb[1]),int(255*rgb[2]))
-    # print "value = " + str(value) + '\tHSV = ' + str((H,S,V)) + '\tRGB = ' + str(rgb)
+    # print("value = " + str(value) + '\tHSV = ' + str((H,S,V)) + '\tRGB = ' + str(rgb))
     return rgb_out
 
 def script_function(bw_ref):
@@ -41,16 +41,16 @@ def script_function(bw_ref):
             if j[0] in myotus:
                 placements[j[0]]=i['p'][0]
 
-    print "placements:\t%s" % len(placements)
+    print("placements:\t%s" % len(placements))
     if len(placements)>0:
-        print placements[placements.keys()[0]]
-    print "myotus:\t%s" % len(myotus)
+        print(placements[placements.keys()[0]])
+    print("myotus:\t%s" % len(myotus))
 
     # tmp=bw_ref.radial_phylogram.myt.find_node_with_label(str(placements[placements.keys()[0]][0]))
-    # print tmp.__dict__
-    # print tmp.viewer_node.__dict__
-    # print tmp.edge.__dict__
-    # print tmp.edge.viewer_edge.__dict__
+    # print(tmp.__dict__)
+    # print(tmp.viewer_node.__dict__)
+    # print(tmp.edge.__dict__)
+    # print(tmp.edge.viewer_edge.__dict__)
     for i in placements.keys():
         nd = bw_ref.radial_phylogram.myt.find_node_with_label(str(placements[i][0]))
         frac=placements[i][3]/nd.edge.length
@@ -58,13 +58,13 @@ def script_function(bw_ref):
         tx = nd.edge.viewer_edge.tail_x
         circ_x = (frac*hx[0]+(1-frac)*tx[0],frac*hx[1]+(1-frac)*tx[1])
         bw_ref.AddToExtraDrawCircles((circ_x,255,0,0,2))
-    print '%s circles drawn' % len(bw_ref.ExtraDrawCircles)
+    print('%s circles drawn' % len(bw_ref.ExtraDrawCircles))
 
 
     # titer=bw_ref.radial_phylogram.myt.postorder_node_iter()
     # for i in range(10):
     #     a=titer.next()
-    #     print a.__dict__
+    #     print(a.__dict__)
 
 
 def script_function_proteinstruct( prefix, scores=None, header = None):
@@ -94,39 +94,39 @@ def script_function_proteinstruct( prefix, scores=None, header = None):
         cols=[wx.Colour(15,240,234),wx.Colour(255,200,145)]
         cols_vivid=[wx.Colour(0,0,255),wx.Colour(255,0,0)]
         if value_a is None and i.value[0]=='Q':
-            # print str(value_a) +'\t1'
+            # print(str(value_a) +'\t1')
             value_a=i.value[2:8]
             i.m_colourPicker1.SetColour(cols_vivid[0])
             i.m_spinCtrl.SetValue(3)
             i.clr=cols_vivid[0]
             i.size=3
         elif value_a is None and i.value[0]!='Q':
-            # print str(value_a) +'\t2'
+            # print(str(value_a) +'\t2')
             value_a=i.value[0:6]
             i.m_colourPicker1.SetColour(cols[0])
             i.m_spinCtrl.SetValue(8)
             i.clr=cols[0]
             i.size=8
         elif value_a is not None and i.value[0]=='Q' and i.value[2:8]==value_a:
-            # print str(value_a) +'\t' + i.value[2:8] + '\t3'
+            # print(str(value_a) +'\t' + i.value[2:8] + '\t3')
             i.m_colourPicker1.SetColour(cols_vivid[0])
             i.m_spinCtrl.SetValue(3)
             i.clr=cols_vivid[0]
             i.size=3
         elif value_a is not None and i.value[0]!='Q' and i.value[0:6]==value_a:
-            # print str(value_a) +'\t' + i.value[0:6] + '\t4'
+            # print(str(value_a) +'\t' + i.value[0:6] + '\t4')
             i.m_colourPicker1.SetColour(cols[0])
             i.m_spinCtrl.SetValue(8)
             i.clr=cols[0]
             i.size=8
         elif value_a is not None and i.value[0]=='Q' and i.value[2:8]!=value_a:
-            # print str(value_a) +'\t' + i.value[2:8] + '\t5'
+            # print(str(value_a) +'\t' + i.value[2:8] + '\t5')
             i.m_colourPicker1.SetColour(cols_vivid[1])
             i.m_spinCtrl.SetValue(3)
             i.clr=cols_vivid[1]
             i.size=3
         elif value_a is not None and i.value[0]!='Q' and i.value[0:6]!=value_a:
-            # print str(value_a) +'\t' + i.value[0:6] + '\t6'
+            # print(str(value_a) +'\t' + i.value[0:6] + '\t6')
             i.m_colourPicker1.SetColour(cols[1])
             i.m_spinCtrl.SetValue(8)
             i.clr=cols[1]
@@ -176,7 +176,7 @@ def script_function_container():
     import os, time
     for i in os.listdir(fo):
         a=i.replace('_taxa.txt','')
-        print a
+        print(a)
         script_function(a)
         # time.sleep(2)
 

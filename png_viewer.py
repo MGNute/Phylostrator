@@ -39,7 +39,7 @@ class PNGBufferedWindow(BufferedWindow):
             time.sleep(1)
 
     def on_right_dclick(self,event):
-        print event.GetPosition()
+        print(event.GetPosition())
 
     def set_image_path(self,image_path):
         self.image_path=image_path
@@ -63,10 +63,10 @@ class PNGBufferedWindow(BufferedWindow):
             dc.SetPen(wx.WHITE_PEN)
             sz = dc.GetSizeTuple()
             dc.DrawRectangle(0,0,sz[0],sz[1])
-        if self.image <> None:
+        if self.image != None:
             dc.DrawBitmap(self.image,0,0)
 
-        # print str(self.GetBackgroundColour())
+        # print(str(self.GetBackgroundColour()))
 
 class pngviewer(sfld_view.imgFrame):
     ip = False
@@ -93,7 +93,7 @@ class pngviewer(sfld_view.imgFrame):
 
 
     def right_dclick(self, event):
-        print event.GetPosition()
+        print(event.GetPosition())
 
     def chg_file(self,event=None):
         fi=self.m_filePicker5.GetPath()

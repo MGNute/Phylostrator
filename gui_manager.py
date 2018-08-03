@@ -38,7 +38,7 @@ class gui_manager(sfld_view.ctrlFrame):
         self.c=controller.Controller()
         self.sepp_c = controller.SEPPController()
         self.opts = controller.Options()
-        print self.opts.cairo.tree_line_width
+        # print(self.opts.cairo.tree_line_width)
         # self.opts.read_config_filepath('resources/default_settings.cfg')
         self.populate_options_to_text_fields()
         self.populate_options_from_text_fields()
@@ -111,12 +111,12 @@ class gui_manager(sfld_view.ctrlFrame):
         self.c.buffered_window.show_root = self.m_checkBoxShowRoot.IsChecked()
 
     def populate_options_to_text_fields(self, event = None):
-        # print 'options to text'
+        # print('options to text')
         opts = self.opts
-        # print opts.cairo.tree_line_width
-        # print self.opts.cairo.tree_line_width
-        # print str(opts.cairo.tree_line_width)
-        # print str(self.opts.cairo.tree_line_width)
+        # print(opts.cairo.tree_line_width)
+        # print(self.opts.cairo.tree_line_width)
+        # print(str(opts.cairo.tree_line_width))
+        # print(str(self.opts.cairo.tree_line_width))
 
         # initial file paths
         self.m_FilePicker_tree.SetPath(os.path.abspath(opts.starting_file_paths.init_tree_path))
@@ -141,7 +141,7 @@ class gui_manager(sfld_view.ctrlFrame):
         t_clr=tuple([int(i) for i in opts.cairo.tree_line_color_rgb.split(',')])
         # self.c.buffered_window.tree_line_color = (float(t_clr[0])/255., float(t_clr[1])/255., float(t_clr[2])/255.)
         self.m_treeLineColor.SetColour(wx.Colour(*t_clr))
-        # print self.m_textTreeLineWidth.GetValue()
+        # print(self.m_textTreeLineWidth.GetValue())
 
         #SEPP:
         self.m_checkSeppShowAll.SetValue(opts.placement.show_all_seven_placements)
@@ -168,13 +168,17 @@ class gui_manager(sfld_view.ctrlFrame):
         opts.cairo.legend_block_size = int(self.m_textLegendBlock.GetValue())
         opts.cairo.legend_spacing = int(self.m_textLegendSpacing.GetValue())
         clr = self.m_treeLineColor.GetColour().Get()
-        opts.cairo.tree_line_color_rgb = '%s,%s,%s' % clr
+        try:
+            opts.cairo.tree_line_color_rgb = '%s,%s,%s' % clr[0:3]
+        except:
+            print(str(clr))
 
         # SEPP:
         opts.placement.show_all_seven_placements = self.m_checkSeppShowAll.IsChecked()
 
 
         if self.ready == True:
+            print("UPDATING")
             self.c.buffered_window.UpdateDrawing()
 
     def draw_circles( self, event=None ):
@@ -352,7 +356,7 @@ class gui_manager(sfld_view.ctrlFrame):
             self.m_comboBox5.Append(i)
             self.m_comboBox6.Append(i)
             self.m_ComboSelectedField1.Append(i)
-        print "done with import"
+        print(("done with import"))
 
 
 
@@ -369,14 +373,14 @@ class gui_manager(sfld_view.ctrlFrame):
     def sepp_load_filter1( self, event=None ):
         f1_field=self.m_comboBox5.GetValue()
         opts=self.sepp_c.load_filter1(f1_field)
-        # print opts
+        # print(opts)
         self.m_listBox3.SetItems(list(opts))
         pass
 
     def sepp_load_filter2( self, event=None ):
         f2_field=self.m_comboBox6.GetValue()
         opts=self.sepp_c.load_filter2(f2_field)
-        # print opts
+        # print(opts)
         self.m_listBox2.SetItems(list(opts))
 
     def sepp_set_uniform_color( self, event = None):
@@ -389,7 +393,7 @@ class gui_manager(sfld_view.ctrlFrame):
 
     def sepp_process_filter1( self, event=None ):
         filter1_selections=self.m_listBox3.GetSelections()
-        # print filter1_selections
+        # print(filter1_selections)
         filter1_items=self.m_listBox3.GetItems()
         strItems=[]
         for i in filter1_selections:
@@ -400,7 +404,7 @@ class gui_manager(sfld_view.ctrlFrame):
 
     def sepp_process_filter2( self, event=None ):
         filter2_selections = self.m_listBox2.GetSelections()
-        # print filter2_selections
+        # print(filter2_selections)
         filter2_items = self.m_listBox2.GetItems()
         strItems=[]
         for i in filter2_selections:
@@ -426,7 +430,7 @@ class gui_manager(sfld_view.ctrlFrame):
             self.sepp_value_picker.set_color_scale(list(set(unqs)))
         else:
             if len(unqs)>50:
-                print "this list has more than 50 elements, so we're not going to list them all. Try filtering down first"
+                print(("this list has more than 50 elements, so we're not going to list them all. Try filtering down first"))
                 self.sepp_value_picker.set_values(unqs[0:30])
             else:
                 self.sepp_value_picker.set_values(unqs)
@@ -456,16 +460,16 @@ class gui_manager(sfld_view.ctrlFrame):
 
 
     def initial_checks(self):
-        if self.m_FilePicker_tree.GetTextCtrlValue()<>'':
+        if self.m_FilePicker_tree.GetTextCtrlValue()!='':
             self.set_file(filepath=self.m_FilePicker_tree.GetTextCtrlValue())
-        if self.m_FilePicker_annotation.GetTextCtrlValue()<>'':
+        if self.m_FilePicker_annotation.GetTextCtrlValue()!='':
             self.annotation_file=self.m_FilePicker_annotation.GetTextCtrlValue()
 
     def set_file( self, event=None, filepath=None):
-        print "file changed"
+        print("file changed")
         fo=''
         self.c.apm.tree_file=self.m_FilePicker_tree.GetPath()
-        # print self.c.tree_file
+        # print(self.c.tree_file)
         try:
             fo, fi = os.path.split(self.c.apm.tree_file)
         except:
@@ -576,12 +580,12 @@ class gui_manager(sfld_view.ctrlFrame):
     #         if i.m_checkBox1.IsChecked()==True:
     #             checked=(i.value, i.clr)
     #
-    #     print checked
+    #     print(checked)
 
     def import_tree( self, event=None ):
         mytree=self.m_FilePicker_tree.GetPath()
         if mytree[-3:].lower()=='.rp':
-            print "importing from picked file %s" % mytree
+            print("importing from picked file %s" % mytree)
             import pickle
             fi = open(mytree,'r')
             self.c.buffered_window.radial_phylogram=pickle.load(fi)
@@ -599,7 +603,7 @@ class gui_manager(sfld_view.ctrlFrame):
         self.c.get_relevent_data_from_model()
         self.populate_annotation_fields()
         # else:
-        #     print "Tree not loaded, so no action taken."
+        #     print("Tree not loaded, so no action taken.")
 
 
     def trigger_redraw(self,event=None):
@@ -615,7 +619,7 @@ class gui_manager(sfld_view.ctrlFrame):
     def adjust_rotation( self, event=None ):
         rot=self.m_textCtrl101.GetValue()
         fRot=int(rot)
-        print "adjusting rotation to %s degrees" % fRot
+        print("adjusting rotation to %s degrees" % fRot)
         self.c.set_tree_rotation(fRot)
         self.m_panel9.set_global_bitmap()
         self.m_panel9.Refresh()
@@ -651,7 +655,7 @@ class gui_manager(sfld_view.ctrlFrame):
         self.c.buffered_window.UpdateDrawing()
 
     def on_draw_internal_labels_click( self, event =None):
-        print 'drawing internal node labels'
+        print('drawing internal node labels')
         # self.c.buffered_window.DrawInternalNodeLabels()
         self.c.buffered_window.toggle_internal_node_labels()
 
@@ -680,7 +684,7 @@ class gui_manager(sfld_view.ctrlFrame):
         self.m_statusBar1.SetStatusText(msg)
 
     def propogate_values( self, event=None ):
-        # print "propogating values"
+        # print("propogating values")
         # self.c.apm.tree_file=self.m_FilePicker_tree.GetPath()
         # self.c.apm.annotation_file=self.m_FilePicker_annotation.GetPath()
         pass
@@ -688,17 +692,17 @@ class gui_manager(sfld_view.ctrlFrame):
     def add_circles( self, event ):
         circs=self.m_spinCtrl2.GetValue()
         nd=self.parent.img_panel.aln.node_added_order[circs]
-        print "Child Nodes:"
-        if nd['cvs']<>None:
+        print("Child Nodes:")
+        if nd['cvs']!=None:
             for i in nd['cvs']:
-                print " - %s, %s" % i
-        print "This Node:"
-        print " - %s, %s" % nd['vert']
+                print(" - %s, %s" % i)
+        print("This Node:")
+        print(" - %s, %s" % nd['vert'])
         self.parent.img_panel.UpdateDrawing()
 
 
     def on_zoompanel_holder_paint(self,event):
-        # print "zoompaint"
+        # print("zoompaint")
         self.m_panel9.Refresh()
 
     def redraw_tree(self,event=None):
@@ -728,11 +732,11 @@ class gui_manager(sfld_view.ctrlFrame):
 
     def pivot_clock(self,event=None):
         if self.c.buffered_window.active_edge is not None:
-            print "pivoting clockwise"
+            print("pivoting clockwise")
             t = float(self.m_textCtrl3311.GetValue())
-            print "t: %s" % t
+            print("t: %s" % t)
             t += 5.0/360.0*2.0*math.pi
-            print "new t: %s" % t
+            print("new t: %s" % t)
             self.m_textCtrl3311.SetValue(str(t))
 
     def pivot_ctrclock(self,event=None):
@@ -751,9 +755,9 @@ class gui_manager(sfld_view.ctrlFrame):
 
     # def print_native_string( self, event=None ):
     #     f=self.m_fontPicker1.GetSelectedFont()
-    #     # print f.GetNativeFontInfoDesc()
-    #     # print ""
-    #     # print f.GetNativeFontInfoUserDesc()
+    #     # print(f.GetNativeFontInfoDesc())
+    #     # print("")
+    #     # print(f.GetNativeFontInfoUserDesc())
 
 class alignment_gui_manager(gui_manager):
     def __init__(self,parent):
@@ -766,7 +770,7 @@ class alignment_gui_manager(gui_manager):
         :return:
         '''
         v = self.m_startCol.GetValue()
-        print "starting column changed to %s" % v
+        print("starting column changed to %s" % v)
         self.parent.img_panel.ChangeStartingColumn(v)
 
 
@@ -820,13 +824,13 @@ class image_manager(abstract_image_manager):
         self.control_panel.propogate_values()
 
     def right_dclick(self, event):
-        print event.GetPosition()
+        print(event.GetPosition())
 
     def bind_methods(self):
         self.img_panel.Bind(wx.EVT_RIGHT_DCLICK, self.right_dclick)
 
     def control_panel_tool_click(self,event=None):
-        # print self.control_panel.IsActive()
+        # print(self.control_panel.IsActive())
         if self.control_panel.IsIconized()==True:
             self.control_panel.Iconize(False)
         self.control_panel.Raise()

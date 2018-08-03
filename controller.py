@@ -1,8 +1,8 @@
 __author__ = 'Michael'
 import tree_manipulator as trman
 import json, colorsys
-import ConfigParser
 from usersettingsclasses import PhylostratorUserSettings
+from functools import reduce
 import os
 
 class Singleton(type):
@@ -17,9 +17,8 @@ class Singleton(type):
             cls.instance = obj
         return cls.instance
 
-
-class Options(PhylostratorUserSettings):
-    __metaclass__ = Singleton
+class Options(PhylostratorUserSettings,metaclass=Singleton):
+    # __metaclass__ = Singleton
     def __init__(self):
         PhylostratorUserSettings.__init__(self)
         self.def_settings_path = os.path.join('resources','default_settings.cfg')
@@ -35,8 +34,8 @@ class Options(PhylostratorUserSettings):
         # self.jitter_radius = self.cfg.getint('cairo','jitter_radius')
         # self.temp_subtree_path = self.cfg.get('main','temp_subtree_path')
 
-class Controller():
-    __metaclass__ = Singleton
+class Controller(metaclass=Singleton):
+    # __metaclass__ = Singleton
     def __init__(self):
         self.apm=trman.AnnotatedPhylogramModel()
         self.current_uniques=[]
@@ -66,16 +65,17 @@ class Controller():
 
     def set_cairo_draw_count_label(self,ct):
         self.image_frame.control_panel.m_stCairoDrawCount.SetLabel('Draw Count: %s' % ct)
+        # pass
 
     def set_tree_rotation(self,rotation):
         self.buffered_window.set_rotation(rotation)
 
     def get_relevent_data_from_model(self):
-        print "getting relevant data from model"
+        print("getting relevant data from model")
         self.max_data_dims=self.buffered_window.radial_phylogram.get_max_dims()
-        print "getting leaf coordinate data copy"
+        print("getting leaf coordinate data copy")
         self.leaf_coords=self.buffered_window.radial_phylogram.leaf_node_coords
-        print "getting the node_annotation fields"
+        print("getting the node_annotation fields")
         # self.annotation_fields=self.annotation.annotation_fields
         self.annotation_fields = self.annotation.headers
 
@@ -84,6 +84,7 @@ class Controller():
 
     def set_ImageFrame_referenece(self,img_frame):
         self.image_frame=img_frame
+        print("IMAGEFRAME REFERENCE SET: %s" % str(self.image_frame))
 
     def set_zoompanel_reference(self,zp):
         self.zoom_panel=zp
@@ -132,7 +133,7 @@ class Controller():
         return cols
 
     def import_tree(self,path):
-        # if path<>None:
+        # if path!=None:
             # self.tree_file=path
             # self.apm.tree_file=path
 
@@ -252,20 +253,20 @@ class SEPPController():
                             self.placements[j] = reduce(lambda x,y: x if x[2] > y[2] else y, i['p'])
                 else:
                     not_in +=0
-                    # print i['nm']
-                    # print i['p'][0][0]
-        print "not ins are: %s" % not_in
-        print "ins are: %s" % ins
+                    # print(i['nm'])
+                    # print(i['p'][0][0])
+        print("not ins are: %s" % not_in)
+        print("ins are: %s" % ins)
 
         self.get_reference_tree_locations()
 
     def get_reference_tree_locations(self):
-        print "making reference tree node point hash table..."
+        print("making reference tree node point hash table...")
         self.ref_tree_point_lookup={}
         for i in self.bw_ref.radial_phylogram.myt.preorder_node_iter():
             if i.parent_node is not None:
                 self.ref_tree_point_lookup[i.label]=(i.edge.length,i.edge.viewer_edge.head_x, i.edge.viewer_edge.tail_x)
-        print "...done making reference tree node point hash table"
+        print("...done making reference tree node point hash table")
 
     def initialize_sepp_annotation(self,safpath=None,keycol=0):
         if safpath is not None:
@@ -277,14 +278,14 @@ class SEPPController():
             ln = i.strip().split('\t')
             self.sepp_ann_dict[ln[keycol]]=tuple(ln)
             # k+=1
-        # print k
-        print len(self.sepp_ann_dict)
+        # print(k)
+        print(len(self.sepp_ann_dict))
 
         saf.close()
 
     def load_filter1(self,header):
         f1_vals=[]
-        print "getting values for header %s" % header
+        print("getting values for header %s" % header)
         self.filter1_field=header
         if self.filter1_field=='(none)':
             self.filter1_options = set([])
@@ -299,7 +300,7 @@ class SEPPController():
 
     def load_filter2(self,header):
         f2_vals=[]
-        print "getting values for header %s" % header
+        print("getting values for header %s" % header)
         self.filter2_field=header
         if self.filter2_field=='(none)':
             self.filter2_options = set([])
@@ -378,8 +379,8 @@ class SEPPController():
                 vals_to_draw.append(i)
 
         self.SeppValuePickerCtrl_ref.three_color_scale.set_values(vals_for_scale)
-        print vals_to_draw[0][ann_col]
-        print self.SeppValuePickerCtrl_ref.three_color_scale.get_color(vals_to_draw[0][ann_col])
+        print(vals_to_draw[0][ann_col])
+        print(self.SeppValuePickerCtrl_ref.three_color_scale.get_color(vals_to_draw[0][ann_col]))
 
         for i in vals_to_draw:
             x0 = self.get_location_ex_pendant(i[0])
@@ -487,12 +488,12 @@ class SEPPController():
 
     def get_location_ex_pendant(self,nm):
         if nm not in self.placements.keys():
-            # print "%s not in tree as shown" % nm
+            # print("%s not in tree as shown" % nm)
             return None
 
         place = self.placements[nm]
-        # print nm
-        # print place
+        # print(nm)
+        # print(place)
         # nd=self.bw_ref.radial_phylogram.myt.find_node_with_label(str(place[0]))
         try:
             edgevals=self.ref_tree_point_lookup[str(place[0])]
@@ -513,12 +514,12 @@ class SEPPController():
 
     def get_location_with_pendant(self,nm):
         if nm not in self.placements.keys():
-            print "%s not in tree as shown" % nm
+            print("%s not in tree as shown" % nm)
             return None
 
         place = self.placements[nm]
-        # print nm
-        # print place
+        # print(nm)
+        # print(place)
         # nd=self.bw_ref.radial_phylogram.myt.find_node_with_label(str(place[0]))
         try:
             edgevals=self.ref_tree_point_lookup[str(place[0])]

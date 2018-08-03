@@ -10,7 +10,7 @@ import numpy as np
 import scipy.spatial as spat
 import sys
 import datetime, time
-import c_utilities
+# import c_utilities
 
 GLOBAL_DEBUG = True
 
@@ -45,7 +45,7 @@ class AnnotatedPhylogramModel():
 
     def initialize_tree(self,tp=None):
 
-        if tp<> None:
+        if tp!= None:
             self.tree_file=tp
         self.rp=Radial_Phylogram(self.tree_file)
         self.rp.get_segments()
@@ -84,7 +84,7 @@ class Radial_Phylogram():
         self.leaf_node_coords={}
         self.selected_color=None
         self.rotation=0
-        if tp is not None and tp<>'':
+        if tp is not None and tp!='':
             self.set_treepath(tp)
         # self.print_right_angles()
 
@@ -217,7 +217,7 @@ class Radial_Phylogram():
         self.get_leaf_node_coords()
         self.get_segments()
         self.myt.m_matrix = None
-        print 'Successfully imported tree. Number of Taxa: %s' % len(self.myt.leaf_nodes())
+        print('Successfully imported tree. Number of Taxa: %s' % len(self.myt.leaf_nodes()))
 
 
     def get_radial_phylogram(self):
@@ -238,7 +238,7 @@ class Radial_Phylogram():
                     child_l+=self.node_labels[j.label]['l']
                 self.node_labels[i.label]['l']=child_l
         pr=self.myt.preorder_node_iter()
-        r=pr.next()
+        r=pr.__next__()
 
         self.node_labels[r.label]['x']=(0.0,0.0)
         r.location = (0.0,0.0)
@@ -254,7 +254,7 @@ class Radial_Phylogram():
         # k=0
         for i in pr:
             # k+=1
-            # print k
+            # print(k)
             # if i.edge_length is None:
             # i.edge_length = 0.001 # debug
             ww=float(len(i.leaf_nodes()))/leafct*2*math.pi
@@ -275,7 +275,7 @@ class Radial_Phylogram():
                 x1=xu[0]+delta*math.cos(thetav)
                 x2=xu[1]+delta*math.sin(thetav)
             except:
-                print 'thetav is %d' % thetav
+                print('thetav is %d' % thetav)
                 x1=xu[0]
                 x2=xu[1]
             i.location = (x1,x2)
@@ -302,13 +302,13 @@ class Radial_Phylogram():
                 eip.append((i.index,i.parent_node.index))
             ct +=1
         self.edges_as_node_pairs = np.asarray(eip,dtype=np.int32)
-        # print self.edges_as_node_pairs.shape
+        # print(self.edges_as_node_pairs.shape)
 
     def make_tree_copy(self,parent, evt):
         # if self.myt_copy is not None:
         #     del self.myt_copy
         # self.myt_copy=copy.deepcopy(self.myt)
-        print 'event set in make_tree_copy'
+        print('event set in make_tree_copy')
         evt.set()
         # wx.CallAfter(parent.UpdateDrawing)
 
@@ -335,7 +335,7 @@ class Radial_Phylogram():
         :param node:
         :return:
         '''
-        if node <> None:
+        if node != None:
             for i in node.preorder_iter():
                 x0 = i.parent_node.location
                 t1 = i.edge_segment_angle
@@ -345,7 +345,7 @@ class Radial_Phylogram():
                 self.pts_nparr[i.index,:]= i.location
         else:
             pr = self.myt.preorder_node_iter()
-            pr.next()
+            pr.__next__()
             for i in pr:
                 x0 = i.parent_node.location
                 t1 = i.edge_segment_angle
@@ -361,7 +361,7 @@ class Radial_Phylogram():
         :return:
         '''
         levelo=self.myt.levelorder_node_iter()
-        rt = levelo.next()
+        rt = levelo.__next__()
 
         ct = 0
         max_ct = 30
@@ -373,17 +373,17 @@ class Radial_Phylogram():
                     j.percent_of_parent_wedge*=1.25
                 self.relocate_subtree_by_wedge_properties(i)
                 ct +=1
-                print "done with %s expansions" % ct
+                print("done with %s expansions" % ct)
                 if ct % 50 == 0:
                     self.make_tree_copy(parent)
-                    # print 'press any key to continue'
+                    # print('press any key to continue')
                     # raw_input()
                     # parent.UpdateDrawing()
             else:
-                print "wedge angle x .9: %s, de-facto spread: %s" % (.9*i.wedge_angle,df_spread)
+                print("wedge angle x .9: %s, de-facto spread: %s" % (.9*i.wedge_angle,df_spread))
             # if ct >=max_ct:
             #     break
-        print "done with spacefill by levelorder"
+        print("done with spacefill by levelorder")
 
     def test_1(self):
         for i in self.myt.preorder_node_iter():
@@ -391,10 +391,10 @@ class Radial_Phylogram():
                 test_nd = i
                 break
 
-        print '---------test 1: label11 -------------------------------'
-        print test_nd.__dict__
+        print('---------test 1: label11 -------------------------------')
+        print(test_nd.__dict__)
         dfs = self.get_de_facto_spread_angle(test_nd)
-        print 'min %.4f -- max %.4f -- spread %.4f' % (dfs[0],dfs[1],dfs[1]-dfs[0])
+        print('min %.4f -- max %.4f -- spread %.4f' % (dfs[0],dfs[1],dfs[1]-dfs[0]))
 
     def test_2(self):
         for i in self.myt.preorder_node_iter():
@@ -407,173 +407,179 @@ class Radial_Phylogram():
         self.relocate_subtree_by_wedge_properties(test_nd)
 
     def test_3(self):
-        # self.set_segments_as_nparr()
-        # print np_find_intersect_segments_test(self.segments_as_nparr)
-        self.numnodes = int(self.pts_nparr.shape[0])
-        self.deflect_angles = np.zeros((self.numnodes,1),dtype=np.float64)
-        self.wedge_sizes = np.zeros((self.numnodes,1),dtype=np.float64)
-        self.right_wedges = np.zeros((self.numnodes,1),dtype=np.float64)
-        self.edge_angles = np.zeros((self.numnodes,1),dtype=np.float64)
-        self.lengths = np.zeros((self.numnodes,1),dtype=np.float64)
-        self.topo = -1*np.ones((self.numnodes,3),dtype=np.int32)
-
-        for i in self.myt.preorder_node_iter():
-            self.edge_angles[i.index]=i.edge_segment_angle
-            self.deflect_angles[i.index]=i.deflect_angle
-            self.wedge_sizes[i.index] = i.wedge_angle
-            self.right_wedges[i.index] = i.right_wedge_border
-            if i.edge_length is not None:
-                self.lengths[i.index]=i.edge_length
-            if i.parent_node is not None:
-                self.topo[i.index,0]=i.parent_node.index
-            if len(i.child_nodes())>0:
-                self.topo[i.index,1]=i.child_nodes()[0].index
-            if len(i.child_nodes())>1:
-                self.topo[i.index,2]=i.child_nodes()[1].index
-            if len(i.child_nodes())>2 and i.parent_node is None:
-                self.topo[i.index,0]=i.child_nodes()[2].index
-        # print self.pts_nparr.__array_interface__['data']
-        # print self.topo.__array_interface__['data']
-        # print self.edge_angles.__array_interface__['data']
-        # print self.deflect_angles.__array_interface__['data']
-        # print self.lengths.__array_interface__['data']
-        # np.savetxt('resources/cutils/pts_nparr.txt',self.pts_nparr,'%f','\t')
-        # c_utilities.dbgWriteSegs(self.pts_nparr, self.topo, self.numnodes)
-
-
-        c_utilities.angleSpread(self.pts_nparr, self.topo, self.numnodes,self.deflect_angles,
-                                self.wedge_sizes, self.edge_angles, self.lengths,self.right_wedges,0)
-        # self.node_center_index = 0
-        # for i in range(50):
-        #     c_utilities.centerCladeRot(self.pts_nparr, self.topo,self.edge_angles,
-        #                                self.deflect_angles, self.lengths, self.numnodes, self.node_center_index)
-        #     self.node_center_index +=1
-            # c_utilities.testCheck()
-            # print self.pts_nparr
-            # if self.node_center_index >= self.numnodes:
-            #     self.node_center_index=0
-
-        for i in self.myt.preorder_node_iter():
-            i.edge_segment_angle=self.edge_angles[i.index]
-            i.deflect_angle = self.deflect_angles[i.index]
-            i.location = (np.asscalar(self.pts_nparr[i.index,0]),np.asscalar(self.pts_nparr[i.index,1]))
-            # time.sleep(.1)
-
-
-        # testing
-        # nn=np.asarray(numnodes,dtype=np.int32)
-        # nn.tofile('resources/cutils/num_nodes.bin')
-        # self.topo.tofile('resources/cutils/topo.bin')
-        # self.pts_nparr.tofile('resources/cutils/pts_nparr.bin')
-        # self.edge_angles.tofile('resources/cutils/edge_angles.bin')
-        # self.deflect_angles.tofile('resources/cutils/deflect_angles.bin')
-        # self.lengths.tofile('resources/cutils/lengths.bin')
-
-        # np.savetxt('resources/cutils/topo.txt',self.topo,'%f','\t')
-
-
         pass
+
+    # def test_3_old(self):
+    #     # self.set_segments_as_nparr()
+    #     # print(np_find_intersect_segments_test(self.segments_as_nparr))
+    #     self.numnodes = int(self.pts_nparr.shape[0])
+    #     self.deflect_angles = np.zeros((self.numnodes,1),dtype=np.float64)
+    #     self.wedge_sizes = np.zeros((self.numnodes,1),dtype=np.float64)
+    #     self.right_wedges = np.zeros((self.numnodes,1),dtype=np.float64)
+    #     self.edge_angles = np.zeros((self.numnodes,1),dtype=np.float64)
+    #     self.lengths = np.zeros((self.numnodes,1),dtype=np.float64)
+    #     self.topo = -1*np.ones((self.numnodes,3),dtype=np.int32)
+    #
+    #     for i in self.myt.preorder_node_iter():
+    #         self.edge_angles[i.index]=i.edge_segment_angle
+    #         self.deflect_angles[i.index]=i.deflect_angle
+    #         self.wedge_sizes[i.index] = i.wedge_angle
+    #         self.right_wedges[i.index] = i.right_wedge_border
+    #         if i.edge_length is not None:
+    #             self.lengths[i.index]=i.edge_length
+    #         if i.parent_node is not None:
+    #             self.topo[i.index,0]=i.parent_node.index
+    #         if len(i.child_nodes())>0:
+    #             self.topo[i.index,1]=i.child_nodes()[0].index
+    #         if len(i.child_nodes())>1:
+    #             self.topo[i.index,2]=i.child_nodes()[1].index
+    #         if len(i.child_nodes())>2 and i.parent_node is None:
+    #             self.topo[i.index,0]=i.child_nodes()[2].index
+    #     # print(self.pts_nparr.__array_interface__['data'])
+    #     # print(self.topo.__array_interface__['data'])
+    #     # print(self.edge_angles.__array_interface__['data'])
+    #     # print(self.deflect_angles.__array_interface__['data'])
+    #     # print(self.lengths.__array_interface__['data'])
+    #     # np.savetxt('resources/cutils/pts_nparr.txt',self.pts_nparr,'%f','\t')
+    #     # c_utilities.dbgWriteSegs(self.pts_nparr, self.topo, self.numnodes)
+    #
+    #
+    #     c_utilities.angleSpread(self.pts_nparr, self.topo, self.numnodes,self.deflect_angles,
+    #                             self.wedge_sizes, self.edge_angles, self.lengths,self.right_wedges,0)
+    #     # self.node_center_index = 0
+    #     # for i in range(50):
+    #     #     c_utilities.centerCladeRot(self.pts_nparr, self.topo,self.edge_angles,
+    #     #                                self.deflect_angles, self.lengths, self.numnodes, self.node_center_index)
+    #     #     self.node_center_index +=1
+    #         # c_utilities.testCheck()
+    #         # print(self.pts_nparr)
+    #         # if self.node_center_index >= self.numnodes:
+    #         #     self.node_center_index=0
+    #
+    #     for i in self.myt.preorder_node_iter():
+    #         i.edge_segment_angle=self.edge_angles[i.index]
+    #         i.deflect_angle = self.deflect_angles[i.index]
+    #         i.location = (np.asscalar(self.pts_nparr[i.index,0]),np.asscalar(self.pts_nparr[i.index,1]))
+    #         # time.sleep(.1)
+    #
+    #
+    #     # testing
+    #     # nn=np.asarray(numnodes,dtype=np.int32)
+    #     # nn.tofile('resources/cutils/num_nodes.bin')
+    #     # self.topo.tofile('resources/cutils/topo.bin')
+    #     # self.pts_nparr.tofile('resources/cutils/pts_nparr.bin')
+    #     # self.edge_angles.tofile('resources/cutils/edge_angles.bin')
+    #     # self.deflect_angles.tofile('resources/cutils/deflect_angles.bin')
+    #     # self.lengths.tofile('resources/cutils/lengths.bin')
+    #
+    #     # np.savetxt('resources/cutils/topo.txt',self.topo,'%f','\t')
+    #
+    #
+    #     pass
 
     def test_4(self, parent=None, myevt = None):
         '''
         delauny triangulation method
         :return:
         '''
-        ndct, node_order, pts, pts_leaves_bln, tri, pts_nparr = self.get_delaunay_trianglization()
+        pass
 
-
-        # declare some matrices for the partials
-
-        ''' M here has a specific definition. A column of M represents a node somewhere on the tree,
-        and the columsn are indexed by the node labels. The rows of M are indexed by branches (equivalently,
-        also nodes). The (i,j)-th entry of M (row i, col j) is 1 iff branch i is on the path from the root
-        to node j.
-        '''
-        # M = np.zeros((ndct, lct), dtype=np.float64)  # for K leaves, M is [(2K-2) X K]
-        # using all delaunay distances, not just leaves:
-        M = np.zeros((ndct, ndct), dtype=np.float64)  # for K leaves, M is [(2K-2) X (2K-2)]
-
-        lens = np.zeros(ndct, dtype=np.float64)
-        thetas = np.zeros(ndct, dtype=np.float64)
-
-        # Make the 'M' matrix:
-        if GLOBAL_DEBUG==True:
-            print 'making the M matrix'
-        do_M = (self.myt.m_matrix is None)
-        pr = self.myt.preorder_node_iter()
-        pr.next() #(excluding the first one)
-        for nd in pr:
-            nd_ind = pts[nd.label]['index']
-            t_i = nd.edge_segment_angle
-            thetas[nd_ind] = t_i
-
-            L_i = nd.edge_length
-            lens[nd_ind] = L_i
-
-            if do_M == True:
-
-                for sub_nd in nd.preorder_iter():
-                    sub_nd_ind = pts[sub_nd.label]['index']
-                    M[nd_ind,sub_nd_ind]=1.
-            else:
-                M = self.myt.m_matrix
-        if do_M==True:
-            # storing the M matrix and the pts object in the tree for later.
-            self.myt.m_matrix=M
-
-        # np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\test-M.txt', M, '%.2f', '\t')
-
-        if GLOBAL_DEBUG == True:
-            print 'getting delaunay leaf segments'
-        seg_inds = self.get_delaunay_leaf_segments( pts_leaves_bln,  tri)
-        leaf_to_edge_segs = self.get_delaunay_leaf_to_edge_segments(tri,pts_nparr)
-
-        # get the gradient vector
-        if GLOBAL_DEBUG == True:
-            print 'getting the gradient vector'
-        gradients = self.get_delaunay_gradients(M, lens, node_order, pts, seg_inds,
-                                                thetas, ndct, pts_nparr, leaf_to_edge_segs)
-        # np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\test-gradients.txt', gradients,
-        #            '%.2f', '\t')
-        if GLOBAL_DEBUG == True:
-            print 'done with delaunay gradients'
-
-        loss = self.get_total_loss(pts_nparr, seg_inds)
-        print 'Starting Loss: %s' % loss
-
-        step = .01
-        # max_angle_change = np.pi / (float(ndct)/2.)
-        max_angle_change = .017*10
-        self.po_ct = 0
-
-        ok_to_continue = True
-        q=None
-
-        # trying the all at once method:
-        eff_grads = np.dot(2*np.identity(ndct,dtype=np.float64)-M.transpose(),gradients)
-        np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\test-effgrads.txt',eff_grads,'%.2f', '\t')
-
-        # ct +=0
-        for i in self.myt.preorder_node_iter():
-            last_edge_angles = self.get_tree_restore_point(ndct)
-            i.edge_segment_angle += min(max(-max_angle_change, step * gradients[i.index]), max_angle_change)
-            self.relocate_subtree_by_edge_segment_angle()
-            self.set_segments_as_nparr()
-            if np_find_intersect_segments(self.segments_as_nparr) == False:
-                print "breaking because we found an intersection"
-                print np_find_intersect_segments_allpy(self.segments_as_nparr)
-                self.set_tree_to_last_restore_point(last_edge_angles)
-                break
-
-
-            # print 'index: %s -- gradient %s -- angle change %s' % (i.index, gradients[i.index],min(max(-max_angle_change, step * gradients[i.index]), max_angle_change))
-            myevt.set()
-            # time.sleep(0.1)
-
-            q=raw_input()
-            if q == 'q':
-                break
-        self.relocate_subtree_by_edge_segment_angle()
+    # def test_4_old(self, parent=None, myevt=None):
+    #     ndct, node_order, pts, pts_leaves_bln, tri, pts_nparr = self.get_delaunay_trianglization()
+    #
+    #
+    #     # declare some matrices for the partials
+    #
+    #     ''' M here has a specific definition. A column of M represents a node somewhere on the tree,
+    #     and the columsn are indexed by the node labels. The rows of M are indexed by branches (equivalently,
+    #     also nodes). The (i,j)-th entry of M (row i, col j) is 1 iff branch i is on the path from the root
+    #     to node j.
+    #     '''
+    #     # M = np.zeros((ndct, lct), dtype=np.float64)  # for K leaves, M is [(2K-2) X K]
+    #     # using all delaunay distances, not just leaves:
+    #     M = np.zeros((ndct, ndct), dtype=np.float64)  # for K leaves, M is [(2K-2) X (2K-2)]
+    #
+    #     lens = np.zeros(ndct, dtype=np.float64)
+    #     thetas = np.zeros(ndct, dtype=np.float64)
+    #
+    #     # Make the 'M' matrix:
+    #     if GLOBAL_DEBUG==True:
+    #         print('making the M matrix')
+    #     do_M = (self.myt.m_matrix is None)
+    #     pr = self.myt.preorder_node_iter()
+    #     pr.__next__() #(excluding the first one)
+    #     for nd in pr:
+    #         nd_ind = pts[nd.label]['index']
+    #         t_i = nd.edge_segment_angle
+    #         thetas[nd_ind] = t_i
+    #
+    #         L_i = nd.edge_length
+    #         lens[nd_ind] = L_i
+    #
+    #         if do_M == True:
+    #
+    #             for sub_nd in nd.preorder_iter():
+    #                 sub_nd_ind = pts[sub_nd.label]['index']
+    #                 M[nd_ind,sub_nd_ind]=1.
+    #         else:
+    #             M = self.myt.m_matrix
+    #     if do_M==True:
+    #         # storing the M matrix and the pts object in the tree for later.
+    #         self.myt.m_matrix=M
+    #
+    #     # np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\test-M.txt', M, '%.2f', '\t')
+    #
+    #     if GLOBAL_DEBUG == True:
+    #         print('getting delaunay leaf segments')
+    #     seg_inds = self.get_delaunay_leaf_segments( pts_leaves_bln,  tri)
+    #     leaf_to_edge_segs = self.get_delaunay_leaf_to_edge_segments(tri,pts_nparr)
+    #
+    #     # get the gradient vector
+    #     if GLOBAL_DEBUG == True:
+    #         print('getting the gradient vector')
+    #     gradients = self.get_delaunay_gradients(M, lens, node_order, pts, seg_inds,
+    #                                             thetas, ndct, pts_nparr, leaf_to_edge_segs)
+    #     # np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\test-gradients.txt', gradients,
+    #     #            '%.2f', '\t')
+    #     if GLOBAL_DEBUG == True:
+    #         print('done with delaunay gradients')
+    #
+    #     loss = self.get_total_loss(pts_nparr, seg_inds)
+    #     print('Starting Loss: %s' % loss)
+    #
+    #     step = .01
+    #     # max_angle_change = np.pi / (float(ndct)/2.)
+    #     max_angle_change = .017*10
+    #     self.po_ct = 0
+    #
+    #     ok_to_continue = True
+    #     q=None
+    #
+    #     # trying the all at once method:
+    #     eff_grads = np.dot(2*np.identity(ndct,dtype=np.float64)-M.transpose(),gradients)
+    #     np.savetxt('C:\\Users\\miken\\Dropbox\\Grad School\\Phylogenetics\\work\\phylostrator-testing\\test-effgrads.txt',eff_grads,'%.2f', '\t')
+    #
+    #     # ct +=0
+    #     for i in self.myt.preorder_node_iter():
+    #         last_edge_angles = self.get_tree_restore_point(ndct)
+    #         i.edge_segment_angle += min(max(-max_angle_change, step * gradients[i.index]), max_angle_change)
+    #         self.relocate_subtree_by_edge_segment_angle()
+    #         self.set_segments_as_nparr()
+    #         if np_find_intersect_segments(self.segments_as_nparr) == False:
+    #             print("breaking because we found an intersection")
+    #             print(np_find_intersect_segments_allpy(self.segments_as_nparr))
+    #             self.set_tree_to_last_restore_point(last_edge_angles)
+    #             break
+    #
+    #
+    #         # print('index: %s -- gradient %s -- angle change %s' % (i.index, gradients[i.index],min(max(-max_angle_change, step * gradients[i.index]), max_angle_change)))
+    #         myevt.set()
+    #         # time.sleep(0.1)
+    #
+    #         q=raw_input()
+    #         if q == 'q':
+    #             break
+    #     self.relocate_subtree_by_edge_segment_angle()
         # self.make_tree_copy(parent,myevt)
 
         # while (self.po_ct < 30):
@@ -595,30 +601,30 @@ class Radial_Phylogram():
         #
         #             # check for intersections
         #             pr = self.myt.preorder_node_iter()
-        #             pr.next()
+        #             pr.__next__()
         #             for i in pr:
         #                 all_segs[i.index, 0:2] = i.location
         #                 all_segs[i.index, 2:4] = i.parent_node.location
         #             check_intersect = np_find_intersect_segments(all_segs)
         #             ok_to_continue = check_intersect[0]
         #             if ok_to_continue == True:
-        #                 print 'No intersections found, continuing for another round'
+        #                 print('No intersections found, continuing for another round')
         #                 last_edge_angles = self.get_tree_restore_point(ndct)
         #             else:
         #                 # parent.draw_red_line_pair(check_intersect[1],check_intersect[2])
         #                 # parent.UpdateDrawing()
         #                 self.set_tree_to_last_restore_point(last_edge_angles)
-        #                 print 'Intersection found, resetting to last restore point'
-        #                 print check_intersect
+        #                 print('Intersection found, resetting to last restore point')
+        #                 print(check_intersect)
         #             toc = datetime.datetime.now()
-        #             print 'Finished with all steps after %s nodes in %s seconds.' % (ct, toc-tic)
+        #             print('Finished with all steps after %s nodes in %s seconds.' % (ct, toc-tic))
         #         if ct % 25 == 0:
-        #             print 'ct = %s' % ct
+        #             print('ct = %s' % ct)
         #             gradients, loss = self.refresh_and_redraw(M, lens, ndct, node_order, parent,
         #                                                       pts, pts_nparr, seg_inds, thetas,
         #                                                       new_delaunay=True, pts_leaves_bln=pts_leaves_bln)
         #     self.po_ct += 1
-        #     print 'Done with one full postorder edit. Total loss = %s' % self.get_total_loss(pts_nparr, seg_inds)
+        #     print('Done with one full postorder edit. Total loss = %s' % self.get_total_loss(pts_nparr, seg_inds))
 
 
 
@@ -638,7 +644,7 @@ class Radial_Phylogram():
         # levels.sort(reverse=True)
         # for level in levels:
         #     if GLOBAL_DEBUG == True:
-        #         print 'starting level %s' % level
+        #         print('starting level %s' % level)
         #     angle_changes = []
         #     for i in levelorder_hash[level]:
         #         # ind = pts[i.label]['index']
@@ -646,24 +652,24 @@ class Radial_Phylogram():
         #         angle_changes.append(step * gradients[i.index])
         #     if len(angle_changes)>30:
         #         angle_changes = angle_changes[0:30]
-        #     print 'angle changes: %s' % map(lambda x: '%.3f' % x, angle_changes)
+        #     print('angle changes: %s' % map(lambda x: '%.3f' % x, angle_changes))
         #
         #     gradients, loss = self.refresh_and_redraw(M, gradients, lens, loss, ndct, node_order, parent, pts,
         #                                               pts_nparr, seg_inds, thetas)
         #     if GLOBAL_DEBUG==True:
-        #     #     # print 'done with callback, setting status.'
-        #         print 'Level %s\tLoss: %s\n' % (level, loss)
+        #     #     # print('done with callback, setting status.')
+        #         print('Level %s\tLoss: %s\n' % (level, loss))
         #
-        #         # print 'status should say: Done with level %s, press a key to continue (q to exit thread)' % level
+        #         # print('status should say: Done with level %s, press a key to continue (q to exit thread)' % level)
         #     # parent.parent.set_status('Done with level %s, press a key to continue' % level)
         #     cmd=raw_input()
         #     if cmd=='q':
-        #         print 'exiting space fill function'
+        #         print('exiting space fill function')
         #         return
-        loss = self.get_total_loss(pts_nparr, seg_inds)
-        print 'Loss after full iteration: %s' % loss
-        parent.parent.set_status('Ready')
-        print 'exiting space fill function'
+        # loss = self.get_total_loss(pts_nparr, seg_inds)
+        # print('Loss after full iteration: %s' % loss)
+        # parent.parent.set_status('Ready')
+        # print('exiting space fill function')
 
     def set_segments_as_nparr(self):
         edge_ct = self.edges_as_node_pairs.shape[0]
@@ -674,7 +680,7 @@ class Radial_Phylogram():
     def fix_missing_edge_lengths(self):
         lens = []
         pr = self.myt.preorder_node_iter()
-        pr.next()
+        pr.__next__()
         for i in pr:
             if i.edge.length is not None:
                 i.edge.orig_edge_length = i.edge.length
@@ -683,8 +689,8 @@ class Radial_Phylogram():
                 i.edge.orig_edge_length = None
         mean_len = np.mean(np.asarray(lens,dtype=np.float64))
         pr = self.myt.preorder_node_iter()
-        pr.next()
-        pr.next()
+        pr.__next__()
+        pr.__next__()
         for i in pr:
             if i.edge.length is None or i.edge.length==0:
                 i.edge.length = mean_len
@@ -692,28 +698,28 @@ class Radial_Phylogram():
         # leaflens=[]
         # for i in self.myt.leaf_node_iter():
         #     leaflens.append(i.edge_length)
-        # print leaflens
+        # print(leaflens)
 
 
 
     def get_tree_restore_point(self, ndct):
         last_edge_angles = np.zeros(ndct,dtype=np.float64)
         pr = self.myt.preorder_node_iter()
-        pr.next()
+        pr.__next__()
         for i in pr:
             last_edge_angles[i.index]=i.edge_segment_angle
         return last_edge_angles
 
     def set_tree_to_last_restore_point(self,last_edge_angles):
         pr = self.myt.preorder_node_iter()
-        pr.next()
+        pr.__next__()
         for i in pr:
             i.edge_segment_angle = last_edge_angles[i.index]
         self.relocate_subtree_by_edge_segment_angle()
 
     def refresh_and_redraw(self, M,  lens, ndct, node_order, parent, pts, pts_nparr, seg_inds, thetas, full_redraw=False, new_delaunay=False, pts_leaves_bln=None):
         self.relocate_subtree_by_edge_segment_angle()
-        # print full_redraw
+        # print(full_redraw)
         # if full_redraw:
         #     self.make_tree_copy(parent)
         self.update_pts_np_array(pts_nparr)
@@ -731,12 +737,12 @@ class Radial_Phylogram():
     def update_pts_np_array(self,pts_nparr):
         tic = datetime.datetime.now()
         pr = self.myt.preorder_node_iter()
-        pr.next()
+        pr.__next__()
         for i in pr:
             pts_nparr[i.index,:]=i.location
             self.pts_nparr[i.index,:]=i.location
         toc = datetime.datetime.now()
-        # print 'Points numpy array updated. Time: %s' % (toc - tic)
+        # print('Points numpy array updated. Time: %s' % (toc - tic))
 
     def get_levelorder_hash(self):
         '''
@@ -744,7 +750,7 @@ class Radial_Phylogram():
         objects at that level. Excludes the root of the tree.
         '''
         lo = self.myt.levelorder_node_iter()
-        a=lo.next()
+        a=lo.__next__()
         l_hash={}
         for i in lo:
             l = i.level()
@@ -785,7 +791,7 @@ class Radial_Phylogram():
             #     opp_node=self.node_refs[seg_inds[i,0]]
             #     debug_file.write('Node\t' + opp_node.label + '\t' + str(-dLdx_pre[0, i]) + '\t' + str(-dLdx_pre[1, i]) + '\t' + str(sq_norms[i]) + '\n')
         # if GLOBAL_DEBUG == True:
-        #     print 'running through second O(n) loop in gradients function...'
+        #     print('running through second O(n) loop in gradients function...')
         for i in range(nsegs):
             dLdy[seg_inds[i, 0]] += dLdx_pre[1,i]
             dLdy[seg_inds[i, 1]] += -dLdx_pre[1,i]
@@ -808,7 +814,7 @@ class Radial_Phylogram():
 
         # finally, the distances to sibling edges:
         pr = self.myt.preorder_node_iter()
-        pr.next()
+        pr.__next__()
         for i in pr:
             sn = i.sibling_nodes()
             if len(sn)>0:
@@ -836,22 +842,22 @@ class Radial_Phylogram():
         # debug_file.close()
 
         # if GLOBAL_DEBUG == True:
-        #     print 'calculating dxdt and dydt'
+        #     print('calculating dxdt and dydt')
         # dxdt = np.dot(np.diag(np.multiply(-1 * lens, np.sin(thetas))), M)  # [(2K-2) X (2K-2)] x [(2K-2) X (2K-2)]
         dxdt = (M.transpose()*np.multiply(-1 * lens, np.sin(thetas))).transpose()
         # if GLOBAL_DEBUG == True:
-        #     print 'dxdt done...'
+        #     print('dxdt done...')
         # dydt = np.dot(np.diag(np.multiply(lens, np.cos(thetas))), M)  # [(2K-2) X (2K-2)] x [(2K-2) X (2K-2)]
         dydt = (M.transpose() * np.multiply(lens, np.cos(thetas))).transpose()
         # if GLOBAL_DEBUG == True:
-        #     print 'dydt done...'
-        # print 'Total Log-Norms: %s' % total_loss
+        #     print('dydt done...')
+        # print('Total Log-Norms: %s' % total_loss)
         gradients = np.dot(dLdx, dxdt) + np.dot(dLdy, dydt)
         # if GLOBAL_DEBUG == True:
-        #     print 'done making gradietns, the shape is: %s' % tuple(gradients.shape)
-        # print gradients.shape
+        #     print('done making gradietns, the shape is: %s' % tuple(gradients.shape))
+        # print(gradients.shape)
         toc = datetime.datetime.now()
-        # print 'Total time to calc gradients: %s' % (toc-tic)
+        # print('Total time to calc gradients: %s' % (toc-tic))
         return gradients
 
     def get_delaunay_leaf_segments(self, pts_leaves_bln,  tri):
@@ -949,7 +955,7 @@ class Radial_Phylogram():
         :return:
         '''
         preo = node.preorder_iter()
-        nd = preo.next()
+        nd = preo.__next__()
         temp_nu={}
         temp_nu[nd.id]=nd.right_wedge_border
         for i in preo:
@@ -1040,7 +1046,7 @@ class Radial_Phylogram():
         return view_segments
 
     def prepare_tree(self):
-        # print self.myt.internal_edges()[1].length
+        # print(self.myt.internal_edges()[1].length)
         rooted = False
         for i in self.myt.preorder_edge_iter():
             if i.length==None:
@@ -1073,7 +1079,7 @@ class Radial_Phylogram():
             # self.node_labels[i.label]={'x':None, 'l':None, 'w':None, 't':None, 'nu':None, 'theta':0, 'old_label':oldlab, 'taxon_label':taxname}
             if i.taxon == None:
                 if i.label == None or i.label in alllabs:
-                    # print i.__dict__
+                    # print(i.__dict__)
                     i.label='label' + str(lab)
                     lab+=1
                     if i.is_leaf()==True:
@@ -1091,14 +1097,14 @@ class Radial_Phylogram():
 
     # def get_selected(self,tx):
     #     #TODO: Make sure this is deprecated
-    #     # print 'getting x coords for selected taxa'
+    #     # print('getting x coords for selected taxa')
     #     settx=set(tx)
     #     self.selected=[]
     #     # ct = 0
     #     for i in self.myt.leaf_node_iter():
     #         # ct +=1
     #         # if ct % 1000==0:
-    #         #     print str(i.taxon.label) + ' - ' + type(i.taxon.label)
+    #         #     print(str(i.taxon.label) + ' - ' + type(i.taxon.label))
     #         if str(i.taxon.label) in settx:
     #             self.selected.append(self.node_labels[i.label]['x'])
     #     return self.selected
@@ -1123,7 +1129,7 @@ class Radial_Phylogram():
     #     DEPRECATED
     #     :return: big list of veiwer nodes
     #     '''
-    #     print 'get_vew_nodes() called, tree_manipulator.py, line 483'
+    #     print('get_vew_nodes() called, tree_manipulator.py, line 483')
     #     view_nodes={}
     #     for i in self.myt.preorder_node_iter():
     #         vn=ViewerNode(x=self.node_labels[i.label]['x'],node_ref=i,theta=self.node_labels[i.label]['theta'])
@@ -1142,7 +1148,7 @@ class Radial_Phylogram():
 
 
         pr = nd.preorder_iter()
-        a=pr.next()
+        a=pr.__next__()
         self.node_labels[a.label]['w']=width_radians
         self.node_labels[a.label]['t']=right_edge_radians
         self.node_labels[a.label]['nu']=right_edge_radians
@@ -1155,7 +1161,7 @@ class Radial_Phylogram():
 
         for i in pr:
             # k+=1
-            # print k
+            # print(k)
             ww=float(len(i.leaf_nodes()))/ref_ct*width_radians
             self.node_labels[i.label]['w']=ww   # wedge angle
             self.node_labels[i.label]['t']=self.node_labels[i.parent_node.label]['nu'] # angle of right wedge border
@@ -1223,7 +1229,7 @@ class AnnotationData():
 
     def load_filter2(self, header):
         f2_vals = []
-        print "getting values for header %s" % header
+        print("getting values for header %s" % header)
         self.filter2_field = header
         if self.filter2_field == '(none)':
             self.filter2_options = set([])
@@ -1251,14 +1257,14 @@ class AnnotationData():
             self.filter1_values = set(selections)
 
     def get_active_unique_annotation_values(self):
-        # print self.selected_annotation_field
+        # print(self.selected_annotation_field)
         if self.selected_annotation_field is None or self.selected_annotation_field == '':
             return None
         if self.active_unique_annotation_values is not None:
             del self.active_unique_annotation_values
         uav = []
         ann_col = self.headers.index(self.selected_annotation_field)
-        # print ann_col
+        # print(ann_col)
         if self.filter1_field is not None:
             f1_col = self.headers.index(self.filter1_field)
         if self.filter2_field is not None:
@@ -1277,18 +1283,18 @@ class AnnotationData():
                 # try:
                 ann_col_val = self.data[i][ann_col]
                 # except:
-                #     print "i: %s" % i
-                #     print "ann_col: %s" % ann_col
+                #     print("i: %s" % i)
+                #     print("ann_col: %s" % ann_col)
                 if ann_col_val in setuav:
                     self.grouped[ann_col_val].append(i)
                 else:
-                    # print self.data[i]
-                    # print "%s - %s" % (ann_col_val,str(setuav))
+                    # print(self.data[i])
+                    # print("%s - %s" % (ann_col_val,str(setuav)))
                     setuav.update(set([self.data[i][ann_col]]))
                     self.grouped[ann_col_val]=[i]
 
         self.active_unique_annotation_values = setuav
-        # print setuav
+        # print(setuav)
         return setuav
 
     def get_EFDIDs_grouped_by(self,header_field):
@@ -1316,7 +1322,7 @@ class SfldAnnotationData():
             self.annotation_fields=self.fieldnames[:self.efdid_index] + self.fieldnames[(self.efdid_index+1):]
             self.import_data()
         except:
-            print 'No column called %s in the node_annotation file %s' % (key_field,filepath)
+            print('No column called %s in the node_annotation file %s' % (key_field,filepath))
             self.efdid_index=None
             self.annotation_fields=None
 
@@ -1350,7 +1356,7 @@ class SfldAnnotationData():
         # try:
         assert header_field in self.fieldnames
         # except:
-        #     print "get_EFIDs_grouped_by called with missing header field"
+        #     print("get_EFIDs_grouped_by called with missing header field")
         #     return {}
 
         grouped={}
@@ -1364,5 +1370,5 @@ class SfldAnnotationData():
         for i in grouped:
             grouped[i]=set(grouped[i])
 
-        # print grouped
+        # print(grouped)
         return grouped

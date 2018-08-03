@@ -18,7 +18,7 @@
 
 # Jiaye Yu and Mark Holder, University of Kansas
 
-import ConfigParser
+import configparser
 import os
 # import glob
 
@@ -237,7 +237,7 @@ class UserSettingGroup(object):
     def read_config_parser_fields(self, parsed):
         try:
             items = parsed.items(self.name)
-        except ConfigParser.NoSectionError:
+        except configparser.NoSectionError:
             return
         for p in items:
             k, v = p
@@ -245,7 +245,7 @@ class UserSettingGroup(object):
             if opt is not None:
                 opt.value = v
             else:
-                print 'Unknown option "%s" in section "%s" skipped!' % (k, self.name)
+                print('Unknown option "%s" in section "%s" skipped!' % (k, self.name))
                 # _LOG.warn('Unknown option "%s" in section "%s" skipped!' % (k, self.name))
 
     def all_options(self):
@@ -290,7 +290,7 @@ class UserSettingsContainer(object):
 
     def __init__(self):
         self._categories = []
-        self._config_parser = ConfigParser.RawConfigParser()
+        self._config_parser = configparser.RawConfigParser()
 
     def read_config_filepath(self, filepath):
         self._config_parser.read(filepath)
@@ -363,4 +363,4 @@ class PhylostratorUserSettings(UserSettingsContainer):
         self.spread.add_option('max_angle',FloatUserSetting(name='max_angle', default=0.34, min=0.0, max=None, short_name=None,help='Maximum change to an edge angle in a single iteration.', subcategory=None))
 
 
-        # print self.starting_file_paths.
+        # print(self.starting_file_paths.)

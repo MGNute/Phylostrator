@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Jun 17 2015)
+## Python code generated with wxFormBuilder (version Jul 20 2018)
 ## http://www.wxformbuilder.org/
 ##
-## PLEASE DO "NOT" EDIT THIS FILE!
+## PLEASE DO *NOT* EDIT THIS FILE!
 ###########################################################################
 
 import wx
@@ -21,9 +21,9 @@ class imgFrame ( wx.Frame ):
 	def __init__( self, parent ):
 		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"Phylostrator", pos = wx.DefaultPosition, size = wx.Size( 1500,800 ), style = wx.DEFAULT_FRAME_STYLE|wx.MAXIMIZE|wx.TAB_TRAVERSAL )
 		
-		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 		
-		self.m_statusBar2 = self.CreateStatusBar( 3, wx.ST_SIZEGRIP, wx.ID_ANY )
+		self.m_statusBar2 = self.CreateStatusBar( 3, wx.STB_SIZEGRIP, wx.ID_ANY )
 		self.m_toolBar1 = self.CreateToolBar( wx.TB_HORIZONTAL, wx.ID_ANY ) 
 		self.icnControlPanel = self.m_toolBar1.AddLabelTool( wx.ID_ANY, u"tool", wx.Bitmap( u"resources/icnControls30.png", wx.BITMAP_TYPE_ANY ), wx.NullBitmap, wx.ITEM_NORMAL, u"Control Panel", u"Show/Hide the Control Panel", None ) 
 		
@@ -59,9 +59,9 @@ class imgFrame ( wx.Frame ):
 class ctrlFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"SFLD Tree Viewer - Controls", pos = wx.Point( 1,1 ), size = wx.Size( 886,750 ), style = wx.DEFAULT_FRAME_STYLE|wx.RAISED_BORDER|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"SFLD Tree Viewer - Controls", pos = wx.Point( 1,1 ), size = wx.Size( 886,750 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL|wx.BORDER_RAISED )
 		
-		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 		
 		bSizer2 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -79,13 +79,14 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.lblFile2 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Config File", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_LEFT )
 		self.lblFile2.Wrap( -1 )
-		self.lblFile2.SetFont( wx.Font( 9, 74, 90, 92, False, "Arial" ) )
+		
+		self.lblFile2.SetFont( wx.Font( 9, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial" ) )
 		self.lblFile2.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		
 		bSizer41.Add( self.lblFile2, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
-		bSizer41.AddSpacer( ( 43, 0), 0, wx.EXPAND, 5 )
+		bSizer41.Add( ( 43, 0), 0, wx.EXPAND, 5 )
 		
 		self.m_FilePicker_config = wx.FilePickerCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.Size( 500,-1 ), wx.FLP_DEFAULT_STYLE )
 		self.m_FilePicker_config.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
@@ -110,12 +111,13 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText5 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Working Folder:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText5.Wrap( -1 )
-		self.m_staticText5.SetFont( wx.Font( 9, 74, 90, 92, False, "Arial" ) )
+		
+		self.m_staticText5.SetFont( wx.Font( 9, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial" ) )
 		self.m_staticText5.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
 		
 		bSizer6.Add( self.m_staticText5, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.txt_workingFolder = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_CHARWRAP|wx.TE_READONLY|wx.NO_BORDER )
+		self.txt_workingFolder = wx.TextCtrl( self.m_panel2, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_CHARWRAP|wx.TE_READONLY|wx.BORDER_NONE )
 		self.txt_workingFolder.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
 		self.txt_workingFolder.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_INACTIVECAPTION ) )
 		
@@ -134,7 +136,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText6 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Saving Images:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText6.Wrap( -1 )
-		self.m_staticText6.SetFont( wx.Font( 11, 72, 90, 92, False, "Cambria" ) )
+		
+		self.m_staticText6.SetFont( wx.Font( 11, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Cambria" ) )
 		self.m_staticText6.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
 		
 		bSizer3.Add( self.m_staticText6, 0, wx.ALL, 5 )
@@ -145,12 +148,13 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText9 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Image Name", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText9.Wrap( -1 )
+		
 		self.m_staticText9.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		
 		bSizer13.Add( self.m_staticText9, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_textImageSaveTarget = wx.TextCtrl( self.m_panel2, wx.ID_ANY, u"(file name)", wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER )
-		self.m_textImageSaveTarget.SetToolTipString( u"file is saved in the working directory above automatically" )
+		self.m_textImageSaveTarget.SetToolTip( u"file is saved in the working directory above automatically" )
 		self.m_textImageSaveTarget.SetMaxSize( wx.Size( 300,-1 ) )
 		
 		bSizer13.Add( self.m_textImageSaveTarget, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -180,12 +184,6 @@ class ctrlFrame ( wx.Frame ):
 		bSizer562.Add( self.m_button27, 0, wx.ALL, 5 )
 		
 		
-		bSizer562.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
-		
-		self.m_button461 = wx.Button( self.m_panel2, wx.ID_ANY, u"Save PNG, SVG and SEPP Legend", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer562.Add( self.m_button461, 0, wx.ALL, 5 )
-		
-		
 		bSizer53.Add( bSizer562, 1, wx.EXPAND, 5 )
 		
 		
@@ -198,7 +196,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText61 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"Write Image as SVG File:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText61.Wrap( -1 )
-		self.m_staticText61.SetFont( wx.Font( 11, 72, 90, 92, False, "Cambria" ) )
+		
+		self.m_staticText61.SetFont( wx.Font( 11, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Cambria" ) )
 		self.m_staticText61.SetForegroundColour( wx.Colour( 0, 0, 0 ) )
 		
 		bSizer57.Add( self.m_staticText61, 0, wx.ALL, 5 )
@@ -207,12 +206,13 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText91 = wx.StaticText( self.m_panel2, wx.ID_ANY, u"File Name", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText91.Wrap( -1 )
+		
 		self.m_staticText91.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		
 		bSizer131.Add( self.m_staticText91, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_textSvgSaveTarget = wx.TextCtrl( self.m_panel2, wx.ID_ANY, u"(file name)", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_textSvgSaveTarget.SetToolTipString( u"file is saved in the working directory above automatically" )
+		self.m_textSvgSaveTarget.SetToolTip( u"file is saved in the working directory above automatically" )
 		self.m_textSvgSaveTarget.SetMaxSize( wx.Size( 300,-1 ) )
 		
 		bSizer131.Add( self.m_textSvgSaveTarget, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -233,7 +233,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel2.SetSizer( bSizer3 )
 		self.m_panel2.Layout()
 		bSizer3.Fit( self.m_panel2 )
-		self.m_notebook1.AddPage( self.m_panel2, u"Files", True )
+		self.m_notebook1.AddPage( self.m_panel2, u"Files", False )
 		self.m_panel11 = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		self.m_panel11.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
 		self.m_panel11.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
@@ -244,7 +244,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.lblFile = wx.StaticText( self.m_panel11, wx.ID_ANY, u"Tree File", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_LEFT )
 		self.lblFile.Wrap( -1 )
-		self.lblFile.SetFont( wx.Font( 9, 74, 90, 92, False, "Arial" ) )
+		
+		self.lblFile.SetFont( wx.Font( 9, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial" ) )
 		self.lblFile.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		
 		bSizer4.Add( self.lblFile, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -252,13 +253,13 @@ class ctrlFrame ( wx.Frame ):
 		self.m_FilePicker_tree = wx.FilePickerCtrl( self.m_panel11, wx.ID_ANY, wx.EmptyString, u"Select a file", u"*.*", wx.DefaultPosition, wx.Size( 500,-1 ), wx.FLP_DEFAULT_STYLE )
 		self.m_FilePicker_tree.SetBackgroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_3DLIGHT ) )
 		
-		bSizer4.Add( self.m_FilePicker_tree, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		bSizer4.Add( self.m_FilePicker_tree, 0, wx.ALL, 5 )
 		
 		self.btn_import_tree = wx.Button( self.m_panel11, wx.ID_ANY, u"Import", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer4.Add( self.btn_import_tree, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		bSizer4.Add( self.btn_import_tree, 0, wx.ALL, 5 )
 		
 		self.m_button372 = wx.Button( self.m_panel11, wx.ID_ANY, u"Export (Nwk)", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer4.Add( self.m_button372, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		bSizer4.Add( self.m_button372, 0, wx.ALL, 5 )
 		
 		
 		bSizer61.Add( bSizer4, 0, wx.EXPAND, 5 )
@@ -310,7 +311,7 @@ class ctrlFrame ( wx.Frame ):
 		self.m_panel11.SetSizer( bSizer61 )
 		self.m_panel11.Layout()
 		bSizer61.Fit( self.m_panel11 )
-		self.m_notebook1.AddPage( self.m_panel11, u"Tree", False )
+		self.m_notebook1.AddPage( self.m_panel11, u"Tree", True )
 		self.viewer_panel = wx.Panel( self.m_notebook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.FULL_REPAINT_ON_RESIZE|wx.TAB_TRAVERSAL )
 		bSizer27 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -322,7 +323,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText22 = wx.StaticText( self.m_panel81, wx.ID_ANY, u"Zoom", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText22.Wrap( -1 )
-		self.m_staticText22.SetFont( wx.Font( 10, 74, 90, 92, False, "Arial" ) )
+		
+		self.m_staticText22.SetFont( wx.Font( 10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial" ) )
 		self.m_staticText22.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_CAPTIONTEXT ) )
 		
 		bSizer28.Add( self.m_staticText22, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -337,17 +339,18 @@ class ctrlFrame ( wx.Frame ):
 		bSizer28.Add( self.m_textCtrl10, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
-		bSizer28.AddSpacer( ( 10, 0), 0, wx.ALIGN_CENTER_VERTICAL, 5 )
+		bSizer28.Add( ( 10, 0), 0, wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_staticline10 = wx.StaticLine( self.m_panel81, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL|wx.LI_VERTICAL )
 		bSizer28.Add( self.m_staticline10, 0, wx.EXPAND |wx.ALL, 5 )
 		
 		
-		bSizer28.AddSpacer( ( 10, 0), 0, 0, 5 )
+		bSizer28.Add( ( 10, 0), 0, 0, 5 )
 		
 		self.m_staticText221 = wx.StaticText( self.m_panel81, wx.ID_ANY, u"Rotation", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText221.Wrap( -1 )
-		self.m_staticText221.SetFont( wx.Font( 10, 74, 90, 92, False, "Arial" ) )
+		
+		self.m_staticText221.SetFont( wx.Font( 10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial" ) )
 		self.m_staticText221.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_CAPTIONTEXT ) )
 		
 		bSizer28.Add( self.m_staticText221, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -363,15 +366,13 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText26 = wx.StaticText( self.m_panel81, wx.ID_ANY, u"(deg)", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText26.Wrap( -1 )
+		
 		self.m_staticText26.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_CAPTIONTEXT ) )
 		
 		bSizer28.Add( self.m_staticText26, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_button10 = wx.Button( self.m_panel81, wx.ID_ANY, u"Redraw", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer28.Add( self.m_button10, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_wxPanelBackgroundColor = wx.ColourPickerCtrl( self.m_panel81, wx.ID_ANY, wx.Colour( 255, 255, 255 ), wx.DefaultPosition, wx.Size( 80,-1 ), wx.CLRP_DEFAULT_STYLE )
-		bSizer28.Add( self.m_wxPanelBackgroundColor, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
 		self.m_panel81.SetSizer( bSizer28 )
@@ -393,7 +394,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText7 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Annotation Properties", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText7.Wrap( -1 )
-		self.m_staticText7.SetFont( wx.Font( 14, 71, 93, 90, True, "Bauhaus 93" ) )
+		
+		self.m_staticText7.SetFont( wx.Font( 14, wx.FONTFAMILY_DECORATIVE, wx.FONTSTYLE_ITALIC, wx.FONTWEIGHT_NORMAL, True, "Bauhaus 93" ) )
 		
 		bSizer11.Add( self.m_staticText7, 0, wx.ALL|wx.EXPAND, 5 )
 		
@@ -401,7 +403,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.lblFile1 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Taxon Metadata File", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_LEFT )
 		self.lblFile1.Wrap( -1 )
-		self.lblFile1.SetFont( wx.Font( 9, 74, 90, 92, False, "Arial" ) )
+		
+		self.lblFile1.SetFont( wx.Font( 9, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial" ) )
 		self.lblFile1.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		
 		bSizer5.Add( self.lblFile1, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -424,6 +427,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText71 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Field to Annotate", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText71.Wrap( -1 )
+		
 		bSizer121.Add( self.m_staticText71, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		m_ComboSelectedFieldChoices = []
@@ -439,6 +443,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText411 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Filters:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText411.Wrap( -1 )
+		
 		gbSizer11.Add( self.m_staticText411, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		m_comboBox51Choices = []
@@ -469,6 +474,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText711 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Circle Size (px)", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText711.Wrap( -1 )
+		
 		bSizer1211.Add( self.m_staticText711, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_textCtrl24 = wx.TextCtrl( self.m_panel4, wx.ID_ANY, u"2", wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER )
@@ -490,6 +496,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText34 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"W: ", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText34.Wrap( -1 )
+		
 		bSizer42.Add( self.m_staticText34, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 0 )
 		
 		self.m_textCtrl12 = wx.TextCtrl( self.m_panel4, wx.ID_ANY, u"1", wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER|wx.TE_RIGHT )
@@ -497,6 +504,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText341 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"H: ", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText341.Wrap( -1 )
+		
 		bSizer42.Add( self.m_staticText341, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 0 )
 		
 		self.m_textCtrl13 = wx.TextCtrl( self.m_panel4, wx.ID_ANY, u"1", wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER|wx.TE_RIGHT )
@@ -513,9 +521,10 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticTextLegendFont = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Legend Font:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticTextLegendFont.Wrap( -1 )
+		
 		bSizer561.Add( self.m_staticTextLegendFont, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_fontPickerLegend = wx.FontPickerCtrl( self.m_panel4, wx.ID_ANY, wx.Font( 14, 70, 90, 90, False, "Cambria" ), wx.DefaultPosition, wx.DefaultSize, wx.FNTP_DEFAULT_STYLE )
+		self.m_fontPickerLegend = wx.FontPickerCtrl( self.m_panel4, wx.ID_ANY, wx.Font( 14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Cambria" ), wx.DefaultPosition, wx.DefaultSize, wx.FNTP_DEFAULT_STYLE )
 		self.m_fontPickerLegend.SetMaxPointSize( 100 ) 
 		bSizer561.Add( self.m_fontPickerLegend, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
@@ -532,6 +541,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText50 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Legend Block Size:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText50.Wrap( -1 )
+		
 		bSizer63.Add( self.m_staticText50, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_textLegendBlock = wx.TextCtrl( self.m_panel4, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER )
@@ -539,6 +549,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText51 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Legend Spacing", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText51.Wrap( -1 )
+		
 		bSizer63.Add( self.m_staticText51, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_textLegendSpacing = wx.TextCtrl( self.m_panel4, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER )
@@ -560,7 +571,7 @@ class ctrlFrame ( wx.Frame ):
 		bSizer11.Add( bSizer60, 0, wx.EXPAND, 5 )
 		
 		
-		bSizer11.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
+		bSizer11.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
 		
 		bSizer10.Add( bSizer11, 1, wx.EXPAND, 5 )
@@ -571,7 +582,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText8 = wx.StaticText( self.m_panel4, wx.ID_ANY, u"Values", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText8.Wrap( -1 )
-		self.m_staticText8.SetFont( wx.Font( 11, 72, 90, 92, False, "Cambria" ) )
+		
+		self.m_staticText8.SetFont( wx.Font( 11, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Cambria" ) )
 		
 		bSizer17.Add( self.m_staticText8, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
@@ -619,7 +631,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText72 = wx.StaticText( self.m_panel41, wx.ID_ANY, u"SEPP Annotation Properties", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText72.Wrap( -1 )
-		self.m_staticText72.SetFont( wx.Font( 14, 71, 93, 90, True, "Bauhaus 93" ) )
+		
+		self.m_staticText72.SetFont( wx.Font( 14, wx.FONTFAMILY_DECORATIVE, wx.FONTSTYLE_ITALIC, wx.FONTWEIGHT_NORMAL, True, "Bauhaus 93" ) )
 		
 		bSizer111.Add( self.m_staticText72, 0, wx.ALL|wx.EXPAND, 5 )
 		
@@ -630,7 +643,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.lblFile111 = wx.StaticText( self.m_panel41, wx.ID_ANY, u"SEPP Placement JSON", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_LEFT )
 		self.lblFile111.Wrap( -1 )
-		self.lblFile111.SetFont( wx.Font( 9, 74, 90, 92, False, "Arial" ) )
+		
+		self.lblFile111.SetFont( wx.Font( 9, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial" ) )
 		self.lblFile111.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		
 		bSizer511.Add( self.lblFile111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -648,7 +662,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.lblFile11 = wx.StaticText( self.m_panel41, wx.ID_ANY, u"SEPP Placement Metadata File", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_LEFT )
 		self.lblFile11.Wrap( -1 )
-		self.lblFile11.SetFont( wx.Font( 9, 74, 90, 92, False, "Arial" ) )
+		
+		self.lblFile11.SetFont( wx.Font( 9, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial" ) )
 		self.lblFile11.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
 		
 		bSizer51.Add( self.lblFile11, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -671,6 +686,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText712 = wx.StaticText( self.m_panel41, wx.ID_ANY, u"Field to Annotate", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText712.Wrap( -1 )
+		
 		bSizer1212.Add( self.m_staticText712, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		m_ComboSelectedField1Choices = []
@@ -700,6 +716,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText41 = wx.StaticText( self.m_panel41, wx.ID_ANY, u"Filters:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText41.Wrap( -1 )
+		
 		gbSizer1.Add( self.m_staticText41, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )
 		
 		m_comboBox5Choices = []
@@ -730,9 +747,10 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText7111 = wx.StaticText( self.m_panel41, wx.ID_ANY, u"Circle Props: Size (px)", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText7111.Wrap( -1 )
+		
 		bSizer12111.Add( self.m_staticText7111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textCtrl25 = wx.TextCtrl( self.m_panel41, wx.ID_ANY, u"25", wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER )
+		self.m_textCtrl25 = wx.TextCtrl( self.m_panel41, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,-1 ), wx.TE_PROCESS_ENTER )
 		bSizer12111.Add( self.m_textCtrl25, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_button41 = wx.Button( self.m_panel41, wx.ID_ANY, u"Trigger Redraw", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -747,43 +765,21 @@ class ctrlFrame ( wx.Frame ):
 		self.m_staticline511 = wx.StaticLine( self.m_panel41, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		bSizer111.Add( self.m_staticline511, 0, wx.EXPAND |wx.ALL, 5 )
 		
-		bSizer66 = wx.BoxSizer( wx.HORIZONTAL )
-		
-		bSizer67 = wx.BoxSizer( wx.VERTICAL )
-		
 		self.m_checkBox3 = wx.CheckBox( self.m_panel41, wx.ID_ANY, u"Draw with Pendant Branch", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer67.Add( self.m_checkBox3, 0, wx.ALL, 5 )
+		bSizer111.Add( self.m_checkBox3, 0, wx.ALL, 5 )
 		
 		self.m_checkBox6 = wx.CheckBox( self.m_panel41, wx.ID_ANY, u"Jitter Attachment Point", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_checkBox6.SetValue(True) 
-		bSizer67.Add( self.m_checkBox6, 0, wx.ALL, 5 )
+		bSizer111.Add( self.m_checkBox6, 0, wx.ALL, 5 )
 		
 		self.m_checkSeppShowAll = wx.CheckBox( self.m_panel41, wx.ID_ANY, u"Show All Placement Locations (alt: show top 1)", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_checkSeppShowAll.SetValue(True) 
-		bSizer67.Add( self.m_checkSeppShowAll, 0, wx.ALL, 5 )
-		
-		
-		bSizer66.Add( bSizer67, 0, 0, 0 )
-		
-		bSizer68 = wx.BoxSizer( wx.VERTICAL )
-		
-		self.m_button441 = wx.Button( self.m_panel41, wx.ID_ANY, u"6-color", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer68.Add( self.m_button441, 0, wx.ALL, 5 )
-		
-		self.m_saveSeppLegend = wx.Button( self.m_panel41, wx.ID_ANY, u"Save Legend", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer68.Add( self.m_saveSeppLegend, 0, wx.ALL, 5 )
-		
-		
-		bSizer66.Add( bSizer68, 1, wx.EXPAND, 5 )
-		
-		
-		bSizer111.Add( bSizer66, 0, wx.ALIGN_CENTER_HORIZONTAL, 0 )
+		bSizer111.Add( self.m_checkSeppShowAll, 0, wx.ALL, 5 )
 		
 		self.m_staticline71 = wx.StaticLine( self.m_panel41, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		bSizer111.Add( self.m_staticline71, 0, wx.EXPAND |wx.ALL, 5 )
 		
 		
-		bSizer111.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
+		bSizer111.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
 		
 		bSizer101.Add( bSizer111, 1, wx.EXPAND, 5 )
@@ -794,7 +790,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText81 = wx.StaticText( self.m_panel41, wx.ID_ANY, u"Values", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText81.Wrap( -1 )
-		self.m_staticText81.SetFont( wx.Font( 11, 72, 90, 92, False, "Cambria" ) )
+		
+		self.m_staticText81.SetFont( wx.Font( 11, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Cambria" ) )
 		
 		bSizer171.Add( self.m_staticText81, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
@@ -920,9 +917,10 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText74 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Tree Line Width", wx.DefaultPosition, wx.Size( 120,-1 ), 0 )
 		self.m_staticText74.Wrap( -1 )
+		
 		bSizer91.Add( self.m_staticText74, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textTreeLineWidth = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u".004", wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER )
+		self.m_textTreeLineWidth = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u".0012", wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER )
 		bSizer91.Add( self.m_textTreeLineWidth, 0, wx.ALL, 5 )
 		
 		
@@ -930,22 +928,13 @@ class ctrlFrame ( wx.Frame ):
 		
 		bSizer911 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		self.m_staticText741 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Tree Line Color", wx.DefaultPosition, wx.Size( 80,-1 ), 0 )
+		self.m_staticText741 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Tree Line Color", wx.DefaultPosition, wx.Size( 120,-1 ), 0 )
 		self.m_staticText741.Wrap( -1 )
+		
 		bSizer911.Add( self.m_staticText741, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_treeLineColor = wx.ColourPickerCtrl( self.m_panel82, wx.ID_ANY, wx.Colour( 128, 128, 128 ), wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
+		self.m_treeLineColor = wx.ColourPickerCtrl( self.m_panel82, wx.ID_ANY, wx.BLACK, wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
 		bSizer911.Add( self.m_treeLineColor, 0, wx.ALL, 5 )
-		
-		self.m_staticline22 = wx.StaticLine( self.m_panel82, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_VERTICAL )
-		bSizer911.Add( self.m_staticline22, 0, wx.EXPAND |wx.ALL, 5 )
-		
-		self.m_staticText47 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Img Background", wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.m_staticText47.Wrap( -1 )
-		bSizer911.Add( self.m_staticText47, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
-		
-		self.m_cairoBackgroundColor = wx.ColourPickerCtrl( self.m_panel82, wx.ID_ANY, wx.Colour( 240, 240, 240 ), wx.DefaultPosition, wx.DefaultSize, wx.CLRP_DEFAULT_STYLE )
-		bSizer911.Add( self.m_cairoBackgroundColor, 0, wx.ALL, 5 )
 		
 		
 		bSizer89.Add( bSizer911, 0, 0, 5 )
@@ -957,23 +946,25 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText7812 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"PNG Width", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText7812.Wrap( -1 )
+		
 		self.m_staticText7812.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
 		
 		bSizer9711.Add( self.m_staticText7812, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textPngWidth = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"1500", wx.DefaultPosition, wx.Size( 75,-1 ), wx.TE_PROCESS_ENTER )
+		self.m_textPngWidth = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"1050", wx.DefaultPosition, wx.Size( 75,-1 ), wx.TE_PROCESS_ENTER )
 		bSizer9711.Add( self.m_textPngWidth, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
-		bSizer9711.AddSpacer( ( 20, 0), 1, wx.EXPAND, 5 )
+		bSizer9711.Add( ( 20, 0), 1, wx.EXPAND, 5 )
 		
 		self.m_staticText78111 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Height", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText78111.Wrap( -1 )
+		
 		self.m_staticText78111.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
 		
 		bSizer9711.Add( self.m_staticText78111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textPngHeight = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"900", wx.DefaultPosition, wx.Size( 75,-1 ), wx.TE_PROCESS_ENTER )
+		self.m_textPngHeight = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"725", wx.DefaultPosition, wx.Size( 75,-1 ), wx.TE_PROCESS_ENTER )
 		bSizer9711.Add( self.m_textPngHeight, 0, wx.ALL, 5 )
 		
 		
@@ -983,6 +974,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_textCircleAlphas = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Circle Alphas", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_textCircleAlphas.Wrap( -1 )
+		
 		self.m_textCircleAlphas.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
 		
 		bSizer97111.Add( self.m_textCircleAlphas, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -991,10 +983,11 @@ class ctrlFrame ( wx.Frame ):
 		bSizer97111.Add( self.m_textCircleAlphas, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
-		bSizer97111.AddSpacer( ( 20, 0), 1, wx.EXPAND, 5 )
+		bSizer97111.Add( ( 20, 0), 1, wx.EXPAND, 5 )
 		
 		self.m_staticText781111 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"SEPP alphas", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText781111.Wrap( -1 )
+		
 		self.m_staticText781111.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
 		
 		bSizer97111.Add( self.m_staticText781111, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -1012,6 +1005,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_stCairoDrawCount = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Draw Count: ", wx.DefaultPosition, wx.Size( 100,-1 ), 0 )
 		self.m_stCairoDrawCount.Wrap( -1 )
+		
 		bSizer55.Add( self.m_stCairoDrawCount, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_button33 = wx.Button( self.m_panel82, wx.ID_ANY, u"Reload Tree Module", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -1034,7 +1028,8 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText77 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Tree Manipulator", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText77.Wrap( -1 )
-		self.m_staticText77.SetFont( wx.Font( 12, 74, 90, 92, False, "Arial" ) )
+		
+		self.m_staticText77.SetFont( wx.Font( 12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial" ) )
 		self.m_staticText77.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
 		
 		bSizer96.Add( self.m_staticText77, 0, wx.ALL, 5 )
@@ -1043,11 +1038,12 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText78 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Active Edge:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText78.Wrap( -1 )
+		
 		self.m_staticText78.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
 		
 		bSizer97.Add( self.m_staticText78, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
-		self.m_textCtrl33 = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"None", wx.DefaultPosition, wx.Size( 200,-1 ), wx.TE_READONLY|wx.NO_BORDER )
+		self.m_textCtrl33 = wx.TextCtrl( self.m_panel82, wx.ID_ANY, u"None", wx.DefaultPosition, wx.Size( 200,-1 ), wx.TE_READONLY|wx.BORDER_NONE )
 		bSizer97.Add( self.m_textCtrl33, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.m_button36 = wx.Button( self.m_panel82, wx.ID_ANY, u"Reroot Above", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -1060,6 +1056,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText781 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Wedge Angle (w)", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText781.Wrap( -1 )
+		
 		self.m_staticText781.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
 		
 		bSizer971.Add( self.m_staticText781, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -1068,10 +1065,11 @@ class ctrlFrame ( wx.Frame ):
 		bSizer971.Add( self.m_textCtrl331, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
-		bSizer971.AddSpacer( ( 20, 0), 1, wx.EXPAND, 5 )
+		bSizer971.Add( ( 20, 0), 1, wx.EXPAND, 5 )
 		
 		self.m_staticText7811 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Right Border (t):", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText7811.Wrap( -1 )
+		
 		self.m_staticText7811.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
 		
 		bSizer971.Add( self.m_staticText7811, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -1086,6 +1084,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText79 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Pivot Branch:", wx.DefaultPosition, wx.Size( 100,-1 ), 0 )
 		self.m_staticText79.Wrap( -1 )
+		
 		self.m_staticText79.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
 		
 		bSizer98.Add( self.m_staticText79, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -1103,6 +1102,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText791 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"Expand Branch:", wx.DefaultPosition, wx.Size( 100,-1 ), 0 )
 		self.m_staticText791.Wrap( -1 )
+		
 		self.m_staticText791.SetForegroundColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_BTNTEXT ) )
 		
 		bSizer981.Add( self.m_staticText791, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -1136,10 +1136,11 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText43 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"File Name", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText43.Wrap( -1 )
+		
 		bSizer56.Add( self.m_staticText43, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
-		bSizer56.AddSpacer( ( 25, 0), 0, 0, 5 )
+		bSizer56.Add( ( 25, 0), 0, 0, 5 )
 		
 		self.m_textCtrl17 = wx.TextCtrl( self.m_panel82, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer56.Add( self.m_textCtrl17, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
@@ -1163,14 +1164,17 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.m_staticText40 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText40.Wrap( -1 )
+		
 		bSizer99.Add( self.m_staticText40, 0, wx.ALL, 5 )
 		
 		self.m_staticText412 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText412.Wrap( -1 )
+		
 		bSizer99.Add( self.m_staticText412, 0, wx.ALL, 5 )
 		
 		self.m_staticText42 = wx.StaticText( self.m_panel82, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText42.Wrap( -1 )
+		
 		bSizer99.Add( self.m_staticText42, 0, wx.ALL, 5 )
 		
 		
@@ -1196,7 +1200,7 @@ class ctrlFrame ( wx.Frame ):
 		
 		self.SetSizer( bSizer2 )
 		self.Layout()
-		self.m_statusBar1 = self.CreateStatusBar( 1, wx.ST_SIZEGRIP, wx.ID_ANY )
+		self.m_statusBar1 = self.CreateStatusBar( 1, wx.STB_SIZEGRIP, wx.ID_ANY )
 		
 		self.Centre( wx.BOTH )
 		
@@ -1207,11 +1211,10 @@ class ctrlFrame ( wx.Frame ):
 		self.btn_import_tree1.Bind( wx.EVT_BUTTON, self.import_tree )
 		self.m_checkBox51.Bind( wx.EVT_CHECKBOX, self.on_toggle_config )
 		self.m_dirPicker3.Bind( wx.EVT_DIRPICKER_CHANGED, self.set_working_folder )
-		self.m_textImageSaveTarget.Bind( wx.EVT_TEXT, self.set_cairo_image_path )
+		self.m_textImageSaveTarget.Bind( wx.EVT_TEXT_ENTER, self.set_cairo_image_path )
 		self.m_button1.Bind( wx.EVT_BUTTON, self.save_cairo_image )
 		self.m_button44.Bind( wx.EVT_BUTTON, self.save_as_svg_from_png_filename )
 		self.m_button27.Bind( wx.EVT_BUTTON, self.on_draw_cairo_click )
-		self.m_button461.Bind( wx.EVT_BUTTON, self.on_save_sepp_legend_click )
 		self.m_button11.Bind( wx.EVT_BUTTON, self.save_as_svg_click )
 		self.m_FilePicker_tree.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_file )
 		self.btn_import_tree.Bind( wx.EVT_BUTTON, self.import_tree )
@@ -1225,7 +1228,6 @@ class ctrlFrame ( wx.Frame ):
 		self.m_spinBtn21.Bind( wx.EVT_SPIN_UP, self.rotate_counterclockwise )
 		self.m_textCtrl101.Bind( wx.EVT_TEXT_ENTER, self.adjust_rotation )
 		self.m_button10.Bind( wx.EVT_BUTTON, self.adjust_rotation )
-		self.m_wxPanelBackgroundColor.Bind( wx.EVT_COLOURPICKER_CHANGED, self.on_wx_panel_background_changed )
 		self.m_FilePicker_annotation.Bind( wx.EVT_FILEPICKER_CHANGED, self.set_annotation_file )
 		self.btn_import_annotation.Bind( wx.EVT_BUTTON, self.import_annotation )
 		self.m_ComboSelectedField.Bind( wx.EVT_COMBOBOX, self.populate_annotation_values )
@@ -1262,8 +1264,6 @@ class ctrlFrame ( wx.Frame ):
 		self.m_colourPicker2.Bind( wx.EVT_COLOURPICKER_CHANGED, self.sepp_set_uniform_color )
 		self.m_checkBox3.Bind( wx.EVT_CHECKBOX, self.set_pendant_branch_checked )
 		self.m_checkSeppShowAll.Bind( wx.EVT_CHECKBOX, self.sepp_show_all_check )
-		self.m_button441.Bind( wx.EVT_BUTTON, self.on_sepp_six_color )
-		self.m_saveSeppLegend.Bind( wx.EVT_BUTTON, self.on_save_sepp_legend_click )
 		self.m_button71.Bind( wx.EVT_BUTTON, self.sepp_valpicker_clear )
 		self.m_button81.Bind( wx.EVT_BUTTON, self.sepp_valpicker_load )
 		self.m_button42.Bind( wx.EVT_BUTTON, self.sepp_select_all )
@@ -1274,8 +1274,6 @@ class ctrlFrame ( wx.Frame ):
 		self.m_button30.Bind( wx.EVT_BUTTON, self.on_test_3_click )
 		self.m_button31.Bind( wx.EVT_BUTTON, self.on_test_4_click )
 		self.m_textTreeLineWidth.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
-		self.m_treeLineColor.Bind( wx.EVT_COLOURPICKER_CHANGED, self.on_tree_line_color_change )
-		self.m_cairoBackgroundColor.Bind( wx.EVT_COLOURPICKER_CHANGED, self.on_cairo_background_change )
 		self.m_textPngWidth.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
 		self.m_textPngHeight.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
 		self.m_textCircleAlphas.Bind( wx.EVT_TEXT_ENTER, self.populate_options_from_text_fields )
@@ -1327,9 +1325,6 @@ class ctrlFrame ( wx.Frame ):
 	def on_draw_cairo_click( self, event ):
 		event.Skip()
 	
-	def on_save_sepp_legend_click( self, event ):
-		event.Skip()
-	
 	def save_as_svg_click( self, event ):
 		event.Skip()
 	
@@ -1362,9 +1357,6 @@ class ctrlFrame ( wx.Frame ):
 	def adjust_rotation( self, event ):
 		event.Skip()
 	
-	
-	def on_wx_panel_background_changed( self, event ):
-		event.Skip()
 	
 	def set_annotation_file( self, event ):
 		event.Skip()
@@ -1464,10 +1456,6 @@ class ctrlFrame ( wx.Frame ):
 	def sepp_show_all_check( self, event ):
 		event.Skip()
 	
-	def on_sepp_six_color( self, event ):
-		event.Skip()
-	
-	
 	def sepp_valpicker_clear( self, event ):
 		event.Skip()
 	
@@ -1495,12 +1483,6 @@ class ctrlFrame ( wx.Frame ):
 	def on_test_4_click( self, event ):
 		event.Skip()
 	
-	
-	def on_tree_line_color_change( self, event ):
-		event.Skip()
-	
-	def on_cairo_background_change( self, event ):
-		event.Skip()
 	
 	
 	
@@ -1545,12 +1527,13 @@ class AddTxtDialog ( wx.Dialog ):
 	def __init__( self, parent ):
 		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 250,250 ), style = wx.CAPTION|wx.CLOSE_BOX|wx.DEFAULT_DIALOG_STYLE )
 		
-		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+		self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 		
 		bSizer52 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.m_staticText44 = wx.StaticText( self, wx.ID_ANY, u"Text Label:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.m_staticText44.Wrap( -1 )
+		
 		bSizer52.Add( self.m_staticText44, 0, wx.ALL, 5 )
 		
 		self.m_textCtrl13 = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -1559,12 +1542,12 @@ class AddTxtDialog ( wx.Dialog ):
 		self.m_staticline21 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL )
 		bSizer52.Add( self.m_staticline21, 0, wx.EXPAND |wx.ALL, 5 )
 		
-		self.m_fontPicker4 = wx.FontPickerCtrl( self, wx.ID_ANY, wx.Font( 11, 70, 90, 92, False, "Arial" ), wx.DefaultPosition, wx.DefaultSize, wx.FNTP_DEFAULT_STYLE )
+		self.m_fontPicker4 = wx.FontPickerCtrl( self, wx.ID_ANY, wx.Font( 11, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, "Arial" ), wx.DefaultPosition, wx.DefaultSize, wx.FNTP_DEFAULT_STYLE )
 		self.m_fontPicker4.SetMaxPointSize( 100 ) 
 		bSizer52.Add( self.m_fontPicker4, 0, wx.ALL, 5 )
 		
 		
-		bSizer52.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
+		bSizer52.Add( ( 0, 0), 1, wx.EXPAND, 5 )
 		
 		bSizer53 = wx.BoxSizer( wx.HORIZONTAL )
 		

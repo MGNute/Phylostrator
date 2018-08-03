@@ -5,7 +5,7 @@ import wx.lib.scrolledpanel
 import dendropy
 import cairo
 # import copy
-# import controller
+import controller
 # import aux_view_classes as avc
 # from view import *
 # import my_globals
@@ -88,12 +88,13 @@ class ValuePickerControl(wx.BoxSizer):
             self.Add(a,0, wx.EXPAND, 5)
             self.value_pickers.append(a)
 
-        # print [i.value for i in self.value_pickers]
+        # print([i.value for i in self.value_pickers])
         self.add_final_spacer()
 
     def add_final_spacer(self):
         bSizer15 = wx.BoxSizer( wx.VERTICAL )
-        bSizer15.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
+        # bSizer15.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
+        bSizer15.AddSpacer( 1)
         self.Add( bSizer15, 1, wx.EXPAND, 5 )
 
     def move_to_bottom(self,val):
@@ -102,7 +103,7 @@ class ValuePickerControl(wx.BoxSizer):
             args={'parent':self.parent, 'clr':i.clr, 'value':i.value, 'sz':i.size, 'checked':i.m_checkBox1.GetValue(), 'val_ctrl':self}
             val_temps.append(args)
         for v in val_temps:
-            # print v
+            # print(v)
             if v['value']==val:
                 ind=val_temps.index(v)
                 tmp = val_temps.pop(ind)
@@ -215,7 +216,7 @@ class ValuePicker(wx.BoxSizer):
     def move_down_in_list(self,event):
         fld=self.c.apm.node_annotation_level
         ind=self.c.apm.node_annotation.uniques[fld].index(self.value)
-        # print self.c.apm.node_annotation.uniques[fld]
+        # print(self.c.apm.node_annotation.uniques[fld])
         self.c.apm.node_annotation.uniques[fld].pop(ind)
         self.c.apm.node_annotation.uniques[fld].append(self.value)
         # self.c.trigger_annotation_picker_refresh()
@@ -234,7 +235,7 @@ class ValuePicker(wx.BoxSizer):
         self.c.trigger_refresh()
 
     def process_size_change(self,event=None):
-        print "processing size change"
+        print("processing size change")
         self.size=int(self.m_spinCtrl.GetValue())
         self.c.update_circles_by_annotation()
         self.c.trigger_refresh()
@@ -272,9 +273,9 @@ class ThreeColorScale():
 
         if self.typ0=='Percentile':
             a = np.asscalar(np.percentile(self.values,self.val0))
-            # print "percentile: %s" % a
+            # print("percentile: %s" % a)
         else:
-            # print self.typ0
+            # print(self.typ0)
             a = self.val0
 
         if self.typ1=='Percentile':
@@ -292,19 +293,19 @@ class ThreeColorScale():
         self.value_pt0 = li[0]
         self.value_pt1 = li[1]
         self.value_pt2 = li[2]
-        print (self.value_pt0, self.value_pt1, self.value_pt2)
+        print((self.value_pt0, self.value_pt1, self.value_pt2))
 
 
     def get_color(self,val):
         val = float(val)
         if val < self.value_pt0:
-            # print "val %s -- A" % val
+            # print("val %s -- A" % val)
             return self.col0
         elif val > self.value_pt2:
-            # print "val %s -- B" % val
+            # print("val %s -- B" % val)
             return self.col2
         elif val < self.value_pt1:
-            # print "val %s -- C" % val
+            # print("val %s -- C" % val)
             # h0 = colorsys.rgb_to_hsv(*self.col0)
             # h1 = colorsys.rgb_to_hsv(*self.col1)
             h0 = self.col0
@@ -314,7 +315,7 @@ class ThreeColorScale():
             # return colorsys.hsv_to_rgb(*hsvnew)
             return hsvnew
         else:
-            # print "val %s -- D" % val
+            # print("val %s -- D" % val)
             # h0 = colorsys.rgb_to_hsv(*self.col1)
             # h1 = colorsys.rgb_to_hsv(*self.col2)
             h0 = self.col1
@@ -404,15 +405,15 @@ class SEPPValuePickerControl(ValuePickerControl):
                     if firstchecked==-1:
                         firstchecked=i
                 else:
-                    if firstchecked<>-1:
+                    if firstchecked!=-1:
                         next_to_check=i
                         break
             if firstchecked==-1:
                 next_to_check=0
             self.unselect_all()
-            # print 'nvals = %s' % nvals
+            # print('nvals = %s' % nvals)
             for i in range(9):
-                # print 'i + nexttocheck = %s' % (i + next_to_check)
+                # print('i + nexttocheck = %s' % (i + next_to_check))
                 if i+next_to_check<nvals:
                     self.value_pickers[i+next_to_check].m_checkBox1.SetValue(True)
                     v = self.value_pickers[i+next_to_check].value
@@ -516,7 +517,7 @@ class SEPPValuePicker(wx.BoxSizer):
         self.c.trigger_refresh()
 
     def process_size_change(self,event=None):
-        print "processing size change"
+        print("processing size change")
         self.size=int(self.m_spinCtrl.GetValue())
         self.c.update_circles_by_annotation()
         self.c.trigger_refresh()
@@ -574,11 +575,11 @@ class BufferedWindow(wx.Panel):
         pass
 
     def OnRightDclick(self, event):
-        print event.GetPosition()
+        print(event.GetPosition())
 
     def OnPaint(self, event):
         self.paint_count += 1
-        # print "OnPaint called: ", self.paint_count
+        # print("OnPaint called: ", self.paint_count)
         # All that is needed here is to draw the buffer to screen
 
         if USE_BUFFERED_DC:
@@ -593,7 +594,7 @@ class BufferedWindow(wx.Panel):
     def OnSize(self,event):
         # The Buffer init is done here, to make sure the buffer is always
         # the same size as the Window
-        Size  = self.GetClientSizeTuple()
+        Size  = self.GetClientSize()
 
 
         # Make new offscreen bitmap: this bitmap will always have the
@@ -653,13 +654,14 @@ class PhylogenyBufferedWindow(BufferedWindow):
         self.MakeDrawData()
         BufferedWindow.__init__(self,parent, *args, **kwargs)
         self.set_corner_boundaries()
+        self.c.set_zoompanel_reference(self.parent.control_panel.m_panel9)
         self.c.zoom_panel.phylogeny_viewer_loaded()
         self.Bind(wx.EVT_LEFT_DOWN, self.on_click)
         self.Bind(wx.EVT_LEFT_DCLICK, self.on_double_click)
         self.Bind(wx.EVT_RIGHT_DOWN, self.on_right_click)
 
     def on_click( self, event ):
-        # print "mouse_clicked"
+        # print("mouse_clicked")
         # self.parent.m_statusBar2.SetStatusText("Panel Space -- x: %s, y: %s" % event.GetPositionTuple(),1)
         self.parent.m_statusBar2.SetStatusText("Tree Space -- x: %s, y: %s" % self.transform_coordinate(event.GetPositionTuple(),True), 1)
 
@@ -674,10 +676,10 @@ class PhylogenyBufferedWindow(BufferedWindow):
                 # ln = distance_to_line_segment(i.head_node.viewer_node.ts_x, i.tail_node.viewer_node.ts_x, tscoord)
                 if ln < minlen:
                     ct +=1
-                    # print "ln
+                    # print("ln)
                     minlen = ln
                     eref = (i,ln)
-        # print "checked %s edges" % ct
+        # print("checked %s edges" % ct)
 
         # pos1 = "(%.2f, %.2f)" % eref[0].head_node.viewer_node.ts_x
         # pos2 = "(%.2f, %.2f)" % eref[0].tail_node.viewer_node.ts_x
@@ -701,9 +703,9 @@ class PhylogenyBufferedWindow(BufferedWindow):
 
     def on_double_click(self,event):
         tscoord = self.transform_coordinate(event.GetPositionTuple(), True)
-        # print event.GetPositionTuple()
-        # print tscoord
-        # print self.transform_coordinate(tscoord,False)
+        # print(event.GetPositionTuple())
+        # print(tscoord)
+        # print(self.transform_coordinate(tscoord,False))
         minlen = 99999999.0
         eref = None
         ct = 0
@@ -714,13 +716,13 @@ class PhylogenyBufferedWindow(BufferedWindow):
                 # ln = distance_to_line_segment(i.head_node.viewer_node.ts_x, i.tail_node.viewer_node.ts_x, tscoord)
                 if ln < minlen:
                     ct +=1
-                    # print "ln
+                    # print("ln)
                     minlen = ln
                     eref = (i,ln)
         newtree = eref[0].head_node.extract_subtree()
         newtree_tree = dendropy.Tree(seed_node = newtree)
         newtree_tree.write(path=opts.starting_file_paths.temp_subtree_path,schema = "newick")
-        print "wrote the tree from node %s and below to the subtree path" % eref[0].tail_node.label
+        print("wrote the tree from node %s and below to the subtree path" % eref[0].tail_node.label)
 
     def on_clear_extra(self,event=None):
         self.active_edge = None
@@ -757,11 +759,11 @@ class PhylogenyBufferedWindow(BufferedWindow):
             self.MakeDrawData(False)
             self.UpdateDrawing()
         else:
-            print "active edge not set! Tree not adjusted."
+            print("active edge not set! Tree not adjusted.")
 
 
     def on_right_click( self, event ):
-        # print "mouse_clicked"
+        # print("mouse_clicked")
         menu = MyContextMenu(self, event.GetPosition())
         self.PopupMenu(menu, event.GetPosition())
         menu.Destroy()
@@ -784,7 +786,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
 
     def set_initial_corners(self):
         max_dims=self.radial_phylogram.get_max_dims()
-        print "max dims: %s, %s, %s, %s" % max_dims
+        print("max dims: %s, %s, %s, %s" % max_dims)
         self.top_left=(max_dims[0],max_dims[3])
         self.bottom_right=(max_dims[1],max_dims[2])
 
@@ -819,7 +821,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
 
 
     def UpdateMiscInfoOnDraw(self):
-        print 'UpdateMiscInfoOnDraw() called, view_classes.py line 645'
+        print('UpdateMiscInfoOnDraw() called, view_classes.py line 645')
         self.c.image_frame.control_panel.m_textHeight.SetValue(str(self._Buffer.Height))
         self.c.image_frame.control_panel.m_textWidth.SetValue(str(self._Buffer.Width))
 
@@ -833,11 +835,11 @@ class PhylogenyBufferedWindow(BufferedWindow):
             # x2 = convert_coordinates(xyrange, (self.w, self.h), (i[2], i[3]))
             # self.line_list.append((x1[0],x1[1],x2[0],x2[1]))
             seg=self.get_segment_for_rendering((i[0],i[1]),(i[2],i[3]))
-            if seg <> None:
+            if seg != None:
                 self.line_list.append(seg)
 
         dc.DrawLineList(self.line_list)
-        if self.c.circle_sets_by_color<>None:
+        if self.c.circle_sets_by_color!=None:
             self.DrawCircles(dc)
 
         if len(self.ExtraDrawCircles)>0:
@@ -849,7 +851,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
         if len(self.ExtraDrawSegments)>0:
             self.DrawExtraSegments(dc)
 
-        if self.LegendDrawData<>None:
+        if self.LegendDrawData!=None:
             self.DrawLegend(dc)
 
         if self.c.zoom_panel.viewer_loaded==True:
@@ -866,8 +868,8 @@ class PhylogenyBufferedWindow(BufferedWindow):
 
     def DrawLegend(self,dc):
         curr_brush = dc.GetBrush()
-        # print self.LegendDrawData['entries']
-        # print self.LegendDrawData['entries'][0][1]
+        # print(self.LegendDrawData['entries'])
+        # print(self.LegendDrawData['entries'][0][1])
         textent = dc.GetTextExtent(self.LegendDrawData['entries'][0][0])
         h = self.LegendDrawData['H']
         w = self.LegendDrawData['W']
@@ -883,14 +885,14 @@ class PhylogenyBufferedWindow(BufferedWindow):
 
     def DrawCircles(self,dc):
 
-        # print "Drawing Circles"
+        # print("Drawing Circles")
         curr_brush = dc.GetBrush()
         for i in self.c.circle_sets_by_color:
             dc.SetBrush(wx.Brush(wx.Colour(i[0],i[1],i[2]),wx.SOLID))
             for j in self.c.circle_sets_by_color[i]:
                 x=self.transform_coordinate(j[0])
 
-                # print x
+                # print(x)
                 dc.DrawCirclePoint(wx.Point(x[0],-x[1]),j[1])
         dc.SetBrush(curr_brush)
 
@@ -901,7 +903,7 @@ class PhylogenyBufferedWindow(BufferedWindow):
             x1 = self.transform_coordinate(i[0])
             x2 = self.transform_coordinate(i[1])
             dc.DrawLine(x1[0],-x1[1],x2[0],-x2[1])
-            # print "drawing red line from (%s, %s) to (%s, %s)" % (x1[0],x1[1],x2[0],x2[1])
+            # print("drawing red line from (%s, %s) to (%s, %s)" % (x1[0],x1[1],x2[0],x2[1]))
         dc.SetPen(curr_pen)
 
     def DrawExtraCircles(self,dc,circle_set=None):
@@ -992,9 +994,9 @@ class PhylogenyBufferedWindow(BufferedWindow):
 
     def set_corner_boundaries(self,initial=True,topleft=None,bottomright=None):
 
-        if topleft<>None:
+        if topleft!=None:
             self.top_left=topleft
-        if bottomright<>None:
+        if bottomright!=None:
             self.bottom_right=bottomright
 
         if initial==True:
@@ -1013,15 +1015,15 @@ class PhylogenyBufferedWindow(BufferedWindow):
     def set_rotation(self,rotation=0.0):
         # self.radial_phylogram.set_rotation(rotation)
         self.rotation=rotation
-        # print "old coordinate transforms: %s, %s, %s; %s, %s, %s" % (self.t11, self.t12, self.t13,self.t21, self.t22, self.t23)
+        # print("old coordinate transforms: %s, %s, %s; %s, %s, %s" % (self.t11, self.t12, self.t13,self.t21, self.t22, self.t23))
         self.set_coordinate_transform()
-        # print "new coordinate transforms: %s, %s, %s; %s, %s, %s" % (self.t11, self.t12, self.t13, self.t21, self.t22, self.t23)
+        # print("new coordinate transforms: %s, %s, %s; %s, %s, %s" % (self.t11, self.t12, self.t13, self.t21, self.t22, self.t23))
         # self.MakeDrawData()
         self.UpdateDrawing()
-        print "done redrawing"
+        print("done redrawing")
 
     def DrawCairoFigure(self,event=None):
-        print "Not using CairoBufferedWindow"
+        print("Not using CairoBufferedWindow")
 
 # class ViewAreaSelectorPanel(BufferedWindow):
 class ValuePickerScrolledPanel(wx.lib.scrolledpanel.ScrolledPanel):
@@ -1104,7 +1106,7 @@ class ViewAreaSelectorPanel(wx.Panel):
         :param box_ymax:
         :return:
         '''
-        # print self.c.bw_aspect_ratio
+        # print(self.c.bw_aspect_ratio)
         if direct==True:
             self.box_xmin=box_xmin
             self.box_xmax=box_xmax
@@ -1137,7 +1139,7 @@ class ViewAreaSelectorPanel(wx.Panel):
                                [self.ymin,self.ymax],
                                [1,1]),dtype=np.float64)
             outcoords=np.dot(self.trans,mycoords)
-            # print self.trans
+            # print(self.trans)
             self.box_xmin=np.asscalar(outcoords[0,0])
             self.box_xmax = np.asscalar(outcoords[0, 1])
             self.box_ymax= np.asscalar(outcoords[1,0])
@@ -1158,17 +1160,17 @@ class ViewAreaSelectorPanel(wx.Panel):
 
     def on_left_mouse_down(self,event):
         ck=event.GetPosition()
-        # print "click at (%s,%s)" % (ck[0],ck[1])
+        # print("click at (%s,%s)" % (ck[0],ck[1]))
         self.sz=self.GetSize()
-        # print "bounding box for click is (%s, %s, %s, %s)" % (self.box_xmin, self.box_xmax, self.box_ymin, self.box_ymax)
+        # print("bounding box for click is (%s, %s, %s, %s)" % (self.box_xmin, self.box_xmax, self.box_ymin, self.box_ymax))
         if ck[0]<=self.box_xmax and ck[0]>=self.box_xmin and ck[1]>=self.box_ymin and ck[1]<=self.box_ymax:
-            # print "click inside the bounding box"
+            # print("click inside the bounding box")
             self.click=ck
             self.temp_xmin=self.box_xmin
             self.temp_xmax=self.box_xmax
             self.temp_ymin=self.box_ymin
             self.temp_ymax=self.box_ymax
-            # print self.click
+            # print(self.click)
         else:
             self.click=None
 
@@ -1178,7 +1180,7 @@ class ViewAreaSelectorPanel(wx.Panel):
             offsetx=self.clickup[0]-self.click[0]
             offsety=self.clickup[1]-self.click[1]
             self.reset_view_square(offset=(offsetx,offsety))
-            # print (offsetx,offsety)
+            # print((offsetx,offsety))
             # self.box_xmin=self.xmin*float(self.sz[0])
             # self.box_xmax=(self.xmin+self.zoom)*float(self.sz[0])
             # self.box_ymin=(self.ymin)*float(self.sz[1])
@@ -1189,7 +1191,7 @@ class ViewAreaSelectorPanel(wx.Panel):
         self.set_zoom_level()
 
     def reset_view_square(self,offset=None,zoom=None):
-        if offset<>None:
+        if offset!=None:
             args={}
             args['box_xmin']=self.temp_xmin+offset[0]
             args['box_xmax']=self.temp_xmax+offset[0]
@@ -1210,7 +1212,7 @@ class ViewAreaSelectorPanel(wx.Panel):
         if newzoom is not None:
             self.vzoom=newzoom
             self.set_box_coords()
-        # print "bounding box after zoom is (%s, %s, %s, %s)" % (self.box_xmin, self.box_xmax, self.box_ymin, self.box_ymax)
+        # print("bounding box after zoom is (%s, %s, %s, %s)" % (self.box_xmin, self.box_xmax, self.box_ymin, self.box_ymax))
         self.c.buffered_window.bottom_right=(self.xmax,self.ymin)
         self.c.buffered_window.top_left=(self.xmin,self.ymax)
         self.c.trigger_refresh()
@@ -1221,9 +1223,9 @@ class ViewAreaSelectorPanel(wx.Panel):
 
 
     def on_mouse_motion(self,event):
-        # print event.LeftIsDown()
+        # print(event.LeftIsDown())
         if event.LeftIsDown()==False or self.click==None:
-            # print "left is down"
+            # print("left is down")
             self.click=None
             self.clickup=None
         else:
@@ -1235,10 +1237,10 @@ class ViewAreaSelectorPanel(wx.Panel):
     def on_zoompanel_paint(self,event):
         temp_image=wx.BitmapFromBuffer(self.current_bitmap.GetWidth(),self.current_bitmap.GetHeight(),self.imgbuffer)
         # self.memdc.Clear()
-        # print "cleared memdc"
+        # print("cleared memdc")
         new_bitmap=wx.EmptyBitmap(*self.sz)
         self.memdc.SelectObject(new_bitmap)
-        # print "memdc selected"
+        # print("memdc selected")
 
         self.memdc.DrawBitmap(temp_image,0,0)
         col=wx.Colour(100,100,100,0.5)
@@ -1273,7 +1275,7 @@ class ViewAreaSelectorPanel(wx.Panel):
         ymin = min(np.asscalar(mins[1]), np.asscalar(mins[4]))
         self.global_bounding_box=[xmin-.00001,xmax+.00001,ymin-.00001,ymax+.00001]
 
-        # print self.global_bounding_box
+        # print(self.global_bounding_box)
         bb_aspect = abs((xmax-xmin)/(ymax-ymin))
         h=float(self.sz[1])
         w=float(self.sz[0])
@@ -1345,11 +1347,11 @@ class MyContextMenu(wx.Menu):
 
     def OnDrawCairo(self, event=None):
         self.phylo_bw.DrawCairoFigure(write_to_path=True)
-        # print "drawing Cairo figure not implemented"
-        # print "Item Two selected in the %s window" % self.WinName
+        # print("drawing Cairo figure not implemented")
+        # print("Item Two selected in the %s window" % self.WinName)
 
     def OnItem3(self, event):
-        print "Item Three selected in the window"
+        print("Item Three selected in the window")
 
 
 '''11/2: drawing this with cairo for right now but this is only temporary.
@@ -1387,7 +1389,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         self.set_coordinate_transform()
 
     def DrawCairoFigure(self, event=None, newtree=None, svgsurf=None):
-        # print 'in the drawCairoFigure function'
+        # print('in the drawCairoFigure function')
         # WIDTH = self.Size[0]
         # HEIGHT = self.Size[1]
         # WIDTH = int(self.parent.control_panel.m_textPngWidth.GetValue())
@@ -1426,13 +1428,13 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         # else:
         #     self.DrawTreeSegmentsCairo(ctx,newtree)
         if self.use_tree_copy==False:
-            # print 'drawing segments from the live tree'
+            # print('drawing segments from the live tree')
             self.DrawTreeSegmentsCairo(ctx,self.radial_phylogram.myt)
         else:
-            # print 'drawing segments from the copy'
+            # print('drawing segments from the copy')
             self.DrawTreeSegmentsCairo(ctx,self.radial_phylogram.myt_copy)
 
-        if self.c.circle_sets_by_color <> None:
+        if self.c.circle_sets_by_color != None:
             self.DrawCirclesCairo(ctx)
 
         if len(self.ExtraDrawCircles) > 0:
@@ -1442,13 +1444,13 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
             self.DrawExtraCirclesCairo(ctx, self.SeppDrawCircles)
 
         if len(self.ExtraDrawSegments) > 0:
-            print 'Extra Draw Segments: %d' % len(self.ExtraDrawSegments)
+            print('Extra Draw Segments: %d' % len(self.ExtraDrawSegments))
             self.DrawExtraSegmentsCairo(ctx)
 
-        if self.LegendDrawData <> None:
+        if self.LegendDrawData != None:
             self.DrawLegendCairo(ctx)
 
-        # print 'write image to path: %s.  Image path: %s' %(self.write_image_to_path, self.image_path)
+        # print('write image to path: %s.  Image path: %s' %(self.write_image_to_path, self.image_path))
         # if self.write_image_to_path==True:
         #     self.surf.write_to_png(self.image_path)
 
@@ -1505,7 +1507,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         # ctx.rectangle(0,0,.5,.5)
         # ctx.fill()
 
-        # print ctx.get_matrix()
+        # print(ctx.get_matrix())
 
         # ma = ctx.get_matrix()
         # ft3 = cairo.Matrix(ma[0], ma[1], ma[2], ma[3], 0, 0)
@@ -1515,7 +1517,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         if self.node_labels_on:
             for i in self.radial_phylogram.myt.preorder_internal_node_iter():
                 if i.label is not None:
-                    # print 'location %s: label %s' % (str(i.location),i.label)
+                    # print('location %s: label %s' % (str(i.location),i.label))
                     ctx.move_to(i.location[0],i.location[1])
                     ctx.show_text(i.label)
                     ctx.fill()
@@ -1523,7 +1525,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         if self.leaf_labels_on:
             for i in self.radial_phylogram.myt.leaf_node_iter():
                 if i.label is not None:
-                    # print 'location %s: label %s' % (str(i.location),i.label)
+                    # print('location %s: label %s' % (str(i.location),i.label))
                     ctx.move_to(i.location[0], i.location[1])
                     ctx.show_text(i.label)
                     ctx.fill()
@@ -1540,7 +1542,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
             sepp_legend_path_svg = self.image_path[:-4] + '_seppLegend.svg'
             sepp_legend_path_png = self.image_path[:-4] + '_seppLegend.png'
         else:
-            print "no image path selected. select that and try again."
+            print("no image path selected. select that and try again.")
             return
 
         ft = self.parent.control_panel.m_fontPickerLegend.GetSelectedFont()
@@ -1609,17 +1611,17 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         ctx.move_to(h,w)
         ma = ctx.get_matrix()
         ft = ctx.get_font_matrix()
-        # print ft
+        # print(ft)
         # ft.scale(.05,.05)
         ma.invert()
         ft2 = ft.multiply(ma)
         ft3 = cairo.Matrix(ft2[0],ft2[1],ft2[2],ft2[3],0,0)
-        # print ft2
-        # print ft3
+        # print(ft2)
+        # print(ft3)
         ctx.set_font_matrix(ft3)
 
         (xbear, ybear, wdt, ht, dx, dy) = ctx.text_extents(self.LegendDrawData['entries'][0][0])
-        # print 'xbear: %s, ybear: %s, wd: %s, ht: %s, dx: %s, dy: %s' % (xbear, ybear, wd, ht, dx, dy)
+        # print('xbear: %s, ybear: %s, wd: %s, ht: %s, dx: %s, dy: %s' % (xbear, ybear, wd, ht, dx, dy))
         gap = ht + ctx.device_to_user_distance(3,3)[0]
 
         for i in self.LegendDrawData['entries']:
@@ -1643,7 +1645,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
 
 
     def DrawCirclesCairo(self, ctx):
-        # print "Drawing Circles"
+        # print("Drawing Circles")
         # curr_brush = dc.GetBrush()
         px_unit = opts.cairo.tree_line_width
         for i in self.c.circle_sets_by_color:
@@ -1655,7 +1657,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
                 ctx.arc(j[0][0],j[0][1],j[1]*px_unit,0,2*math.pi)
                 ctx.fill()
 
-                # print x
+                # print(x)
                 # dc.DrawCirclePoint(wx.Point(x[0], -x[1]), j[1])
         # dc.SetBrush(curr_brush)
 
@@ -1667,7 +1669,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
             ctx.set_source_rgba(i[2][0]/255.,i[2][1]/255.,i[2][2]/255.,self.sepp_alpha)
             ctx.line_to(i[1][0],i[1][1])
             ctx.stroke()
-            # print "drawing red line from (%s, %s) to (%s, %s)" % (x1[0],x1[1],x2[0],x2[1])
+            # print("drawing red line from (%s, %s) to (%s, %s)" % (x1[0],x1[1],x2[0],x2[1]))
 
         pass
 
@@ -1696,7 +1698,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         # self.parent.m_statusBar2.SetStatusText('Event triggered...', 1)
         # self.parent.control_panel.m_textCtrl17.SetValue('rdp_taxonomy_poct_%s_drct_%s' %(self.radial_phylogram.po_ct, self.draw_count))
         # self.image_path = os.path.join(self.parent.control_panel.m_dirPicker4.GetPath(),self.parent.control_panel.m_textCtrl17.GetValue()+'.png')
-        # print '%s, %s' % (self.write_image_to_path,self.image_path)
+        # print('%s, %s' % (self.write_image_to_path,self.image_path))
         # self.parent.control_panel.save_rp_file()
         self.UpdateDrawing()
         self.e.clear()
@@ -1721,14 +1723,14 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
         # self.radial_phylogram.spacefill_spread_tree_by_levelorder(self)
 
 
-        print 'Exiting Fill Space Thread'
+        print('Exiting Fill Space Thread')
         # self.write_image_to_path = False
         # self.use_tree_copy = False
 
     def save_cairo_image(self):
-        if self.image_path[-4:]<>'.png':
+        if self.image_path[-4:]!='.png':
             self.image_path = self.image_path + '.png'
-        print 'Saving to file: %s' % self.image_path
+        print('Saving to file: %s' % self.image_path)
         self.surf.write_to_png(str(self.image_path))
 
     def set_image_path(self,path):
@@ -1764,7 +1766,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
                 self.parent.set_status('')
             # time.sleep(5)
             # if ct % 20 ==0:
-            #     print 'event status %s' % self.e.is_set()
+            #     print('event status %s' % self.e.is_set())
             # ct +=1
 
 
@@ -1775,7 +1777,7 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
 
     def Draw(self,dc):
         self.draw_count +=1
-        print "drawing cairo: %s" % self.draw_count
+        print("drawing cairo: %s" % self.draw_count)
         self.c.set_cairo_draw_count_label(self.draw_count)
         self.pre_draw_perspective_setting()
         self.DrawCairoFigure()
@@ -1786,4 +1788,4 @@ class CairoPhylogenyBufferedWindow(PhylogenyBufferedWindow):
             self._Buffer = wx.EmptyBitmapRGBA(w,h)
             self._Buffer.CopyFromBuffer(self.surf.get_data(),format=wx.BitmapBufferFormat_ARGB32)
             dc.SelectObject(self._Buffer)
-            print 'done drawing'
+            print('done drawing')

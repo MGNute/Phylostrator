@@ -31,7 +31,7 @@ def color_scale_set(total, as_ints=True):
     lower_lim = .40
 
     side = int(float(total) ** .333 + 1)
-    # print 'side length: %s' % side
+    # print('side length: %s' % side)
     gap = 1.0 / float(side)
 
     #get the number of ineligible points (in the dark part of the cube
@@ -42,7 +42,7 @@ def color_scale_set(total, as_ints=True):
         side += 1
         gap = 1.0 / float(side)
         ineliglbe_pts = int((lower_lim - gap * 5 / 6) / gap + 1) ** 3
-    # print 'adjusted # pts: %s' % (side ** 3 - ineliglbe_pts )
+    # print('adjusted # pts: %s' % (side ** 3 - ineliglbe_pts ))
 
     coords = []
     for i in range(side):
@@ -60,8 +60,8 @@ def color_scale_set(total, as_ints=True):
                     locus.append(newc)
 
     sss = side * side * side - ineliglbe_pts
-    # print 'sss: %s' % sss
-    # print 'length of locus (locus): %s' % len(locus)
+    # print('sss: %s' % sss)
+    # print('length of locus (locus): %s' % len(locus))
     perm = get_ideal_permutation(len(locus))
     finals = []
     for i in perm:
@@ -86,7 +86,7 @@ def get_ideal_permutation(els):
     B = random.sample(Bi, len(Bi))
     out = []
     out.append(m1 - 1)
-    if len(B) <> len(A):
+    if len(B) != len(A):
         out.append(B.pop() - 1)
     for i in range(len(A)):
         out.append(A.pop() - 1)
@@ -166,33 +166,33 @@ def get_list_from_file(filepath):
     myf=open(filepath,'r')
     ol=[]
     for i in myf:
-        if i.strip()<>'':
+        if i.strip()!='':
             ol.append(i.strip())
 
     myf.close()
     return ol
 
 def distance_btw_points(pt1,pt2):
-    # print pt1
-    # print pt2
-    # print "%s" % ((pt1[0]-pt2[0])**2 + (pt1[1]-pt2[1])**2)
+    # print(pt1)
+    # print(pt2)
+    # print("%s" % ((pt1[0]-pt2[0])**2 + (pt1[1]-pt2[1])**2))
     return math.sqrt((pt1[0]-pt2[0])**2 + (pt1[1]-pt2[1])**2)
 
 def dot_product(v1, v2):
     return v1[0]*v2[0]+v1[1]*v2[1]
 
-if platform.system()=='Windows':
-    import c_utilities as cutils
-    def np_find_intersect_segments(segs):
-        return cutils.np_find_intersect_segments_c(segs)
-
-    def np_find_intersect_segments_test(segs):
-        return cutils.np_find_intersect_segments_c_test(segs)
-
-else:
-    def np_find_intersect_segments(segs):
-        res = np_find_intersect_segments_allpy(segs)
-        return res[0]
+# if platform.system()=='Windows':
+#     import c_utilities as cutils
+#     def np_find_intersect_segments(segs):
+#         return cutils.np_find_intersect_segments_c(segs)
+#
+#     def np_find_intersect_segments_test(segs):
+#         return cutils.np_find_intersect_segments_c_test(segs)
+#
+# else:
+#     def np_find_intersect_segments(segs):
+#         res = np_find_intersect_segments_allpy(segs)
+#         return res[0]
 
 def np_find_intersect_segments_allpy(segs):
     '''
@@ -222,7 +222,7 @@ def np_find_intersect_segments_allpy(segs):
     #         right_pts[i, 0:2] = segs[i, 2:4]
     #         left_pts[i, 0:2] = segs[i, 0:2]
     ordered_segs = np.hstack((left_pts,right_pts)).copy()
-    # print ordered_segs
+    # print(ordered_segs)
 
 
     all_pts = np.vstack((left_pts,right_pts))
@@ -250,7 +250,7 @@ def np_find_intersect_segments_allpy(segs):
         else:
             start_pt +=2
             if start_pt >= all_inds.shape[0]:
-                # print 'condition: start'
+                # print('condition: start')
                 return True, None, None
 
     for i in range(start_pt+1,2*numpts):
@@ -281,7 +281,7 @@ def np_find_intersect_segments_allpy(segs):
             try:
                 k=np.asscalar(np.where(active_segs[:,4]==all_inds[i,1])[0])
             except:
-                print 'error at that ascalar command'
+                print('error at that ascalar command')
 
                 import sys
                 sys.exit(0)
@@ -297,10 +297,10 @@ def distance_to_line_segment(segx1, segx2, pt):
     v1 = (pt[0]-segx1[0],pt[1]-segx1[1])
     v2 = (pt[0] - segx2[0], pt[1] - segx2[1])
     #
-    # print dot_product(diff,v1)
-    # print dot_product(diff, v2)
-    # print distance_btw_points(segx1,pt)
-    # print distance_btw_points(segx2,pt)
+    # print(dot_product(diff,v1))
+    # print(dot_product(diff, v2))
+    # print(distance_btw_points(segx1,pt))
+    # print(distance_btw_points(segx2,pt))
 
     if dot_product(v1,diff)*dot_product(v2,diff) < 0:
         return abs((segx2[1]-segx1[1])*pt[0] - (segx2[0]-segx1[0])*pt[1] + segx2[0]*segx1[1]-segx2[1]*segx1[0])/distance_btw_points(segx1,segx2)
@@ -353,12 +353,12 @@ def get_valid_points(pts,H,W):
     elif len(newpts)==2:
         return tuple(newpts)
     else:
-        print "Length of the points is not 0 or 2:"
-        print "H\tW:"
-        print "%s\t%s" % (H,W)
+        print("Length of the points is not 0 or 2:")
+        print("H\tW:")
+        print("%s\t%s" % (H,W))
         for i in pts:
-            print "%s\t%s" % i
-        # print pts
+            print("%s\t%s" % i)
+        # print(pts)
         assert len(newpts)==0 or len(newpts)==2, "AssertionError: number of valid points is %s" % len(newpts)
 
 def get_line_on_screen(x1,x2,H,W):
@@ -371,10 +371,10 @@ def get_line_on_screen(x1,x2,H,W):
     :return: display coords (on numpy scale) or None if it's out of the display range
     '''
 
-    # print x1
-    # print x2
-    # print W
-    # print H
+    # print(x1)
+    # print(x2)
+    # print(W)
+    # print(H)
     if (x1[0]<0 and x2[0]<0) or (x1[0] > (W-1) and x2[0] > W-1) or (-1*x1[1]<0 and -1*x2[1] < 0) or (-1*x1[1] > (H-1) and -1*x2[1] > (H-1)):
         return None
     elif x1[0]>=0 and x1[0]<=W-1 and -1*x1[1]>=0 and -1*x1[1]<=H-1 and x2[0]>=0 and x2[0]<=W-1 and -x2[1]>=0 and -x2[1]<=H-1:
@@ -396,14 +396,14 @@ def get_line_on_screen(x1,x2,H,W):
             pts.append((topside_wd, 0))
             rightside_ht = x1[1]
             pts.append((bottomside_wd, -(H - 1)))
-        if x1[0]<>x2[0]:
+        if x1[0]!=x2[0]:
             m = (x2[1] - x1[1]) / (x2[0] - x1[0])
             leftside_ht=x1[1]-x1[0]*m
             pts.append((0,leftside_ht))
             rightside_ht=x2[1]+(W-x2[0])*m
             pts.append((W-1,rightside_ht))
 
-        if x1[1]<>x2[1]:
+        if x1[1]!=x2[1]:
             topside_wd=x2[0]-x2[1]/m
             pts.append((topside_wd,0))
             bottomside_wd = x1[0]-(x1[1]-H)/m
@@ -452,7 +452,7 @@ def read_from_fasta(file_path):
     first=True
     for l in fasta:
         if l[0]=='>':
-            if first<>True:
+            if first!=True:
                 output[name]=seq
             else:
                 first=False
@@ -480,27 +480,27 @@ def unit_test_line_on_screen():
     disprange = (500, 300)
     x1 = (1.5, 0.5)
     x2 = (3.3, 1)
-    print "result should be:(187.13,211.75),(411.68,149.50)"
-    print convert_coordinates_new(xyrange, disprange, x1, x2)
-    print "\n"
+    print("result should be:(187.13,211.75),(411.68,149.50)")
+    print(convert_coordinates_new(xyrange, disprange, x1, x2))
+    print("\n")
 
-    print "Case: One Outside Box"
+    print("Case: One Outside Box")
     xyrange=(0,4,0,2)
     disprange=(500,300)
     x1=(1.5,2.5)
     x2=(3.3,1)
-    print "result should be:(231.91,0.00),(411.68,149.50)"
-    print convert_coordinates_new(xyrange,disprange,x1,x2)
-    print "\n"
+    print("result should be:(231.91,0.00),(411.68,149.50)")
+    print(convert_coordinates_new(xyrange,disprange,x1,x2))
+    print("\n")
 
-    print "Case: Two Outside Box"
+    print("Case: Two Outside Box")
     xyrange=(0,4,0,2)
     disprange=(500,300)
     x1=(1.5,2.5)
     x2=(4.5,1)
-    print "result should be:(261.77,0.00),(500.00,118.87)"
-    print convert_coordinates_new(xyrange,disprange,x1,x2)
-    print "\n"
+    print("result should be:(261.77,0.00),(500.00,118.87)")
+    print(convert_coordinates_new(xyrange,disprange,x1,x2))
+    print("\n")
 
 
 import wx
@@ -564,7 +564,7 @@ class ValuePickerControlGridBag(wx.GridBagSizer):
             args={'parent':self.parent, 'clr':i.clr, 'value':i.value, 'sz':i.size, 'checked':i.m_checkBox1.GetValue(), 'val_ctrl':self}
             val_temps.append(args)
         for v in val_temps:
-            # print v
+            # print(v)
             if v['value']==val:
                 ind=val_temps.index(v)
                 tmp = val_temps.pop(ind)
@@ -611,7 +611,7 @@ class ValuePickerControlGridBag(wx.GridBagSizer):
         def move_down_in_list(self,event):
             fld=self.c.apm.node_annotation_level
             ind=self.c.apm.node_annotation.uniques[fld].index(self.value)
-            # print self.c.apm.node_annotation.uniques[fld]
+            # print(self.c.apm.node_annotation.uniques[fld])
             self.c.apm.node_annotation.uniques[fld].pop(ind)
             self.c.apm.node_annotation.uniques[fld].append(self.value)
             # self.c.trigger_annotation_picker_refresh()
@@ -630,7 +630,7 @@ class ValuePickerControlGridBag(wx.GridBagSizer):
             self.c.trigger_refresh()
 
         def process_size_change(self,event):
-            print "processing size change"
+            print("processing size change")
             self.size=int(self.m_spinCtrl.GetValue())
             self.c.update_circles_by_annotation()
             self.c.trigger_refresh()

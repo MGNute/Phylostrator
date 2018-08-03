@@ -6,6 +6,33 @@ from alignment import *
 from utilities import *
 import view_classes
 
+global aa_colors
+aa_colors = {
+'X':(0.58824,0.58824,0.58824),
+'S':(0.98039,0.58824,0.00000),
+'P':(0.86275,0.58824,0.50980),
+'A':(0.78431,0.78431,0.78431),
+'R':(0.07843,0.35294,1.00000),
+'Q':(0.00000,0.86275,0.86275),
+'T':(0.98039,0.58824,0.00000),
+'F':(0.19608,0.19608,0.66667),
+'B':(0.26275,0.88627,0.01569),
+'C':(0.90196,0.90196,0.00000),
+'M':(0.90196,0.90196,0.00000),
+'H':(0.50980,0.50980,0.82353),
+'G':(0.92157,0.92157,0.92157),
+'K':(0.07843,0.35294,1.00000),
+'V':(0.05882,0.50980,0.05882),
+'L':(0.05882,0.50980,0.05882),
+'D':(0.90196,0.03922,0.03922),
+'Y':(0.19608,0.19608,0.66667),
+'N':(0.00000,0.86275,0.86275),
+'I':(0.05882,0.50980,0.05882),
+'W':(0.70588,0.35294,0.70588),
+'Z':(0.26275,0.88627,0.01569),
+'E':(0.90196,0.03922,0.03922)
+}
+
 class AlignmentControlPanel(WxfbAlignmentControlPanel):
     image_path = None
     ref_aln_path = None
@@ -24,6 +51,7 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
     aln_start_col = 1
     aln_num_cols = 100
     gappy_threshold = 0.0
+    value_picker = None
 
     def __init__(self,parent):
         WxfbAlignmentControlPanel.__init__(self,parent)
@@ -35,22 +63,25 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
     def import_alignment_and_tree( self, event = None):
         ap = self.m_AlnFile.GetPath()
         tp = self.m_TreeFile.GetPath()
-        print ap
-        print tp
+        print(ap)
+        print(tp)
         # self.aln = MultipleSequenceAlignment(refpath=ap,treepath=tp,generic_coords=True)
-        self.aln = LightMutlipleSequenceAlignment(refpath=ap, treepath=tp, generic_coords=True)
+        self.aln = LightMutlipleSequenceAlignment(refpath=ap, treepath=tp, generic_coords=True,
+                                                  data_type = self.m_dataType.GetValue())
         # self.m_textAlnLength.SetValue(str(len(self.aln.msa_cols)))
         self.m_textAlnLength.SetValue(str(self.aln.reflen))
         self.m_textAlnNumTaxa.SetValue(str(self.aln.numtaxa ))
 
-        if self.m_AnnotationFile.GetPath() is not None and self.m_AnnotationFile.GetPath()<>'':
+
+        if self.m_AnnotationFile.GetPath() is not None and self.m_AnnotationFile.GetPath()!='':
             self.parse_annotation_file()
-            self.prepare_annotation_colorpickers()
+            # self.prepare_annotation_colorpickers()
             self.populate_annotation_values()
         else:
             self.annotation_dict={}
             for i in self.aln.ref.keys():
                 self.annotation_dict[i]=i
+
 
     def prepare_annotation_colorpickers(self, event=None):
         self.value_picker_panel = wx.lib.scrolledpanel.ScrolledPanel(self.m_panel3, wx.ID_ANY, wx.DefaultPosition,
@@ -71,7 +102,7 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
         # self.m_panel2.Update()
 
     def populate_annotation_values(self,event=None):
-        if self.m_AnnotationFile.GetPath() is not None and self.m_AnnotationFile.GetPath()<>'':
+        if self.m_AnnotationFile.GetPath() is not None and self.m_AnnotationFile.GetPath()!='':
             unqs = list(set(self.annotation_dict.values()))
             cts = {}
             for i in unqs:
@@ -86,20 +117,20 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
                 mind = cts_list.index(max(cts_list))
                 vals.append(unqs.pop(mind))
                 cts_list.pop(mind)
-            self.value_picker.set_values(vals)
-            self.value_picker_panel.SetupScrolling(False,True)
-            self.m_panel2.Layout()
+            # self.value_picker.set_values(vals)
+            # self.value_picker_panel.SetupScrolling(False,True)
+            # self.m_panel3.Layout()
             # self.m_panel3.Update()
 
         else:
-            print "no annotation selected, so no values have been populated"
+            print("no annotation selected, so no values have been populated")
 
     def notify_redraw(self,event=None):
-        print "annotation drawing not yet implemented"
+        print("annotation drawing not yet implemented")
 
     def set_output_path( self, event =None):
         fn = self.m_textCairoImageFile.GetValue()
-        if fn[-4:]<>".png":
+        if fn[-4:]!=".png":
             fn = fn + '.png'
         self.image_path = os.path.join(self.m_textCairoImgFolder.GetPath(),fn)
 
@@ -121,18 +152,21 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
         self.colors['M'] = (.4, .4, .4, .4)
 
     def set_cairo_settings(self):
-        self.set_colors()
+        if self.m_dataType.GetValue()!='Protein':
+            self.set_colors()
+        else:
+            self.colors = aa_colors.copy()
         try:
             w = int(self.m_textCairoImgWidth.GetValue())
             self.cairo_drawer.W = w
         except:
-            print "%s won't convert to an integer..." % self.m_textCairoImgWidth.GetValue()
+            print("%s won't convert to an integer..." % self.m_textCairoImgWidth.GetValue())
 
         try:
             h = int(self.m_textCairoImgHeight.GetValue())
             self.cairo_drawer.H = h
         except:
-            print "%s won't convert to an integer..." % self.m_textCairoImgHeight.GetValue()
+            print("%s won't convert to an integer..." % self.m_textCairoImgHeight.GetValue())
 
         self.pct_to_alignment = float(self.m_textPctWidthToAlignment.GetValue()) / 100.0
         self.pct_to_phylogeny = float(self.m_textPctWidthToPhylogeny.GetValue()) / 100.0
@@ -153,11 +187,11 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
         self.set_output_path()
         self.image_frame.path = self.image_path
         self.cairo_drawer.path = self.image_path
-        print '''
+        print('''
         Active Cairo Settings:
            -Size: %(W)s, %(H)s
            -Path: %(path)s
-        ''' % self.cairo_drawer.get_settings()
+        ''' % self.cairo_drawer.get_settings())
 
     def on_batch_click( self, event=None ):
         # tot_cols = len(self.aln.msa_cols)
@@ -184,9 +218,9 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
             self.gappy_threshold = 0.0
 
         # if self.m_textCtrl20.IsEnabled:
-        #     print "gappy cols percent text control enabled"
+        #     print("gappy cols percent text control enabled")
         # else:
-        #     print "gappy cols percent text control disabled"
+        #     print("gappy cols percent text control disabled")
 
         self.aln.set_active_cols(self.gappy_threshold)
 
@@ -198,9 +232,9 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
     def on_change_gappy_threshold( self, event = None):
         try:
             self.gappy_threshold =float(self.m_textCtrl20.GetValue())
-            print "setting gappy threshold to %s" % self.gappy_threshold
+            print("setting gappy threshold to %s" % self.gappy_threshold)
         except:
-            print "percent masked must reconcile to a decimal number"
+            print("percent masked must reconcile to a decimal number")
             self.m_textCtrl20.SetValue("0.0")
 
         self.aln.set_active_cols(self.gappy_threshold)
@@ -219,7 +253,7 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
 
     def draw_cairo( self, event=None):
         wx.CallAfter(self.show_viewer)
-        print 'getting settings ready...'
+        print('getting settings ready...')
         self.set_cairo_settings()
         self.cairo_drawer.init_graphic()
         b_v = self.b_top + self.b_bottom
@@ -239,13 +273,16 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
         # Draw the Alignment Characters (TODO-make it so we can scroll rather than just having to make a bigger and bigger png?
         left_limit = self.b_left+self.pct_to_phylogeny*(self.cairo_drawer.W-b_h)+float(self.m_textAlignmentPhylogenySpacerWidth.GetValue())
         right_limit = left_limit - float(self.m_textAlignmentPhylogenySpacerWidth.GetValue()) + (self.cairo_drawer.W-b_h)*self.pct_to_alignment
-        print "leftlimit %s, rightlimit %s" % (left_limit,right_limit)
+        print("leftlimit %s, rightlimit %s" % (left_limit,right_limit))
         top_limit = self.b_top
         bot_limit = self.cairo_drawer.H - self.b_bottom
         h_spacing = (right_limit-left_limit)/self.aln_num_cols
         v_spacing = (bot_limit - top_limit)/self.n
 
-        rect_groups={'A':[], 'C':[], 'G':[], 'T':[], 'U':[], 'M':[], 'N':[]}
+        if self.aln.data_type!='Protein':
+            rect_groups={'A':[], 'C':[], 'G':[], 'T':[], 'U':[], 'M':[], 'N':[]}
+        else:
+            rect_groups=dict([(k,[]) for k in aa_colors.keys()])
 
         # for i in range(actual_num_cols):
         #     col = self.aln.msa_cols[self.aln_start_col+i-1]
@@ -273,47 +310,67 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
             self.cairo_drawer.draw_boxes_one_color(rect_groups[i],clr)
 
         grouping = {}
-        for i in self.value_picker.values:
-            grouping[i]=[]
+        # for i in self.value_picker.values:
+        #     grouping[i]=[]
 
         # Draw the Text Names:
         if self.annotation_dict is None:
+
             for i in range(self.n):
                 lab=self.aln.node_order[i]
                 self.cairo_drawer.draw_text((right_limit+2,top_limit+(i+1)*v_spacing),lab)
         else:
+            # if self.value_picker is not None:
+            #     for i in self.value_picker.values:
+            #         grouping[i] = []
             for i in range(self.n):
                 lab=self.aln.node_order[i]
                 self.cairo_drawer.draw_text((right_limit+2,top_limit+(i+1)*v_spacing),self.annotation_dict[lab])
-                grouping[self.annotation_dict[lab]].append(i)
+                # grouping[self.annotation_dict[lab]].append(i)
 
         self.draw_annotation(grouping, top_limit, right_limit, v_spacing)
 
-        print 'Drawing the image file'
+        print('Drawing the image file')
         self.cairo_drawer.draw_line_set(segs,self.phylo_line_width)
 
         self.cairo_drawer.finish_graphic()
         self.image_frame.refresh_image()
-        print 'Done making graphic'
+        print('Done making graphic')
+
+    def advance_image( self, event =None):
+        cols = int(self.m_textNumColumns.GetValue())
+        st = int(self.m_textStartColumn.GetValue())
+        st += cols
+        self.m_textStartColumn.SetValue(str(st))
+        self.draw_cairo()
+
+    def roll_back_image( self, event = None):
+        cols = int(self.m_textNumColumns.GetValue())
+        st = int(self.m_textStartColumn.GetValue())
+        st -= cols
+        st = max(1,st)
+        self.m_textStartColumn.SetValue(str(st))
+        self.draw_cairo()
+
 
     def draw_annotation(self,grouping, top_limit, right_limit, v_spacing):
         for k in grouping.keys():
             # circs=[]
             boxs=[]
-            if self.value_picker.checked[k]==True:
-                clr=self.value_picker.colors[k]
-                cf = (clr[0]/255., clr[1]/255., clr[2]/255., .5)
-                for j in grouping[k]:
-                    # circs.append((3,top_limit+(j+1)*v_spacing+v_spacing/2., v_spacing/3.))
-                    boxs.append((3,top_limit+(j+1)*v_spacing,self.cairo_drawer.W*self.pct_to_phylogeny-3,v_spacing))
+            # if self.value_picker.checked[k]==True:
+            #     clr=self.value_picker.colors[k]
+            #     cf = (clr[0]/255., clr[1]/255., clr[2]/255., .5)
+            #     for j in grouping[k]:
+            #         circs.append((3,top_limit+(j+1)*v_spacing+v_spacing/2., v_spacing/3.))
+                    # boxs.append((3,top_limit+(j+1)*v_spacing,self.cairo_drawer.W*self.pct_to_phylogeny-3,v_spacing))
                 # self.cairo_drawer.draw_circles_one_color(circs,cf)
-                self.cairo_drawer.draw_boxes_one_color(boxs,cf)
+                # self.cairo_drawer.draw_boxes_one_color(boxs,cf)
 
 
 
     def parse_annotation_file(self):
         self.annotation_dict={}
-        if self.m_AnnotationFile.GetPath() <> None and os.path.exists(self.m_AnnotationFile.GetPath()):
+        if self.m_AnnotationFile.GetPath() != None and os.path.exists(self.m_AnnotationFile.GetPath()):
             f=open(self.m_AnnotationFile.GetPath())
             for line in f:
                 if len(line)>0:
@@ -321,6 +378,7 @@ class AlignmentControlPanel(WxfbAlignmentControlPanel):
                     self.annotation_dict[a[0]]='--'.join(a[1:2])
             f.close()
         else:
+            print('setting annotation dict to None')
             self.annotation_dict=None
 
 class AlnValuePickerControl(wx.BoxSizer):
@@ -394,7 +452,7 @@ class AlnValuePickerControl(wx.BoxSizer):
 
     def add_final_spacer(self):
         bSizer15 = wx.BoxSizer( wx.VERTICAL )
-        bSizer15.AddSpacer( ( 0, 0), 1, wx.EXPAND, 5 )
+        bSizer15.AddSpacer(  1)
         self.Add( bSizer15, 1, wx.EXPAND, 5 )
 
     def move_to_bottom(self,val):
@@ -403,7 +461,7 @@ class AlnValuePickerControl(wx.BoxSizer):
             args={'parent':self.parent, 'clr':i.clr, 'value':i.value, 'sz':i.size, 'checked':i.m_checkBox1.GetValue(), 'val_ctrl':self}
             val_temps.append(args)
         for v in val_temps:
-            # print v
+            # print(v)
             if v['value']==val:
                 ind=val_temps.index(v)
                 tmp = val_temps.pop(ind)
@@ -456,7 +514,7 @@ class AlnValuePicker(wx.BoxSizer):
         self.parent.GetParent().GetParent().GetParent().GetParent().notify_redraw()
 
     def process_size_change(self,event=None):
-        print "size not used in this implementation"
+        print("size not used in this implementation")
         self.size=int(self.m_spinCtrl.GetValue())
         # self.c.update_circles_by_annotation()
         # self.c.trigger_refresh()
@@ -476,10 +534,10 @@ class AlignmentImageFrame(WxfbAlignmentImageFrame):
         self.refresh_image()
 
     def refresh_image( self, event=None ):
-        if self.path <> None and os.path.exists(self.path):
+        if self.path != None and os.path.exists(self.path):
             self.m_htmlWin1.LoadFile(self.path)
         else:
-            print 'The file %s does not exist...' % self.path
+            print('The file %s does not exist...' % self.path)
 
 
 class CairoAlignmentDrawer():
@@ -528,7 +586,7 @@ class CairoAlignmentDrawer():
         self.ctx.fill()
 
     def draw_text(self,bottom_left,text):
-        # print 'drawing text \'%s\' at the point %s' %(text,str(bottom_left))
+        # print('drawing text \'%s\' at the point %s' %(text,str(bottom_left)))
         self.ctx.set_source_rgba(0,0,0,1)
         self.ctx.move_to(*bottom_left)
         self.ctx.show_text(text)
@@ -568,7 +626,7 @@ class CairoAlignmentDrawer():
         '''
         self.ctx.set_source_rgb(0,0,0)
         self.ctx.new_path()
-        if line_width<>None:
+        if line_width!=None:
             old_lw = self.ctx.get_line_width()
             self.ctx.set_line_width(line_width)
 
